@@ -1,0 +1,1 @@
+- Do not add Claude as a co-author in commit messages.
