@@ -1,0 +1,3 @@
+{
+  "extends": "@eurofit/typescript-config/base.json"
+}

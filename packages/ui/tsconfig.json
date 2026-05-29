@@ -1,0 +1,10 @@
+{
+  "extends": "@eurofit/typescript-config/react-library.json",
+  "compilerOptions": {
+    "paths": {
+      "@eurofit/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
+}
