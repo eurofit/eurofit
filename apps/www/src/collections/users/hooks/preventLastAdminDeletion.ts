@@ -14,13 +14,16 @@ export const preventLastAdminDeletion: CollectionBeforeDeleteHook = async ({
     const { totalDocs } = await req.payload.find({
       collection: "users",
       where: {
-        roles: { contains: "admin" },
+        and: [
+          { id: { not_equals: id as string } },
+          { roles: { contains: "admin" } },
+        ],
       },
       limit: 1,
       depth: 0,
     })
 
-    if (totalDocs === 1) {
+    if (totalDocs === 0) {
       throw new APIError(
         "Cannot delete the last administrator. At least one admin must remain.",
         400
