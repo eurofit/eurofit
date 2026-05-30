@@ -1,23 +1,24 @@
-import type { FieldHook } from "payload"
+import type { CollectionBeforeChangeHook } from "payload"
 import { APIError } from "payload"
 import type { User } from "@/payload-types"
 
-export const preventLastAdminDemotion: FieldHook<
-  User,
-  User["roles"],
+export const preventLastAdminDemotion: CollectionBeforeChangeHook<
   User
-> = async ({ req, value }) => {
-  if (value?.includes("admin")) {
+> = async ({ req, data, originalDoc }) => {
+  if (originalDoc?.roles?.includes("admin") && !data.roles?.includes("admin")) {
     const { totalDocs } = await req.payload.find({
       collection: "users",
       where: {
-        roles: { contains: "admin" },
+        and: [
+          { id: { not_equals: originalDoc.id } },
+          { roles: { contains: "admin" } },
+        ],
       },
       limit: 1,
       depth: 0,
     })
 
-    if (totalDocs === 1) {
+    if (totalDocs === 0) {
       throw new APIError(
         "Cannot demote the last administrator. At least one admin must remain.",
         400
@@ -25,5 +26,5 @@ export const preventLastAdminDemotion: FieldHook<
     }
   }
 
-  return (value ?? []) as User["roles"]
+  return data
 }

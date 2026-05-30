@@ -9,6 +9,7 @@ export const users: CollectionConfig = {
   slug: "users",
   auth: true,
   hooks: {
+    beforeChange: [preventLastAdminDemotion],
     beforeDelete: [preventLastAdminDeletion],
   },
   fields: [
@@ -21,7 +22,7 @@ export const users: CollectionConfig = {
       required: true,
       defaultValue: ["customer"],
       hooks: {
-        beforeChange: [ensureFirstUserIsAdmin, preventLastAdminDemotion],
+        beforeChange: [ensureFirstUserIsAdmin],
       },
       admin: {
         position: "sidebar",
