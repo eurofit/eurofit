@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@eurofit/ui/*": ["../../packages/ui/src/*"]
+      "@eurofit/ui/*": ["../../packages/ui/src/*"],
+      "@payload-config": ["./src/payload.config.ts"]
     },
     "plugins": [
       {
