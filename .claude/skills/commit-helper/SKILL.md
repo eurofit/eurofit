@@ -72,6 +72,7 @@ The scope should indicate the area of the codebase affected:
 - Use the body to explain **what** and **why**, not **how**
 - Wrap at 72 characters per line
 - Mention any breaking changes
+- if the subject line is self explanatory, dissmiss the body
 
 ### Footer
 
