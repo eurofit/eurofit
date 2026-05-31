@@ -1,32 +1,35 @@
 import type { FieldHook } from "payload"
 import { APIError } from "payload"
+
 import type { User } from "@/payload-types"
 
-export const preventSuspendingLastAdmin: FieldHook<
+export const preventDeactivatingLastAdmin: FieldHook<
   User,
-  User["isSuspended"],
+  User["isActive"],
   User
 > = async ({ req, value, siblingData }) => {
-  if (value === true && siblingData?.roles?.includes("admin")) {
+  if (value === false && siblingData?.roles?.includes("admin")) {
     const { totalDocs } = await req.payload.find({
       collection: "users",
       where: {
         and: [
           { id: { not_equals: siblingData.id } },
           { roles: { contains: "admin" } },
+          { isActive: { equals: true } },
         ],
       },
       limit: 1,
       depth: 0,
+      req,
     })
 
     if (totalDocs === 0) {
       throw new APIError(
-        "Cannot suspend the last administrator. At least one admin must remain.",
+        "Cannot deactivate the last administrator. At least one active admin must remain.",
         400
       )
     }
   }
 
-  return (value ?? false) as User["isSuspended"]
+  return (value ?? true) as User["isActive"]
 }

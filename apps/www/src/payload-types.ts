@@ -128,7 +128,7 @@ export interface UserAuthOperations {
 export interface User {
   id: string
   roles: ("customer" | "admin")[]
-  isSuspended: boolean
+  isActive: boolean
   updatedAt: string
   createdAt: string
   email: string
@@ -223,7 +223,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   roles?: T
-  isSuspended?: T
+  isActive?: T
   updatedAt?: T
   createdAt?: T
   email?: T

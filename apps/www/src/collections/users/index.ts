@@ -3,11 +3,13 @@ import { adminOnlyFieldAccess } from "@/access/admin-field"
 import { adminOrSelf } from "@/access/admin-or-self"
 import { isAdmin } from "@/access/is-admin"
 import { userRoles } from "@/const/user-roles"
+import { activeField } from "@/fields/active"
 import { CollectionConfig } from "payload"
 import { ensureFirstUserIsAdmin } from "./hooks/ensureFirstUserIsAdmin"
+import { preventSuspendedLogin } from "./hooks/prevent-suspended-login"
+import { preventDeactivatingLastAdmin } from "./hooks/preventDeactivatingLastAdmin"
 import { preventLastAdminDeletion } from "./hooks/preventLastAdminDeletion"
 import { preventLastAdminDemotion } from "./hooks/preventLastAdminDemotion"
-import { preventSuspendingLastAdmin } from "./hooks/preventSuspendingLastAdmin"
 
 export const users: CollectionConfig = {
   slug: "users",
@@ -20,8 +22,13 @@ export const users: CollectionConfig = {
     admin: isAdmin,
   },
   hooks: {
+    beforeLogin: [preventSuspendedLogin],
     beforeChange: [preventLastAdminDemotion],
     beforeDelete: [preventLastAdminDeletion],
+  },
+  admin: {
+    useAsTitle: "email",
+    defaultColumns: ["email", "roles", "isActive"],
   },
   fields: [
     {
@@ -45,23 +52,11 @@ export const users: CollectionConfig = {
         beforeChange: [ensureFirstUserIsAdmin],
       },
     },
-    {
-      type: "checkbox",
-      name: "isSuspended",
-      label: "Suspend User",
-      required: true,
-      defaultValue: false,
-      admin: {
-        position: "sidebar",
-      },
-      access: {
-        create: adminOnlyFieldAccess,
-        read: adminOnlyFieldAccess,
-        update: adminOnlyFieldAccess,
-      },
+    activeField({
+      saveToJWT: true,
       hooks: {
-        beforeChange: [preventSuspendingLastAdmin],
+        beforeChange: [preventDeactivatingLastAdmin],
       },
-    },
+    }),
   ],
 }
