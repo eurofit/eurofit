@@ -1,13 +1,24 @@
-import { CollectionConfig } from "payload"
+import { adminOnly } from "@/access/admin"
+import { adminOnlyFieldAccess } from "@/access/admin-field"
+import { adminOrSelf } from "@/access/admin-or-self"
+import { isAdmin } from "@/access/is-admin"
 import { userRoles } from "@/const/user-roles"
+import { CollectionConfig } from "payload"
 import { ensureFirstUserIsAdmin } from "./hooks/ensureFirstUserIsAdmin"
-import { preventLastAdminDemotion } from "./hooks/preventLastAdminDemotion"
 import { preventLastAdminDeletion } from "./hooks/preventLastAdminDeletion"
+import { preventLastAdminDemotion } from "./hooks/preventLastAdminDemotion"
 import { preventSuspendingLastAdmin } from "./hooks/preventSuspendingLastAdmin"
 
 export const users: CollectionConfig = {
   slug: "users",
   auth: true,
+  access: {
+    create: adminOrSelf,
+    read: adminOrSelf,
+    update: adminOrSelf,
+    delete: adminOnly,
+    admin: isAdmin,
+  },
   hooks: {
     beforeChange: [preventLastAdminDemotion],
     beforeDelete: [preventLastAdminDeletion],
@@ -21,11 +32,17 @@ export const users: CollectionConfig = {
       hasMany: true,
       required: true,
       defaultValue: ["customer"],
-      hooks: {
-        beforeChange: [ensureFirstUserIsAdmin],
-      },
+      saveToJWT: true,
       admin: {
         position: "sidebar",
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      hooks: {
+        beforeChange: [ensureFirstUserIsAdmin],
       },
     },
     {
@@ -34,11 +51,16 @@ export const users: CollectionConfig = {
       label: "Suspend User",
       required: true,
       defaultValue: false,
-      hooks: {
-        beforeChange: [preventSuspendingLastAdmin],
-      },
       admin: {
         position: "sidebar",
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      hooks: {
+        beforeChange: [preventSuspendingLastAdmin],
       },
     },
   ],
