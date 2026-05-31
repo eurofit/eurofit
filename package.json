@@ -17,9 +17,11 @@
     "@commitlint/types": "^21.0.1",
     "@eurofit/eslint-config": "workspace:*",
     "@eurofit/typescript-config": "workspace:*",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
+    "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.9.15",
     "typescript": "^5"
