@@ -6,11 +6,9 @@ export default function ActiveCell({ cellData }: DefaultCellComponentProps) {
   return (
     <div className="flex items-center gap-2">
       <span
-        className={`inline-block size-2.5 rounded-full ${active ? "bg-green-500" : "bg-gray-400"}`}
+        className={`inline-block size-4 rounded-full ${active ? "bg-green-700" : "bg-gray-400"}`}
       />
-      <span
-        className={`text-sm font-medium ${active ? "text-green-700" : "text-gray-500"}`}
-      >
+      <span className={`font-medium ${active ? "" : "text-gray-500"}`}>
         {active ? "Active" : "Suspended"}
       </span>
     </div>

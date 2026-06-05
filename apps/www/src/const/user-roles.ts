@@ -1,4 +1,10 @@
-export const userRoles = [
-  { value: "customer", label: "Customer" },
-  { value: "admin", label: "Administrator" },
-] satisfies Array<{ value: string; label: string }>
+export const USER_ROLES = [
+  {
+    label: "Admin",
+    value: "admin",
+  },
+  {
+    label: "Customer",
+    value: "customer",
+  },
+]
