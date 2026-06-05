@@ -5,5 +5,5 @@ export const COOKIE_KEYS = {
 } as const
 
 export const STORAGE_KEYS = {
-  RECENT_SEARCHES: `${COOKIES_NAMESPACE}_rs`,
+  SEARCHBAR_RECENT_SEARCHES: `${COOKIES_NAMESPACE}_rs`,
 } as const
