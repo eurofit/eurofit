@@ -1,7 +1,6 @@
 "use server"
 
-import config from "@/payload.config"
-import { safeUserSchema } from "@/schemas/safe-user"
+import config from "@payload-config"
 import { headers as getHeaders } from "next/headers"
 import { getPayload } from "payload"
 
@@ -17,14 +16,7 @@ export const getCurrentUser = async () => {
 
   if (!user) return null
 
-  return safeUserSchema.parse({
-    ...user,
-    isVerified: user._verified ?? false,
-    addresses:
-      user.addresses?.docs
-        ?.filter((a) => typeof a !== "string")
-        .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0)) ?? [],
-  })
+  return user
 }
 
 export type CurrentUser = Awaited<ReturnType<typeof getCurrentUser>>

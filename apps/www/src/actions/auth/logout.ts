@@ -1,12 +1,14 @@
 "use server"
 
-import config from "@/payload.config"
+import { ActionResult } from "@/types/action-result"
+import config from "@payload-config"
 import { logout as payloadLogout } from "@payloadcms/next/auth"
 
-export async function logout() {
-  const res = await payloadLogout({
-    config,
-  })
-
-  return res
+export async function logout(): Promise<ActionResult> {
+  try {
+    await payloadLogout({ allSessions: true, config })
+    return { success: true, data: { ok: true } }
+  } catch {
+    return { success: false, code: 500, message: "Logout failed." }
+  }
 }

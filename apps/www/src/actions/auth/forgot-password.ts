@@ -1,31 +1,50 @@
 "use server"
 
-import config from "@/payload.config"
-import { isEmpty } from "lodash-es"
+import { env } from "@/env.mjs"
+import {
+  ForgotPasswordData,
+  forgotPasswordSchema,
+} from "@/lib/schemas/auth/forgot-password"
+import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
+import { ActionResult } from "@/types/action-result"
+import config from "@payload-config"
 import { getPayload } from "payload"
-import * as z from "zod"
 
-const emailSchema = z.object({
-  email: z.email("Invalid email address"),
-})
+export async function forgotPassword(
+  unSafeData: ForgotPasswordData,
+  turnstileToken: string
+): Promise<ActionResult<{ email: string }>> {
+  const turnstileOk = await verifyTurnstile(
+    turnstileToken,
+    env.CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY
+  )
+  if (!turnstileOk) {
+    return {
+      success: false,
+      code: 400,
+      message: "CAPTCHA validation failed. Please try again.",
+    }
+  }
 
-type EmailData = z.infer<typeof emailSchema>
-
-export async function forgotPassword(unSafeData: EmailData) {
-  const { email } = emailSchema.parse(unSafeData)
+  const parsed = forgotPasswordSchema.safeParse(unSafeData)
+  if (!parsed.success) {
+    return { success: false, code: 400, message: "Invalid input." }
+  }
+  const { email } = parsed.data
 
   const payload = await getPayload({ config })
 
-  const token = await payload.forgotPassword({
-    collection: "users",
-    data: {
-      email,
-    },
-  })
-
-  if (isEmpty(token)) {
-    throw new Error("User not found")
+  try {
+    await payload.forgotPassword({
+      collection: "users",
+      data: { email },
+    })
+    return { success: true, data: { email } }
+  } catch {
+    return {
+      success: false,
+      code: 500,
+      message: "Something went wrong. Please try again.",
+    }
   }
-
-  return { email }
 }
