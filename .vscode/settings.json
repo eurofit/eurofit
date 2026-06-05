@@ -1,5 +1,11 @@
 {
   "json.schemaDownload.trustedDomains": {
     "https://turbo.build/schema.json": true
-  }
+  },
+  "terminal.integrated.mouseWheelScrollSensitivity": 3,
+  "terminal.integrated.gpuAcceleration": "off",
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ]
 }
