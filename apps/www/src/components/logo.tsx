@@ -1,5 +1,5 @@
-import { site } from "@/constants/site"
-import { cn } from "@/utils/cn"
+import { site } from "@/const/site"
+import { cn } from "@eurofit/ui/lib/utils"
 import { cva, VariantProps } from "class-variance-authority"
 import Link from "next/link"
 import React from "react"
