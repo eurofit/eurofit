@@ -113,8 +113,8 @@ export const site = {
     },
   ],
   address: {
-    line1: "7th Street",
-    line2: "Opposite to 7th St Mosque",
+    line1: "Unit 111, 1st Floor, 6th Street Tower",
+    line2: "6th Street, Eastleigh",
     city: "Nairobi",
     county: "Nairobi County",
     countryCode: "KE",
@@ -122,7 +122,7 @@ export const site = {
     postalCode: "00610",
     postalAddress: "P.O BOX 8047-00610",
     fullAddress:
-      "7th Street, Opposite to 7th St Mosque, Eastleigh, Nairobi, Kenya",
+      "Unit 111, 1st Floor, 6th Street Tower, 6th Street, Eastleigh, Nairobi, Kenya",
     href: "https://maps.app.goo.gl/7NVhwGcWDW8UQeqD9",
   },
 } as const
