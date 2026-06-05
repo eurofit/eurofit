@@ -1,0 +1,27 @@
+{
+  "name": "@eurofit/transactional",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "email": "email dev --dir emails --port 3333",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-email": "latest"
+  },
+  "devDependencies": {
+    "@eurofit/typescript-config": "workspace:*",
+    "@react-email/ui": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.39.4",
+    "typescript": "^5"
+  },
+  "exports": {
+    "./*": "./emails/*.tsx"
+  }
+}
