@@ -127,15 +127,23 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string
-  roles: ("customer" | "admin")[]
+  roles: ("admin" | "customer")[]
   isActive: boolean
+  firstName: string
+  lastName: string
+  gender: "male" | "female"
   updatedAt: string
   createdAt: string
+  /**
+   * The email address of the user. This will be used for login.
+   */
   email: string
   resetPasswordToken?: string | null
   resetPasswordExpiration?: string | null
   salt?: string | null
   hash?: string | null
+  _verified?: boolean | null
+  _verificationToken?: string | null
   loginAttempts?: number | null
   lockUntil?: string | null
   sessions?:
@@ -224,6 +232,9 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   roles?: T
   isActive?: T
+  firstName?: T
+  lastName?: T
+  gender?: T
   updatedAt?: T
   createdAt?: T
   email?: T
@@ -231,6 +242,8 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T
   salt?: T
   hash?: T
+  _verified?: T
+  _verificationToken?: T
   loginAttempts?: T
   lockUntil?: T
   sessions?:

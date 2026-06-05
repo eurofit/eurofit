@@ -9,8 +9,8 @@ import path from "path"
 import { buildConfig } from "payload"
 import sharp from "sharp"
 import { fileURLToPath } from "url"
-import { users } from "./collections/users"
 import { collections } from "./collections"
+import { users } from "./collections/users"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,7 +47,6 @@ export default buildConfig({
       "./payload-generated-schema.ts"
     ),
   }),
-
   email: resendAdapter({
     apiKey: env.RESEND_API_KEY,
     defaultFromAddress: env.SMTP_NO_REPLY_USERNAME,

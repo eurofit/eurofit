@@ -6,7 +6,9 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
     DATABASE_URI: z.string().min(1),
-    PAYLOAD_SECRET: z.string().min(1),
+    PAYLOAD_SECRET: z
+      .string()
+      .min(32, "PAYLOAD_SECRET must be at least 32 characters"),
     SMTP_NO_REPLY_USERNAME: z.email(),
     SMTP_NO_REPLY_PASSWORD: z.string().min(1),
     SMTP_INFO_USERNAME: z.email(),
