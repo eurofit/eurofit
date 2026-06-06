@@ -2,6 +2,7 @@
 
 import { login as loginAction } from "@/actions/auth/login"
 import { PasswordInput } from "@/components/password-input"
+import { env } from "@/env.mjs"
 import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
 import { isSafeRedirect } from "@/lib/utils/is-safe-redirect"
 import { Button } from "@eurofit/ui/components/button"
@@ -139,8 +140,7 @@ export function LoginForm({
                   id="login-form-turnstile"
                   ref={turnstileRef}
                   siteKey={
-                    process.env
-                      .NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
+                    env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY
                   }
                   options={{ size: "invisible" }}
                 />

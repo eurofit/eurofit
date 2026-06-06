@@ -1,6 +1,7 @@
 "use client"
 
 import { resendVerificationEmailByEmail } from "@/actions/auth/resend-verification-email-by-email"
+import { env } from "@/env.mjs"
 import {
   ResendVerificationData,
   resendVerificationSchema,
@@ -126,10 +127,7 @@ export function ResendVerificationForm() {
               <Turnstile
                 id="resend-verification-form-turnstile"
                 ref={turnstileRef}
-                siteKey={
-                  process.env
-                    .NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-                }
+                siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
               />
               <Button type="submit" className="w-full" disabled={isPending}>

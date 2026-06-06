@@ -1,6 +1,7 @@
 "use client"
 
 import { forgotPassword as forgotPasswordAction } from "@/actions/auth/forgot-password"
+import { env } from "@/env.mjs"
 import {
   ForgotPasswordData,
   forgotPasswordSchema,
@@ -111,10 +112,7 @@ export function ForgetPasswordForm() {
               <Turnstile
                 id="forgot-password-form-turnstile"
                 ref={turnstileRef}
-                siteKey={
-                  process.env
-                    .NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-                }
+                siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
               />
               <Button type="submit" className="w-full" disabled={isPending}>

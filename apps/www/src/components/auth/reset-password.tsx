@@ -2,6 +2,7 @@
 
 import { resetPassword } from "@/actions/auth/reset-password"
 import { PasswordInput } from "@/components/password-input"
+import { env } from "@/env.mjs"
 import {
   ResetPasswordData,
   resetPasswordSchema,
@@ -132,9 +133,7 @@ export function ResetPassword() {
           <Turnstile
             id="reset-password-form-turnstile"
             ref={turnstileRef}
-            siteKey={
-              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-            }
+            siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
             options={{ size: "invisible" }}
           />
           <Button
