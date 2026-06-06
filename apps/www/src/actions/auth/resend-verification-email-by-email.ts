@@ -46,18 +46,17 @@ export async function resendVerificationEmailByEmail(
 
     const { docs } = await payload.find({
       collection: "users",
-      where: {
-        and: [{ _verified: { equals: false } }, { email: { equals: email } }],
-      },
+      where: { email: { equals: email } },
       limit: 1,
       pagination: false,
+      showHiddenFields: true,
       overrideAccess: true,
     })
 
     const user = docs[0] ?? null
 
     // Anti-enumeration: treat not-found and already-verified the same as sent
-    if (!user) {
+    if (!user || user._verified === true) {
       return { success: true, data: { status: "sent" } }
     }
 
