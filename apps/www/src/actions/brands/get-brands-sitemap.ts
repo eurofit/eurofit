@@ -21,13 +21,8 @@ export async function getBrandsSitemap(): Promise<MetadataRoute.Sitemap> {
     where: {
       and: [
         {
-          active: {
+          isActive: {
             equals: true,
-          },
-        },
-        {
-          products: {
-            exists: true,
           },
         },
       ],
