@@ -48,6 +48,7 @@
     "@eurofit/eslint-config": "workspace:^",
     "@eurofit/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
