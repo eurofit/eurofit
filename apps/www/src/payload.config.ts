@@ -11,6 +11,7 @@ import sharp from "sharp"
 import { fileURLToPath } from "url"
 import { collections } from "./collections"
 import { users } from "./collections/users"
+import { globals } from "./globals"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,6 +31,7 @@ export default buildConfig({
     api: "/payload/api",
   },
   collections,
+  globals,
   editor: lexicalEditor(),
   secret: env.PAYLOAD_SECRET,
   typescript: {

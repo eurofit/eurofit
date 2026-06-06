@@ -68,6 +68,8 @@ export interface Config {
   blocks: {}
   collections: {
     users: User
+    media: Media
+    brands: Brand
     "payload-kv": PayloadKv
     "payload-locked-documents": PayloadLockedDocument
     "payload-preferences": PayloadPreference
@@ -76,6 +78,8 @@ export interface Config {
   collectionsJoins: {}
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>
+    media: MediaSelect<false> | MediaSelect<true>
+    brands: BrandsSelect<false> | BrandsSelect<true>
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -91,8 +95,12 @@ export interface Config {
     defaultIDType: string
   }
   fallbackLocale: null
-  globals: {}
-  globalsSelect: {}
+  globals: {
+    settings: Setting
+  }
+  globalsSelect: {
+    settings: SettingsSelect<false> | SettingsSelect<true>
+  }
   locale: null
   widgets: {
     collections: CollectionsWidget
@@ -158,6 +166,62 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string
+  /**
+   * Alternative text for the media, used for accessibility and SEO.
+   */
+  alt?: string | null
+  /**
+   * Tags for the media, used for categorization and search.
+   */
+  tags?: string[] | null
+  prefix?: string | null
+  updatedAt: string
+  createdAt: string
+  url?: string | null
+  thumbnailURL?: string | null
+  filename?: string | null
+  mimeType?: string | null
+  filesize?: number | null
+  width?: number | null
+  height?: number | null
+  focalX?: number | null
+  focalY?: number | null
+}
+/**
+ * Manage brands associated with products in the store.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: string
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null
+  slug: string
+  isActive: boolean
+  /**
+   * The name of the brand, used for display and identification.
+   */
+  title: string
+  /**
+   * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
+   */
+  supplierImageUrl?: string | null
+  /**
+   * The logo of the brand. If you have specified the supplierImage, this will be used first and the supplierImage will be used as a fallback.
+   */
+  logo?: (string | null) | Media
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -179,10 +243,19 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: string
-  document?: {
-    relationTo: "users"
-    value: string | User
-  } | null
+  document?:
+    | ({
+        relationTo: "users"
+        value: string | User
+      } | null)
+    | ({
+        relationTo: "media"
+        value: string | Media
+      } | null)
+    | ({
+        relationTo: "brands"
+        value: string | Brand
+      } | null)
   globalSlug?: string | null
   user: {
     relationTo: "users"
@@ -256,6 +329,40 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T
+  tags?: T
+  prefix?: T
+  updatedAt?: T
+  createdAt?: T
+  url?: T
+  thumbnailURL?: T
+  filename?: T
+  mimeType?: T
+  filesize?: T
+  width?: T
+  height?: T
+  focalX?: T
+  focalY?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands_select".
+ */
+export interface BrandsSelect<T extends boolean = true> {
+  generateSlug?: T
+  slug?: T
+  isActive?: T
+  title?: T
+  supplierImageUrl?: T
+  logo?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -293,6 +400,26 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T
   updatedAt?: T
   createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings".
+ */
+export interface Setting {
+  id: string
+  areas?: string[] | null
+  updatedAt?: string | null
+  createdAt?: string | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings_select".
+ */
+export interface SettingsSelect<T extends boolean = true> {
+  areas?: T
+  updatedAt?: T
+  createdAt?: T
+  globalType?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
