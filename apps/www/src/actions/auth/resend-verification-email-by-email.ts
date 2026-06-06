@@ -29,21 +29,35 @@ export async function resendVerificationEmailByEmail(
     }
   }
 
+  const validationRes = resendVerificationSchema.safeParse(unsafeData)
+
+  if (!validationRes.success) {
+    return {
+      success: false,
+      code: 400,
+      message: "Invalid email address.",
+    }
+  }
+
+  const { email } = validationRes.data
+
   try {
-    const { email } = resendVerificationSchema.parse(unsafeData)
     const payload = await getPayload({ config })
 
     const { docs } = await payload.find({
       collection: "users",
-      where: { email: { equals: email } },
+      where: {
+        and: [{ _verified: { equals: false } }, { email: { equals: email } }],
+      },
       limit: 1,
       pagination: false,
       overrideAccess: true,
     })
+
     const user = docs[0] ?? null
 
     // Anti-enumeration: treat not-found and already-verified the same as sent
-    if (!user || user._verified === true) {
+    if (!user) {
       return { success: true, data: { status: "sent" } }
     }
 
