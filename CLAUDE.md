@@ -67,6 +67,10 @@ Applies everywhere: variables, function return values, Zod output fields, and st
   pnpm dlx shadcn@latest add <component> -c apps/www
   ```
 
+## Env variables
+
+- Always use env from @/env.mjs to get the variable, not directly the process.env
+
 ---
 
 ## Commands
