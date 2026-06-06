@@ -45,6 +45,7 @@ Applies everywhere: variables, function return values, Zod output fields, and st
 ## Next.js
 
 - **Server Actions**: Never throw expected errors. Return `ActionResult<T>` from `@/types/action-result.ts`.
+- Use Server actions only as post. When client need an action or query payload data, use api routes.
 - **Navigation**: Use `useRouter` from `nextjs-toploader/app`, not `next/navigation`, for programmatic client-side navigation — only inside children of the NextJS Top Loader provider.
 - **Auth-guarded pages**: Call `getCurrentUser()` from `@/actions/auth/get-current-user` and `redirect()` before any rendering logic.
 
