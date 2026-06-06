@@ -149,5 +149,15 @@ export const users: CollectionConfig = {
       ],
       required: true,
     },
+    {
+      name: "paystackCustomerCode",
+      type: "text",
+      required: true,
+      admin: {
+        description:
+          "The Paystack customer code for this user. This is given by external payment processor Paystack.",
+        readOnly: true,
+      },
+    },
   ],
 }

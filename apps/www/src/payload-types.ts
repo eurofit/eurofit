@@ -140,6 +140,10 @@ export interface User {
   firstName: string
   lastName: string
   gender: "male" | "female"
+  /**
+   * The Paystack customer code for this user. This is given by external payment processor Paystack.
+   */
+  paystackCustomerCode: string
   updatedAt: string
   createdAt: string
   /**
@@ -308,6 +312,7 @@ export interface UsersSelect<T extends boolean = true> {
   firstName?: T
   lastName?: T
   gender?: T
+  paystackCustomerCode?: T
   updatedAt?: T
   createdAt?: T
   email?: T

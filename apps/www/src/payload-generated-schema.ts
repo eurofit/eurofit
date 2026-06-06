@@ -84,6 +84,7 @@ export const users = pgTable(
     firstName: varchar("first_name").notNull(),
     lastName: varchar("last_name").notNull(),
     gender: enum_users_gender("gender").notNull(),
+    paystackCustomerCode: varchar("paystack_customer_code").notNull(),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
