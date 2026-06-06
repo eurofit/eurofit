@@ -30,6 +30,7 @@ export function BrandSearch() {
     data,
     isFetching: isSearching,
     isError,
+    error,
   } = useQuery({
     queryKey: ["brands-search", query],
     queryFn: () => fetchBrandsSearch(query),
@@ -41,9 +42,13 @@ export function BrandSearch() {
 
   React.useEffect(() => {
     if (isError) {
-      toast.error("Failed to search brands. Please try again.")
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to search brands. Please try again."
+      )
     }
-  }, [isError])
+  }, [isError, error])
 
   const debouncedSetQuery = useDebouncedCallback(setQuery, 300)
 

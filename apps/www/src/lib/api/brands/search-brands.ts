@@ -1,6 +1,6 @@
-import type { SearchBrandsData } from "@/actions/brands/search-brand"
+import type { SearchBrandData } from "@/actions/brands/search-brand"
 
-export type FetchBrandsSearchResult = SearchBrandsData
+export type FetchBrandsSearchResult = SearchBrandData
 
 export async function fetchBrandsSearch(
   q: string
@@ -10,8 +10,12 @@ export async function fetchBrandsSearch(
   const res = await fetch(`/api/brands/search?${params.toString()}`)
 
   if (!res.ok) {
-    throw new Error("Failed to search brands.")
+    const error = (await res.json().catch(() => null)) as {
+      message?: string
+    } | null
+
+    throw new Error(error?.message ?? "Failed to search brands.")
   }
 
-  return res.json() as Promise<FetchBrandsSearchResult>
+  return (await res.json()) as FetchBrandsSearchResult
 }
