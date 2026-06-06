@@ -7,7 +7,8 @@ const TROPICANA_URL = "https://www.tropicanawholesale.com"
 const UNSPLASH_URL = "https://images.unsplash.com"
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@eurofit/ui"],
+  cacheComponents: true,
+  transpilePackages: ["@eurofit/ui", "@eurofit/transactional"],
   redirects,
   images: {
     qualities: [100],
