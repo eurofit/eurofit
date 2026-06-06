@@ -8,7 +8,7 @@ export const organization: WithContext<Organization> = {
   "@id": `${site.url}/#organization`,
   name: site.name,
   legalName: site.legalName,
-  alternateName: site.legalName,
+  alternateName: ["Eurofit", "Eurofit Kenya", "Eurofit Supplements"],
   url: site.url,
   logo: `${site.url}/logo.png`,
   description:
@@ -18,7 +18,7 @@ export const organization: WithContext<Organization> = {
       "@type": "ContactPoint",
       telephone: site.contact.phone.text.replace(" ", ""),
       contactType: "customer service",
-      email: "info@eurofit.uk",
+      email: site.contact.email.text,
       availableLanguage: ["English"],
       areaServed: "KE",
     },
@@ -98,7 +98,7 @@ export const localBusiness: WithContext<LocalBusiness> = {
   paymentAccepted: ["Cash", "M-Pesa", "Bank Transfer"],
   currenciesAccepted: "KES",
   hasMap: "https://maps.app.goo.gl/GBruweVx6PBugsuB6",
-  priceRange: "KES",
-  // image: `${site.url}/images/store-front.jpg`,
+  priceRange: "$$",
+  image: `${site.url}/logo.png`,
   logo: `${site.url}/logo.png`,
 }

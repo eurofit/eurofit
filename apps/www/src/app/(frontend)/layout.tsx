@@ -35,10 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
-        <JsonLd
-          jsonLd={[organization, website, localBusiness]}
-          strategy="beforeInteractive"
-        />
+        <JsonLd jsonLd={[organization, website, localBusiness]} />
         <Toaster richColors duration={8000} closeButton />
         <NextTopLoader
           showSpinner={false}
