@@ -15,6 +15,7 @@ import { preventSuspendedLogin } from "./hooks/prevent-suspended-login"
 import { preventDeactivatingLastAdmin } from "./hooks/preventDeactivatingLastAdmin"
 import { preventLastAdminDeletion } from "./hooks/preventLastAdminDeletion"
 import { preventLastAdminDemotion } from "./hooks/preventLastAdminDemotion"
+import { syncToPaystack } from "./hooks/sync-to-paystack"
 
 export const users: CollectionConfig = {
   slug: "users",
@@ -65,6 +66,7 @@ export const users: CollectionConfig = {
     beforeLogin: [preventSuspendedLogin],
     beforeChange: [preventLastAdminDemotion],
     beforeDelete: [preventLastAdminDeletion],
+    afterChange: [syncToPaystack],
   },
   admin: {
     useAsTitle: "email",
