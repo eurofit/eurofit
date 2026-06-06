@@ -157,7 +157,7 @@ function EmailFooter({ baseUrl }: { baseUrl: string }) {
                   <Img
                     alt="Eurofit on TikTok"
                     height="24"
-                    src={`${baseUrl}/logos/tiktok.png`}
+                    src={`${baseUrl}/icons/tiktok.png`}
                     width="24"
                   />
                 </Link>
@@ -167,7 +167,7 @@ function EmailFooter({ baseUrl }: { baseUrl: string }) {
                   <Img
                     alt="Eurofit on Instagram"
                     height="24"
-                    src={`${baseUrl}/logos/instagram.png`}
+                    src={`${baseUrl}/icons/instagram.png`}
                     width="24"
                   />
                 </Link>
@@ -177,7 +177,7 @@ function EmailFooter({ baseUrl }: { baseUrl: string }) {
                   <Img
                     alt="Eurofit on X"
                     height="24"
-                    src={`${baseUrl}/logos/x.png`}
+                    src={`${baseUrl}/icons/x.png`}
                     width="24"
                   />
                 </Link>
@@ -187,7 +187,7 @@ function EmailFooter({ baseUrl }: { baseUrl: string }) {
                   <Img
                     alt="Eurofit on Facebook"
                     height="24"
-                    src={`${baseUrl}/logos/facebook.png`}
+                    src={`${baseUrl}/icons/facebook.png`}
                     width="24"
                   />
                 </Link>
