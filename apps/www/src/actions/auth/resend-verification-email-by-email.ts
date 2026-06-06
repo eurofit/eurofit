@@ -17,11 +17,11 @@ export async function resendVerificationEmailByEmail(
   unsafeData: ResendVerificationData,
   turnstileToken: string
 ): Promise<ActionResult<{ status: "sent" }>> {
-  const turnstileOk = await verifyTurnstile(
+  const isTurnstileValid = await verifyTurnstile(
     turnstileToken,
     env.CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY
   )
-  if (!turnstileOk) {
+  if (!isTurnstileValid) {
     return {
       success: false,
       code: 400,
