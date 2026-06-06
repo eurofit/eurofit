@@ -39,14 +39,16 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
+    null
+  )
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get("next")
 
   const { mutate: login, isPending: isLoggingIn } = useMutation({
     mutationFn: async (data: LoginData) => {
-      const token = turnstileRef.current?.getResponse() ?? ""
-      const result = await loginAction(data, token)
+      const result = await loginAction(data, turnstileToken ?? "")
       if (!result.success) throw new Error(result.message)
       return result.data
     },
@@ -54,6 +56,9 @@ export function LoginForm({
       router.push(isSafeRedirect(next) ? next : "/")
     },
     onError: (error: unknown) => {
+      // Clear the consumed token; the invisible widget re-solves and fires
+      // onSuccess again, which re-enables the submit button.
+      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error(
         error instanceof Error ? error.message : "An unexpected error occurred."
@@ -143,8 +148,15 @@ export function LoginForm({
                     env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY
                   }
                   options={{ size: "invisible" }}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
                 />
-                <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!turnstileToken || isLoggingIn}
+                >
                   {isLoggingIn && <Spinner aria-hidden="true" />}
                   {isLoggingIn ? "Logging in…" : "Login"}
                 </Button>
