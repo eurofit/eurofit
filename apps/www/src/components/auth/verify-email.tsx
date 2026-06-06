@@ -1,7 +1,7 @@
 "use client"
 
 import { verifyEmail as verifyEmailAction } from "@/actions/auth/verify-email"
-import verified from "@/assets/illustrations/verified.png"
+import verified from "@/assets/illustrations/verified.svg"
 import { Button, buttonVariants } from "@eurofit/ui/components/button"
 import {
   Card,
