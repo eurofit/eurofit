@@ -35,7 +35,12 @@ export async function signUp(
     const user = await payload.create({
       collection: "users",
       overrideAccess: true,
-      data: { ...data, isActive: true, roles: ["customer"] },
+      data: {
+        ...data,
+        isActive: true,
+        roles: ["customer"],
+        paystackCustomerCode: "N/A", // generated at after create hook
+      },
       draft: false,
     })
     return { success: true, data: { email: user.email } }
