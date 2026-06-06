@@ -1,4 +1,6 @@
 import { getBrands } from "@/actions/brands/get-brands"
+import { JsonLd } from "@/components/json-ld"
+import { getBrandListJsonLd } from "@/lib/utils/brands/get-brand-list-jsonld"
 import {
   Empty,
   EmptyDescription,
@@ -8,23 +10,31 @@ import {
 import { BrandList } from "./brands-list"
 
 type BrandsProps = {
-  page: number
+  searchParams: Promise<{ page?: string }>
 }
 
 const BRANDS_LIMIT = 35
 
-export async function Brands({ page }: BrandsProps) {
+export async function Brands({ searchParams }: BrandsProps) {
+  const { page: pageParam } = await searchParams
+  const page = Number(pageParam) || 1
+
   const result = await getBrands({ page, limit: BRANDS_LIMIT })
 
   if (!result.success || !result.data.totalBrands) {
     return <EmptyBrands />
   }
 
+  const jsonLds = getBrandListJsonLd(result.data)
+
   return (
-    <BrandList
-      initialData={result.data}
-      totalBrands={result.data.totalBrands}
-    />
+    <>
+      <JsonLd jsonLd={jsonLds} />
+      <BrandList
+        initialData={result.data}
+        totalBrands={result.data.totalBrands}
+      />
+    </>
   )
 }
 

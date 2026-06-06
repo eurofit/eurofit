@@ -1,13 +1,10 @@
-import { getBrands } from "@/actions/brands/get-brands"
 import { getTotalBrands } from "@/actions/brands/get-total-brands"
 import heroImage from "@/assets/images/brands/hero.png"
 import { BrandsSkeleton } from "@/components/brands/brand-card"
 import { BrandSearchDynamic } from "@/components/brands/brand-search-dynamic"
 import { Brands } from "@/components/brands/brands"
 import { TotalBrands } from "@/components/brands/total-brands"
-import { JsonLd } from "@/components/json-ld"
 import { site } from "@/const/site"
-import { getBrandListJsonLd } from "@/lib/utils/brands/get-brand-list-jsonld"
 import { Metadata } from "next"
 import Image from "next/image"
 import * as React from "react"
@@ -24,31 +21,15 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-const BRANDS_LIMIT = 35
-
 type BrandsPageProps = {
   searchParams: Promise<{
     page?: string
   }>
 }
 
-export default async function BrandsPage({
-  searchParams: searchParamsPromise,
-}: BrandsPageProps) {
-  const searchParams = await searchParamsPromise
-  const page = Number(searchParams.page) || 1
-
-  const brandsResult = await getBrands({ page, limit: BRANDS_LIMIT })
-
-  // --- JSON LD'S ---
-  const jsonLds = brandsResult.success
-    ? getBrandListJsonLd(brandsResult.data)
-    : []
-
+export default function BrandsPage({ searchParams }: BrandsPageProps) {
   return (
     <main className="space-y-8 md:space-y-14">
-      <JsonLd jsonLd={jsonLds} />
-
       <div className="relative w-full overflow-visible md:aspect-4/1">
         <Image
           src={heroImage}
@@ -88,7 +69,7 @@ export default async function BrandsPage({
       </div>
 
       <React.Suspense fallback={<BrandsSkeleton />}>
-        <Brands page={page} />
+        <Brands searchParams={searchParams} />
       </React.Suspense>
     </main>
   )

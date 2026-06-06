@@ -3,6 +3,7 @@
 import payloadConfig from "@/payload.config"
 import { ActionResult } from "@/types/action-result"
 import { Brand } from "@/types/brand"
+import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 import { z } from "zod"
 
@@ -34,13 +35,33 @@ export type GetBrandsData = {
   page?: number
 }
 
+async function findBrands(page: number, limit: number) {
+  "use cache"
+  cacheTag("brands")
+  cacheLife("hours")
+
+  const payload = await getPayload({ config: payloadConfig })
+  return payload.find({
+    collection: "brands",
+    page,
+    limit,
+    sort: "title",
+    select: {
+      slug: true,
+      title: true,
+      supplierImageUrl: true,
+      logo: true,
+      updatedAt: true,
+    },
+  })
+}
+
 export async function getBrands(
   opts: GetBrandsOptions
 ): Promise<ActionResult<GetBrandsData>> {
   try {
     const { page, limit } = options.parse(opts)
 
-    const payload = await getPayload({ config: payloadConfig })
     const {
       docs,
       totalDocs: totalBrands,
@@ -52,19 +73,7 @@ export async function getBrands(
       totalPages,
       limit: responseLimit,
       page: responsePage,
-    } = await payload.find({
-      collection: "brands",
-      page,
-      limit,
-      sort: "title",
-      select: {
-        slug: true,
-        title: true,
-        supplierImageUrl: true,
-        logo: true,
-        updatedAt: true,
-      },
-    })
+    } = await findBrands(page, limit)
 
     return {
       success: true,
