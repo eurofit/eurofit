@@ -28,8 +28,9 @@ export default async function Page() {
         <div className="flex items-center justify-center">
           <Logo className="text-xl" />
         </div>
-        <React.Suspense></React.Suspense>
-        <SignupForm />
+        <React.Suspense>
+          <SignupForm />
+        </React.Suspense>
       </div>
     </div>
   )
