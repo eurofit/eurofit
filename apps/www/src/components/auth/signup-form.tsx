@@ -273,6 +273,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               id="signup-form-turnstile"
               ref={turnstileRef}
               siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY!}
+              className="w-full"
+              options={{ size: "flexible" }}
             />
             <Button type="submit" className="w-full" disabled={isSigningUp}>
               {isSigningUp && <Spinner />}
