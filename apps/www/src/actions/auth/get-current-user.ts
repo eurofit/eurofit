@@ -1,5 +1,5 @@
 import config from "@payload-config"
-import { cacheLife } from "next/cache"
+import { cacheLife, cacheTag } from "next/cache"
 import { headers as getHeaders } from "next/headers"
 import { getPayload } from "payload"
 
@@ -17,6 +17,8 @@ export const getCurrentUser = async () => {
   })
 
   if (!user) return null
+
+  cacheTag("current-user", user.id)
 
   return user
 }
