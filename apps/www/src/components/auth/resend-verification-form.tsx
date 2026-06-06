@@ -37,17 +37,17 @@ export function ResendVerificationForm() {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
 
   const { mutate, isPending, data } = useMutation({
-    mutationFn: async (formData: ResendVerificationData) => {
+    mutationFn: async (data: ResendVerificationData) => {
       const token = turnstileRef.current?.getResponse() ?? ""
-      const result = await resendVerificationEmailByEmail(formData, token)
+      const result = await resendVerificationEmailByEmail(data, token)
       if (!result.success) throw new Error(result.message)
       return result.data
     },
-    onError: () => {
+    onError: (error) => {
+      toast.error(error.message)
+    },
+    onSettled: () => {
       turnstileRef.current?.reset()
-      toast.error("Something went wrong", {
-        description: "Please try again.",
-      })
     },
   })
 
