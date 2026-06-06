@@ -3,6 +3,7 @@ import { LoginForm } from "@/components/auth/login-form"
 import { Logo } from "@/components/logo"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
+import * as React from "react"
 
 export const metadata: Metadata = {
   title: "Login",
@@ -37,7 +38,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="flex items-center justify-center">
           <Logo />
         </div>
-        <LoginForm />
+        <React.Suspense>
+          <LoginForm />
+        </React.Suspense>
       </div>
     </div>
   )
