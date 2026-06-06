@@ -187,7 +187,7 @@ Validated at startup via `@t3-oss/env-nextjs` in `src/env.mjs`.
 | Email     | `RESEND_API_KEY`, `SMTP_*`                                                                                              |
 | Storage   | `SUPABASE_S3_*` (bucket, access key, secret, region, endpoint)                                                          |
 | Payments  | `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`                                                                            |
-| Turnstile | `CLOUDFLARE_TURNSTILE_SECRET_KEY`, `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                                          |
+| Turnstile | `CLOUDFLARE_TURNSTILE_SECRET_KEY`(Managed Turnstile), `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                       |
 | Public    | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY` |
 
 ### Email Templates
