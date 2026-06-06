@@ -64,9 +64,8 @@ export const users: CollectionConfig = {
   },
   hooks: {
     beforeLogin: [preventSuspendedLogin],
-    beforeChange: [preventLastAdminDemotion],
+    beforeChange: [preventLastAdminDemotion, syncToPaystack],
     beforeDelete: [preventLastAdminDeletion],
-    afterChange: [syncToPaystack],
   },
   admin: {
     useAsTitle: "email",
