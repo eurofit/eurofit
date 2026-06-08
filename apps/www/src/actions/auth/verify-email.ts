@@ -45,30 +45,13 @@ export async function verifyEmail(
 
     if (user) {
       // Fire-and-forget welcome email — best-effort, must not block or fail verification.
-      after(async () => {
-        try {
-          const [html, text] = await Promise.all([
-            generateWelcomeEmailHTML({
-              baseUrl: site.url,
-              firstName: user.firstName,
-            }),
-            generateWelcomeEmailText({
-              baseUrl: site.url,
-              firstName: user.firstName,
-            }),
-          ])
-
-          await payload.sendEmail({
-            to: user.email,
-            subject: "Welcome to Eurofit",
-            html,
-            text,
-            replyTo: "info@eurofit.co.ke",
-          })
-        } catch {
-          // Swallow — the welcome email is best-effort.
-        }
-      })
+      after(() =>
+        sendWelcomeEmail({
+          email: user.email,
+          firstName: user.firstName,
+          payload,
+        })
+      )
     }
 
     return { success: true, data: { verified: true } }
@@ -78,5 +61,40 @@ export async function verifyEmail(
       code: 410,
       message: "This token is not valid or might be expired.",
     }
+  }
+}
+
+type SendWelcomeEmailArgs = {
+  email: string
+  firstName: string
+  payload: Awaited<ReturnType<typeof getPayload>>
+}
+
+async function sendWelcomeEmail({
+  email,
+  firstName,
+  payload,
+}: SendWelcomeEmailArgs) {
+  try {
+    const [html, text] = await Promise.all([
+      generateWelcomeEmailHTML({
+        baseUrl: site.url,
+        firstName,
+      }),
+      generateWelcomeEmailText({
+        baseUrl: site.url,
+        firstName,
+      }),
+    ])
+
+    await payload.sendEmail({
+      to: email,
+      subject: "Welcome to Eurofit",
+      html,
+      text,
+      replyTo: "info@eurofit.co.ke",
+    })
+  } catch {
+    // Swallow — the welcome email is best-effort.
   }
 }
