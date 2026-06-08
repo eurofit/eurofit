@@ -1,11 +1,8 @@
 "use server"
 
 import { site } from "@/const/site"
+import { resend } from "@/lib/resend"
 import { ActionResult } from "@/types/action-result"
-import {
-  generateWelcomeEmailHTML,
-  generateWelcomeEmailText,
-} from "@eurofit/transactional/welcome"
 import payloadConfig from "@payload-config"
 import { after } from "next/server"
 import { getPayload } from "payload"
@@ -49,7 +46,7 @@ export async function verifyEmail(
         sendWelcomeEmail({
           email: user.email,
           firstName: user.firstName,
-          payload,
+          siteUrl: site.url,
         })
       )
     }
@@ -67,32 +64,24 @@ export async function verifyEmail(
 type SendWelcomeEmailArgs = {
   email: string
   firstName: string
-  payload: Awaited<ReturnType<typeof getPayload>>
+  siteUrl: string
 }
 
 async function sendWelcomeEmail({
   email,
   firstName,
-  payload,
+  siteUrl,
 }: SendWelcomeEmailArgs) {
   try {
-    const [html, text] = await Promise.all([
-      generateWelcomeEmailHTML({
-        baseUrl: site.url,
-        firstName,
-      }),
-      generateWelcomeEmailText({
-        baseUrl: site.url,
-        firstName,
-      }),
-    ])
-
-    await payload.sendEmail({
-      to: email,
-      subject: "Welcome to Eurofit",
-      html,
-      text,
-      replyTo: "info@eurofit.co.ke",
+    await resend.emails.send({
+      to: [email],
+      template: {
+        id: "welcome",
+        variables: {
+          siteUrl,
+          firstName,
+        },
+      },
     })
   } catch {
     // Swallow — the welcome email is best-effort.
