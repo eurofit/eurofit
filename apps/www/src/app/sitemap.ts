@@ -1,4 +1,4 @@
-import { getBrandsSitemap } from "@/actions/brands/get-brands-sitemap"
+import { getBrandsSitemap } from "@/lib/utils/brands/get-brands-sitemap"
 import { MetadataRoute } from "next"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
