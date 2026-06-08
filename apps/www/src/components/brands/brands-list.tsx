@@ -93,20 +93,23 @@ export function BrandList({
       {brands.length == totalBrands && (
         <div
           aria-live="polite"
-          className="mt-10 flex items-center justify-center gap-2"
+          className="mx-auto mt-8 flex max-w-md flex-col items-center justify-center gap-2 text-center"
         >
           <CheckCircle className="text-green-600" />
-          <span>
-            You&apos;ve seen all {brands.length} brands. Can&apos;t find yours?{" "}
-            <a
-              href="https://wa.me/254110990666"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Message us on WhatsApp.
-            </a>
-          </span>
+          <div>
+            <p> You&apos;ve seen all {brands.length} brands. </p>
+            <p className="text-sm">
+              Can&apos;t find what you need?{" "}
+              <a
+                href="https://wa.me/254110990666"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Message us on WhatsApp.
+              </a>
+            </p>
+          </div>
         </div>
       )}
 
