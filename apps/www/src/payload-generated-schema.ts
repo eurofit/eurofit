@@ -28,6 +28,10 @@ export const enum_users_roles = pgEnum("enum_users_roles", [
   "customer",
 ])
 export const enum_users_gender = pgEnum("enum_users_gender", ["male", "female"])
+export const enum_categories_type = pgEnum("enum_categories_type", [
+  "product",
+  "post",
+])
 
 export const users_roles = pgTable(
   "users_roles",
@@ -216,6 +220,57 @@ export const brands = pgTable(
   ]
 )
 
+export const categories_type = pgTable(
+  "categories_type",
+  {
+    order: integer("order").notNull(),
+    parent: uuid("parent_id").notNull(),
+    value: enum_categories_type("value"),
+    id: uuid("id").defaultRandom().primaryKey(),
+  },
+  (columns) => [
+    index("categories_type_order_idx").on(columns.order),
+    index("categories_type_parent_idx").on(columns.parent),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [categories.id],
+      name: "categories_type_parent_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const categories = pgTable(
+  "categories",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    title: varchar("title").notNull(),
+    description: varchar("description"),
+    srcUrl: varchar("src_url"),
+    active: boolean("active").default(true),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("categories_slug_idx").on(columns.slug),
+    index("categories_updated_at_idx").on(columns.updatedAt),
+    index("categories_created_at_idx").on(columns.createdAt),
+  ]
+)
+
 export const payload_kv = pgTable(
   "payload_kv",
   {
@@ -263,6 +318,7 @@ export const payload_locked_documents_rels = pgTable(
     usersID: uuid("users_id"),
     mediaID: uuid("media_id"),
     brandsID: uuid("brands_id"),
+    categoriesID: uuid("categories_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -271,6 +327,9 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_users_id_idx").on(columns.usersID),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
     index("payload_locked_documents_rels_brands_id_idx").on(columns.brandsID),
+    index("payload_locked_documents_rels_categories_id_idx").on(
+      columns.categoriesID
+    ),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [payload_locked_documents.id],
@@ -290,6 +349,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["brandsID"]],
       foreignColumns: [brands.id],
       name: "payload_locked_documents_rels_brands_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "payload_locked_documents_rels_categories_fk",
     }).onDelete("cascade"),
   ]
 )
@@ -453,6 +517,21 @@ export const relations_brands = relations(brands, ({ one }) => ({
     relationName: "logo",
   }),
 }))
+export const relations_categories_type = relations(
+  categories_type,
+  ({ one }) => ({
+    parent: one(categories, {
+      fields: [categories_type.parent],
+      references: [categories.id],
+      relationName: "type",
+    }),
+  })
+)
+export const relations_categories = relations(categories, ({ many }) => ({
+  type: many(categories_type, {
+    relationName: "type",
+  }),
+}))
 export const relations_payload_kv = relations(payload_kv, () => ({}))
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -476,6 +555,11 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.brandsID],
       references: [brands.id],
       relationName: "brands",
+    }),
+    categoriesID: one(categories, {
+      fields: [payload_locked_documents_rels.categoriesID],
+      references: [categories.id],
+      relationName: "categories",
     }),
   })
 )
@@ -533,12 +617,15 @@ export const relations_settings = relations(settings, ({ many }) => ({
 type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
   enum_users_gender: typeof enum_users_gender
+  enum_categories_type: typeof enum_categories_type
   users_roles: typeof users_roles
   users_sessions: typeof users_sessions
   users: typeof users
   media: typeof media
   media_texts: typeof media_texts
   brands: typeof brands
+  categories_type: typeof categories_type
+  categories: typeof categories
   payload_kv: typeof payload_kv
   payload_locked_documents: typeof payload_locked_documents
   payload_locked_documents_rels: typeof payload_locked_documents_rels
@@ -553,6 +640,8 @@ type DatabaseSchema = {
   relations_media_texts: typeof relations_media_texts
   relations_media: typeof relations_media
   relations_brands: typeof relations_brands
+  relations_categories_type: typeof relations_categories_type
+  relations_categories: typeof relations_categories
   relations_payload_kv: typeof relations_payload_kv
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels
   relations_payload_locked_documents: typeof relations_payload_locked_documents

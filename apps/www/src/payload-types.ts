@@ -70,6 +70,7 @@ export interface Config {
     users: User
     media: Media
     brands: Brand
+    categories: Category
     "payload-kv": PayloadKv
     "payload-locked-documents": PayloadLockedDocument
     "payload-preferences": PayloadPreference
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>
     media: MediaSelect<false> | MediaSelect<true>
     brands: BrandsSelect<false> | BrandsSelect<true>
+    categories: CategoriesSelect<false> | CategoriesSelect<true>
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -226,6 +228,37 @@ export interface Brand {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null
+  slug: string
+  /**
+   * Enter the name of the category.
+   */
+  title: string
+  type?: ("product" | "post")[] | null
+  /**
+   * Provide a brief description of the category.
+   */
+  description?: string | null
+  /**
+   * This is the URL of the supplier's page for this category.
+   */
+  srcUrl?: string | null
+  /**
+   * Indicates whether the category is currently active.
+   */
+  active?: boolean | null
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -259,6 +292,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "brands"
         value: string | Brand
+      } | null)
+    | ({
+        relationTo: "categories"
+        value: string | Category
       } | null)
   globalSlug?: string | null
   user: {
@@ -363,6 +400,21 @@ export interface BrandsSelect<T extends boolean = true> {
   title?: T
   supplierImageUrl?: T
   logo?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  generateSlug?: T
+  slug?: T
+  title?: T
+  type?: T
+  description?: T
+  srcUrl?: T
+  active?: T
   updatedAt?: T
   createdAt?: T
 }
