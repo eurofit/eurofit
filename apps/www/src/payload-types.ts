@@ -71,6 +71,7 @@ export interface Config {
     media: Media
     brands: Brand
     categories: Category
+    "service-areas": ServiceArea
     "payload-kv": PayloadKv
     "payload-locked-documents": PayloadLockedDocument
     "payload-preferences": PayloadPreference
@@ -82,6 +83,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>
     brands: BrandsSelect<false> | BrandsSelect<true>
     categories: CategoriesSelect<false> | CategoriesSelect<true>
+    "service-areas": ServiceAreasSelect<false> | ServiceAreasSelect<true>
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -258,6 +260,27 @@ export interface Category {
   createdAt: string
 }
 /**
+ * Geographic areas the store serves.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas".
+ */
+export interface ServiceArea {
+  id: string
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null
+  slug: string
+  isActive: boolean
+  /**
+   * The name of the service area.
+   */
+  title: string
+  updatedAt: string
+  createdAt: string
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -296,6 +319,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "categories"
         value: string | Category
+      } | null)
+    | ({
+        relationTo: "service-areas"
+        value: string | ServiceArea
       } | null)
   globalSlug?: string | null
   user: {
@@ -415,6 +442,18 @@ export interface CategoriesSelect<T extends boolean = true> {
   description?: T
   srcUrl?: T
   active?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas_select".
+ */
+export interface ServiceAreasSelect<T extends boolean = true> {
+  generateSlug?: T
+  slug?: T
+  isActive?: T
+  title?: T
   updatedAt?: T
   createdAt?: T
 }
