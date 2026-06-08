@@ -1,3 +1,6 @@
+import { adminOnly } from "@/access/admin"
+import { everyone } from "@/access/everyone"
+import { isAdmin } from "@/access/is-admin"
 import { activeField } from "@/fields/active"
 import type { CollectionConfig } from "payload"
 import { slugField } from "payload"
@@ -11,6 +14,13 @@ export const brands: CollectionConfig = {
   labels: {
     singular: "Brand",
     plural: "Brands",
+  },
+  access: {
+    create: adminOnly,
+    read: everyone,
+    update: adminOnly,
+    delete: adminOnly,
+    admin: isAdmin,
   },
   admin: {
     description: "Manage brands associated with products in the store.",
