@@ -3,7 +3,7 @@
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { useClickAway } from "@/hooks/use-click-away"
 import { useToggle } from "@/hooks/use-toggle"
-import { fetchBrandsSearch } from "@/lib/api/brands/search-brands"
+import { searchBrand } from "@/lib/api/brands/search-brands"
 import { buttonVariants } from "@eurofit/ui/components/button"
 import {
   InputGroup,
@@ -33,7 +33,7 @@ export function BrandSearch() {
     error,
   } = useQuery({
     queryKey: ["brands-search", query],
-    queryFn: () => fetchBrandsSearch(query),
+    queryFn: () => searchBrand(query),
     enabled: isEnabled,
   })
 

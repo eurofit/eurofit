@@ -15,32 +15,34 @@ export async function getBrandsSitemap(): Promise<MetadataRoute.Sitemap> {
     config,
   })
 
-  // select active brands with atleast one product.
-  const { docs: brandsWithProducts } = await payload.find({
+  // Active brands only; we filter out brands without products below so the
+  // sitemap never lists an empty brand page.
+  const { docs: brands } = await payload.find({
     collection: "brands",
     where: {
-      and: [
-        {
-          isActive: {
-            equals: true,
-          },
-        },
-      ],
+      isActive: {
+        equals: true,
+      },
     },
     select: {
       slug: true,
-      supplierImage: true,
+      supplierImageUrl: true,
       updatedAt: true,
+      products: true,
+    },
+    joins: {
+      // We only need to know whether a brand has at least one product.
+      products: { limit: 1 },
     },
     sort: "slug",
     limit: 0,
   })
 
-  return brandsWithProducts.map(
-    ({ slug, supplierImageUrl: image, updatedAt }) => ({
+  return brands
+    .filter((brand) => (brand.products?.docs?.length ?? 0) > 0)
+    .map(({ slug, supplierImageUrl: image, updatedAt }) => ({
       url: `${site.url}/brands/${slug}`,
       lastModified: updatedAt,
       images: typeof image === "string" ? [image] : [],
-    })
-  )
+    }))
 }

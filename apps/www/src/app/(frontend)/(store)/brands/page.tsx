@@ -30,6 +30,7 @@ type BrandsPageProps = {
 export default function BrandsPage({ searchParams }: BrandsPageProps) {
   return (
     <main className="space-y-8 md:space-y-14">
+      {/* hero  */}
       <div className="relative w-full overflow-visible md:aspect-4/1">
         <Image
           src={heroImage}

@@ -2,9 +2,7 @@ import type { SearchBrandData } from "@/actions/brands/search-brand"
 
 export type FetchBrandsSearchResult = SearchBrandData
 
-export async function fetchBrandsSearch(
-  q: string
-): Promise<FetchBrandsSearchResult> {
+export async function searchBrand(q: string): Promise<FetchBrandsSearchResult> {
   const params = new URLSearchParams({ q })
 
   const res = await fetch(`/api/brands/search?${params.toString()}`)
