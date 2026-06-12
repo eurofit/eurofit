@@ -1,5 +1,5 @@
-import type { FieldHook } from "payload"
 import type { User } from "@/payload-types"
+import type { FieldHook } from "payload"
 
 export const ensureFirstUserIsAdmin: FieldHook<
   User,
