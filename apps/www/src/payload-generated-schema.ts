@@ -184,6 +184,103 @@ export const media_texts = pgTable(
   ]
 )
 
+export const packages = pgTable(
+  "packages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    title: varchar("title").notNull(),
+    length: numeric("length", { mode: "number" }).notNull(),
+    width: numeric("width", { mode: "number" }).notNull(),
+    height: numeric("height", { mode: "number" }).notNull(),
+    maxWeight: numeric("max_weight", { mode: "number" }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("packages_slug_idx").on(columns.slug),
+    uniqueIndex("packages_title_idx").on(columns.title),
+    index("packages_updated_at_idx").on(columns.updatedAt),
+    index("packages_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const service_areas_shipping_rates = pgTable(
+  "service_areas_shipping_rates",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    package: uuid("package_id")
+      .notNull()
+      .references(() => packages.id, {
+        onDelete: "set null",
+      }),
+    price: numeric("price", { mode: "number" }).notNull(),
+  },
+  (columns) => [
+    index("service_areas_shipping_rates_order_idx").on(columns._order),
+    index("service_areas_shipping_rates_parent_id_idx").on(columns._parentID),
+    index("service_areas_shipping_rates_package_idx").on(columns.package),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [service_areas.id],
+      name: "service_areas_shipping_rates_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const service_areas = pgTable(
+  "service_areas",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    title: varchar("title").notNull(),
+    deliveryTime_minDays: numeric("delivery_time_min_days", {
+      mode: "number",
+    }).notNull(),
+    deliveryTime_maxDays: numeric("delivery_time_max_days", {
+      mode: "number",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("service_areas_slug_idx").on(columns.slug),
+    uniqueIndex("service_areas_title_idx").on(columns.title),
+    index("service_areas_updated_at_idx").on(columns.updatedAt),
+    index("service_areas_created_at_idx").on(columns.createdAt),
+  ]
+)
+
 export const brands = pgTable(
   "brands",
   {
@@ -245,10 +342,10 @@ export const categories = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     generateSlug: boolean("generate_slug").default(true),
     slug: varchar("slug").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
     title: varchar("title").notNull(),
     description: varchar("description"),
     srcUrl: varchar("src_url"),
-    active: boolean("active").default(true),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
@@ -268,6 +365,332 @@ export const categories = pgTable(
     uniqueIndex("categories_slug_idx").on(columns.slug),
     index("categories_updated_at_idx").on(columns.updatedAt),
     index("categories_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    isActive: boolean("is_active").notNull().default(true),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    title: varchar("title").notNull(),
+    brand: uuid("brand_id")
+      .notNull()
+      .references(() => brands.id, {
+        onDelete: "set null",
+      }),
+    origin: varchar("origin"),
+    supplierImageUrl: varchar("supplier_image_url"),
+    productInformation: varchar("product_information"),
+    nutritionalInformation: varchar("nutritional_information"),
+    supplierUrl: varchar("supplier_url"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("products_slug_idx").on(columns.slug),
+    index("products_brand_idx").on(columns.brand),
+    index("products_updated_at_idx").on(columns.updatedAt),
+    index("products_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const products_rels = pgTable(
+  "products_rels",
+  {
+    id: serial("id").primaryKey(),
+    order: integer("order"),
+    parent: uuid("parent_id").notNull(),
+    path: varchar("path").notNull(),
+    mediaID: uuid("media_id"),
+    categoriesID: uuid("categories_id"),
+  },
+  (columns) => [
+    index("products_rels_order_idx").on(columns.order),
+    index("products_rels_parent_idx").on(columns.parent),
+    index("products_rels_path_idx").on(columns.path),
+    index("products_rels_media_id_idx").on(columns.mediaID),
+    index("products_rels_categories_id_idx").on(columns.categoriesID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [products.id],
+      name: "products_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["mediaID"]],
+      foreignColumns: [media.id],
+      name: "products_rels_media_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "products_rels_categories_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const product_variants = pgTable(
+  "product_variants",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    sku: varchar("sku").notNull(),
+    title: varchar("title").notNull(),
+    detailTitle: varchar("detail_title"),
+    size: varchar("size"),
+    flavorColor: varchar("flavor_color"),
+    variant: varchar("variant"),
+    product: uuid("product_id")
+      .notNull()
+      .references(() => products.id, {
+        onDelete: "set null",
+      }),
+    category: varchar("category"),
+    supplierPrice: numeric("supplier_price", { mode: "number" }),
+    supplierDiscountedPrice: numeric("supplier_discounted_price", {
+      mode: "number",
+    }),
+    priceFetchedAt: timestamp("price_fetched_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    costPrice: numeric("cost_price", { mode: "number" }),
+    retailPrice: numeric("retail_price", { mode: "number" }),
+    stock: numeric("stock", { mode: "number" }).notNull().default(0),
+    supplierStock: numeric("supplier_stock", { mode: "number" }),
+    onPallet: numeric("on_pallet", { mode: "number" }),
+    inCase: numeric("in_case", { mode: "number" }),
+    expiryDate: timestamp("expiry_date", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    weight: numeric("weight", { mode: "number" }),
+    servingSizePerContainer: numeric("serving_size_per_container", {
+      mode: "number",
+    }),
+    servingSize: numeric("serving_size", { mode: "number" }),
+    supplierProductCode: varchar("supplier_product_code"),
+    barcode: varchar("barcode"),
+    exportCommodityCode: varchar("export_commodity_code"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("product_variants_slug_idx").on(columns.slug),
+    uniqueIndex("product_variants_sku_idx").on(columns.sku),
+    index("product_variants_title_idx").on(columns.title),
+    index("product_variants_detail_title_idx").on(columns.detailTitle),
+    index("product_variants_product_idx").on(columns.product),
+    index("product_variants_barcode_idx").on(columns.barcode),
+    index("product_variants_updated_at_idx").on(columns.updatedAt),
+    index("product_variants_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const product_variants_rels = pgTable(
+  "product_variants_rels",
+  {
+    id: serial("id").primaryKey(),
+    order: integer("order"),
+    parent: uuid("parent_id").notNull(),
+    path: varchar("path").notNull(),
+    mediaID: uuid("media_id"),
+  },
+  (columns) => [
+    index("product_variants_rels_order_idx").on(columns.order),
+    index("product_variants_rels_parent_idx").on(columns.parent),
+    index("product_variants_rels_path_idx").on(columns.path),
+    index("product_variants_rels_media_id_idx").on(columns.mediaID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [product_variants.id],
+      name: "product_variants_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["mediaID"]],
+      foreignColumns: [media.id],
+      name: "product_variants_rels_media_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const stock_alerts = pgTable(
+  "stock_alerts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    user: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    productVariant: uuid("product_variant_id")
+      .notNull()
+      .references(() => product_variants.id, {
+        onDelete: "set null",
+      }),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("stock_alerts_user_idx").on(columns.user),
+    index("stock_alerts_product_variant_idx").on(columns.productVariant),
+    index("stock_alerts_updated_at_idx").on(columns.updatedAt),
+    index("stock_alerts_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_productVariant_idx").on(
+      columns.user,
+      columns.productVariant
+    ),
+  ]
+)
+
+export const wishlists = pgTable(
+  "wishlists",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customer: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    productVariant: uuid("product_variant_id")
+      .notNull()
+      .references(() => product_variants.id, {
+        onDelete: "set null",
+      }),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("wishlists_customer_idx").on(columns.customer),
+    index("wishlists_product_variant_idx").on(columns.productVariant),
+    index("wishlists_updated_at_idx").on(columns.updatedAt),
+    index("wishlists_created_at_idx").on(columns.createdAt),
+    uniqueIndex("customer_productVariant_idx").on(
+      columns.customer,
+      columns.productVariant
+    ),
+  ]
+)
+
+export const carts_items = pgTable(
+  "carts_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    productVariant: uuid("product_variant_id")
+      .notNull()
+      .references(() => product_variants.id, {
+        onDelete: "set null",
+      }),
+    quantity: numeric("quantity", { mode: "number" }).notNull(),
+    snapshot_retailPrice: numeric("snapshot_retail_price", { mode: "number" }),
+    snapshot_inventoryStock: numeric("snapshot_inventory_stock", {
+      mode: "number",
+    }),
+    snapshot_supplierStock: numeric("snapshot_supplier_stock", {
+      mode: "number",
+    }),
+  },
+  (columns) => [
+    index("carts_items_order_idx").on(columns._order),
+    index("carts_items_parent_id_idx").on(columns._parentID),
+    index("carts_items_product_variant_idx").on(columns.productVariant),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [carts.id],
+      name: "carts_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const carts = pgTable(
+  "carts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customer: uuid("customer_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    guestSessionId: varchar("guest_session_id"),
+    lastActiveAt: timestamp("last_active_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("carts_customer_idx").on(columns.customer),
+    uniqueIndex("carts_guest_session_id_idx").on(columns.guestSessionId),
+    index("carts_updated_at_idx").on(columns.updatedAt),
+    index("carts_created_at_idx").on(columns.createdAt),
   ]
 )
 
@@ -317,8 +740,15 @@ export const payload_locked_documents_rels = pgTable(
     path: varchar("path").notNull(),
     usersID: uuid("users_id"),
     mediaID: uuid("media_id"),
+    packagesID: uuid("packages_id"),
+    "service-areasID": uuid("service_areas_id"),
     brandsID: uuid("brands_id"),
     categoriesID: uuid("categories_id"),
+    productsID: uuid("products_id"),
+    "product-variantsID": uuid("product_variants_id"),
+    "stock-alertsID": uuid("stock_alerts_id"),
+    wishlistsID: uuid("wishlists_id"),
+    cartsID: uuid("carts_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -326,10 +756,29 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_path_idx").on(columns.path),
     index("payload_locked_documents_rels_users_id_idx").on(columns.usersID),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
+    index("payload_locked_documents_rels_packages_id_idx").on(
+      columns.packagesID
+    ),
+    index("payload_locked_documents_rels_service_areas_id_idx").on(
+      columns["service-areasID"]
+    ),
     index("payload_locked_documents_rels_brands_id_idx").on(columns.brandsID),
     index("payload_locked_documents_rels_categories_id_idx").on(
       columns.categoriesID
     ),
+    index("payload_locked_documents_rels_products_id_idx").on(
+      columns.productsID
+    ),
+    index("payload_locked_documents_rels_product_variants_id_idx").on(
+      columns["product-variantsID"]
+    ),
+    index("payload_locked_documents_rels_stock_alerts_id_idx").on(
+      columns["stock-alertsID"]
+    ),
+    index("payload_locked_documents_rels_wishlists_id_idx").on(
+      columns.wishlistsID
+    ),
+    index("payload_locked_documents_rels_carts_id_idx").on(columns.cartsID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [payload_locked_documents.id],
@@ -346,6 +795,16 @@ export const payload_locked_documents_rels = pgTable(
       name: "payload_locked_documents_rels_media_fk",
     }).onDelete("cascade"),
     foreignKey({
+      columns: [columns["packagesID"]],
+      foreignColumns: [packages.id],
+      name: "payload_locked_documents_rels_packages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["service-areasID"]],
+      foreignColumns: [service_areas.id],
+      name: "payload_locked_documents_rels_service_areas_fk",
+    }).onDelete("cascade"),
+    foreignKey({
       columns: [columns["brandsID"]],
       foreignColumns: [brands.id],
       name: "payload_locked_documents_rels_brands_fk",
@@ -354,6 +813,31 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["categoriesID"]],
       foreignColumns: [categories.id],
       name: "payload_locked_documents_rels_categories_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["productsID"]],
+      foreignColumns: [products.id],
+      name: "payload_locked_documents_rels_products_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["product-variantsID"]],
+      foreignColumns: [product_variants.id],
+      name: "payload_locked_documents_rels_product_variants_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["stock-alertsID"]],
+      foreignColumns: [stock_alerts.id],
+      name: "payload_locked_documents_rels_stock_alerts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["wishlistsID"]],
+      foreignColumns: [wishlists.id],
+      name: "payload_locked_documents_rels_wishlists_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["cartsID"]],
+      foreignColumns: [carts.id],
+      name: "payload_locked_documents_rels_carts_fk",
     }).onDelete("cascade"),
   ]
 )
@@ -473,6 +957,94 @@ export const settings_texts = pgTable(
   ]
 )
 
+export const nav_items = pgTable(
+  "nav_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    url: varchar("url").notNull(),
+  },
+  (columns) => [
+    index("nav_items_order_idx").on(columns._order),
+    index("nav_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [nav.id],
+      name: "nav_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const nav = pgTable("nav", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+  createdAt: timestamp("created_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+})
+
+export const footer_nav_links = pgTable(
+  "footer_nav_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    url: varchar("url").notNull(),
+  },
+  (columns) => [
+    index("footer_nav_links_order_idx").on(columns._order),
+    index("footer_nav_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer_nav.id],
+      name: "footer_nav_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const footer_nav = pgTable(
+  "footer_nav",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+  },
+  (columns) => [
+    index("footer_nav_order_idx").on(columns._order),
+    index("footer_nav_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer.id],
+      name: "footer_nav_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const footer = pgTable("footer", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tagline: varchar("tagline").notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+  createdAt: timestamp("created_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+})
+
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
   parent: one(users, {
     fields: [users_roles.parent],
@@ -510,6 +1082,27 @@ export const relations_media = relations(media, ({ many }) => ({
     relationName: "_texts",
   }),
 }))
+export const relations_packages = relations(packages, () => ({}))
+export const relations_service_areas_shipping_rates = relations(
+  service_areas_shipping_rates,
+  ({ one }) => ({
+    _parentID: one(service_areas, {
+      fields: [service_areas_shipping_rates._parentID],
+      references: [service_areas.id],
+      relationName: "shippingRates",
+    }),
+    package: one(packages, {
+      fields: [service_areas_shipping_rates.package],
+      references: [packages.id],
+      relationName: "package",
+    }),
+  })
+)
+export const relations_service_areas = relations(service_areas, ({ many }) => ({
+  shippingRates: many(service_areas_shipping_rates, {
+    relationName: "shippingRates",
+  }),
+}))
 export const relations_brands = relations(brands, ({ one }) => ({
   logo: one(media, {
     fields: [brands.logo],
@@ -532,6 +1125,107 @@ export const relations_categories = relations(categories, ({ many }) => ({
     relationName: "type",
   }),
 }))
+export const relations_products_rels = relations(products_rels, ({ one }) => ({
+  parent: one(products, {
+    fields: [products_rels.parent],
+    references: [products.id],
+    relationName: "_rels",
+  }),
+  mediaID: one(media, {
+    fields: [products_rels.mediaID],
+    references: [media.id],
+    relationName: "media",
+  }),
+  categoriesID: one(categories, {
+    fields: [products_rels.categoriesID],
+    references: [categories.id],
+    relationName: "categories",
+  }),
+}))
+export const relations_products = relations(products, ({ one, many }) => ({
+  brand: one(brands, {
+    fields: [products.brand],
+    references: [brands.id],
+    relationName: "brand",
+  }),
+  _rels: many(products_rels, {
+    relationName: "_rels",
+  }),
+}))
+export const relations_product_variants_rels = relations(
+  product_variants_rels,
+  ({ one }) => ({
+    parent: one(product_variants, {
+      fields: [product_variants_rels.parent],
+      references: [product_variants.id],
+      relationName: "_rels",
+    }),
+    mediaID: one(media, {
+      fields: [product_variants_rels.mediaID],
+      references: [media.id],
+      relationName: "media",
+    }),
+  })
+)
+export const relations_product_variants = relations(
+  product_variants,
+  ({ one, many }) => ({
+    product: one(products, {
+      fields: [product_variants.product],
+      references: [products.id],
+      relationName: "product",
+    }),
+    _rels: many(product_variants_rels, {
+      relationName: "_rels",
+    }),
+  })
+)
+export const relations_stock_alerts = relations(stock_alerts, ({ one }) => ({
+  user: one(users, {
+    fields: [stock_alerts.user],
+    references: [users.id],
+    relationName: "user",
+  }),
+  productVariant: one(product_variants, {
+    fields: [stock_alerts.productVariant],
+    references: [product_variants.id],
+    relationName: "productVariant",
+  }),
+}))
+export const relations_wishlists = relations(wishlists, ({ one }) => ({
+  customer: one(users, {
+    fields: [wishlists.customer],
+    references: [users.id],
+    relationName: "customer",
+  }),
+  productVariant: one(product_variants, {
+    fields: [wishlists.productVariant],
+    references: [product_variants.id],
+    relationName: "productVariant",
+  }),
+}))
+export const relations_carts_items = relations(carts_items, ({ one }) => ({
+  _parentID: one(carts, {
+    fields: [carts_items._parentID],
+    references: [carts.id],
+    relationName: "items",
+  }),
+  productVariant: one(product_variants, {
+    fields: [carts_items.productVariant],
+    references: [product_variants.id],
+    relationName: "productVariant",
+  }),
+}))
+export const relations_carts = relations(carts, ({ one, many }) => ({
+  customer: one(users, {
+    fields: [carts.customer],
+    references: [users.id],
+    relationName: "customer",
+  }),
+  items: many(carts_items, {
+    relationName: "items",
+  }),
+}))
 export const relations_payload_kv = relations(payload_kv, () => ({}))
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -551,6 +1245,16 @@ export const relations_payload_locked_documents_rels = relations(
       references: [media.id],
       relationName: "media",
     }),
+    packagesID: one(packages, {
+      fields: [payload_locked_documents_rels.packagesID],
+      references: [packages.id],
+      relationName: "packages",
+    }),
+    "service-areasID": one(service_areas, {
+      fields: [payload_locked_documents_rels["service-areasID"]],
+      references: [service_areas.id],
+      relationName: "service-areas",
+    }),
     brandsID: one(brands, {
       fields: [payload_locked_documents_rels.brandsID],
       references: [brands.id],
@@ -560,6 +1264,31 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.categoriesID],
       references: [categories.id],
       relationName: "categories",
+    }),
+    productsID: one(products, {
+      fields: [payload_locked_documents_rels.productsID],
+      references: [products.id],
+      relationName: "products",
+    }),
+    "product-variantsID": one(product_variants, {
+      fields: [payload_locked_documents_rels["product-variantsID"]],
+      references: [product_variants.id],
+      relationName: "product-variants",
+    }),
+    "stock-alertsID": one(stock_alerts, {
+      fields: [payload_locked_documents_rels["stock-alertsID"]],
+      references: [stock_alerts.id],
+      relationName: "stock-alerts",
+    }),
+    wishlistsID: one(wishlists, {
+      fields: [payload_locked_documents_rels.wishlistsID],
+      references: [wishlists.id],
+      relationName: "wishlists",
+    }),
+    cartsID: one(carts, {
+      fields: [payload_locked_documents_rels.cartsID],
+      references: [carts.id],
+      relationName: "carts",
     }),
   })
 )
@@ -613,6 +1342,43 @@ export const relations_settings = relations(settings, ({ many }) => ({
     relationName: "_texts",
   }),
 }))
+export const relations_nav_items = relations(nav_items, ({ one }) => ({
+  _parentID: one(nav, {
+    fields: [nav_items._parentID],
+    references: [nav.id],
+    relationName: "items",
+  }),
+}))
+export const relations_nav = relations(nav, ({ many }) => ({
+  items: many(nav_items, {
+    relationName: "items",
+  }),
+}))
+export const relations_footer_nav_links = relations(
+  footer_nav_links,
+  ({ one }) => ({
+    _parentID: one(footer_nav, {
+      fields: [footer_nav_links._parentID],
+      references: [footer_nav.id],
+      relationName: "links",
+    }),
+  })
+)
+export const relations_footer_nav = relations(footer_nav, ({ one, many }) => ({
+  _parentID: one(footer, {
+    fields: [footer_nav._parentID],
+    references: [footer.id],
+    relationName: "nav",
+  }),
+  links: many(footer_nav_links, {
+    relationName: "links",
+  }),
+}))
+export const relations_footer = relations(footer, ({ many }) => ({
+  nav: many(footer_nav, {
+    relationName: "nav",
+  }),
+}))
 
 type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
@@ -623,9 +1389,20 @@ type DatabaseSchema = {
   users: typeof users
   media: typeof media
   media_texts: typeof media_texts
+  packages: typeof packages
+  service_areas_shipping_rates: typeof service_areas_shipping_rates
+  service_areas: typeof service_areas
   brands: typeof brands
   categories_type: typeof categories_type
   categories: typeof categories
+  products: typeof products
+  products_rels: typeof products_rels
+  product_variants: typeof product_variants
+  product_variants_rels: typeof product_variants_rels
+  stock_alerts: typeof stock_alerts
+  wishlists: typeof wishlists
+  carts_items: typeof carts_items
+  carts: typeof carts
   payload_kv: typeof payload_kv
   payload_locked_documents: typeof payload_locked_documents
   payload_locked_documents_rels: typeof payload_locked_documents_rels
@@ -634,14 +1411,30 @@ type DatabaseSchema = {
   payload_migrations: typeof payload_migrations
   settings: typeof settings
   settings_texts: typeof settings_texts
+  nav_items: typeof nav_items
+  nav: typeof nav
+  footer_nav_links: typeof footer_nav_links
+  footer_nav: typeof footer_nav
+  footer: typeof footer
   relations_users_roles: typeof relations_users_roles
   relations_users_sessions: typeof relations_users_sessions
   relations_users: typeof relations_users
   relations_media_texts: typeof relations_media_texts
   relations_media: typeof relations_media
+  relations_packages: typeof relations_packages
+  relations_service_areas_shipping_rates: typeof relations_service_areas_shipping_rates
+  relations_service_areas: typeof relations_service_areas
   relations_brands: typeof relations_brands
   relations_categories_type: typeof relations_categories_type
   relations_categories: typeof relations_categories
+  relations_products_rels: typeof relations_products_rels
+  relations_products: typeof relations_products
+  relations_product_variants_rels: typeof relations_product_variants_rels
+  relations_product_variants: typeof relations_product_variants
+  relations_stock_alerts: typeof relations_stock_alerts
+  relations_wishlists: typeof relations_wishlists
+  relations_carts_items: typeof relations_carts_items
+  relations_carts: typeof relations_carts
   relations_payload_kv: typeof relations_payload_kv
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels
   relations_payload_locked_documents: typeof relations_payload_locked_documents
@@ -650,6 +1443,11 @@ type DatabaseSchema = {
   relations_payload_migrations: typeof relations_payload_migrations
   relations_settings_texts: typeof relations_settings_texts
   relations_settings: typeof relations_settings
+  relations_nav_items: typeof relations_nav_items
+  relations_nav: typeof relations_nav
+  relations_footer_nav_links: typeof relations_footer_nav_links
+  relations_footer_nav: typeof relations_footer_nav
+  relations_footer: typeof relations_footer
 }
 
 declare module "@payloadcms/db-postgres" {
