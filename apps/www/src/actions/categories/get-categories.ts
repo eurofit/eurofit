@@ -55,7 +55,7 @@ async function findCategories(page: number, limit: number) {
       srcUrl: {
         exists: true,
       },
-      active: {
+      isActive: {
         equals: true,
       },
     },

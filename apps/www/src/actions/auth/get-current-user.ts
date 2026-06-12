@@ -1,3 +1,4 @@
+import { Address } from "@/payload-types"
 import config from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
 import { headers as getHeaders } from "next/headers"
@@ -20,7 +21,13 @@ export const getCurrentUser = async () => {
 
   cacheTag("current-user", user.id)
 
-  return user
+  // Flatten the addresses join so callers get a plain, populated array instead of
+  // the paginated `{ docs }` shape.
+  const addresses = (user.addresses?.docs ?? []).filter(
+    (doc): doc is Address => typeof doc === "object"
+  )
+
+  return { ...user, addresses }
 }
 
 export type CurrentUser = Awaited<ReturnType<typeof getCurrentUser>>

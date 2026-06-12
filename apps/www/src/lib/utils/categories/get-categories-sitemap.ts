@@ -19,7 +19,7 @@ export async function getCategoriesSitemap(): Promise<MetadataRoute.Sitemap> {
     where: {
       and: [
         {
-          active: {
+          isActive: {
             equals: true,
           },
         },

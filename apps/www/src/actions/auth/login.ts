@@ -2,11 +2,13 @@
 
 import { env } from "@/env.mjs"
 import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
+import { mergeCart } from "@/lib/utils/cart/merge-cart"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { User } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
 import { login as payloadLogin } from "@payloadcms/next/auth"
+import { after } from "next/server"
 import { APIError, AuthenticationError, UnverifiedEmail } from "payload"
 
 export async function login(
@@ -43,15 +45,20 @@ export async function login(
       password,
     })
 
-    if (!result.user) {
+    const user = result.user
+
+    if (!user) {
       return {
         success: false,
         code: 401,
         message: "Login failed.",
-      } satisfies ActionResult
+      }
     }
 
-    return { success: true, data: { user: result.user } } as const
+    // merge the guest cart into the user account without blocking the response
+    after(() => mergeCart(user.id))
+
+    return { success: true, data: { user } } as const
   } catch (error: unknown) {
     if (error instanceof AuthenticationError) {
       return {
