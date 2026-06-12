@@ -23,6 +23,8 @@ Boolean variables must use semantic prefixes that make their truthiness obvious:
 | `should` | Conditional intent — `shouldRedirect`, `shouldRefetch`   |
 | `did`    | Past action — `didAcceptTerms`                           |
 
+- Use strictly clean code-skill, everytime you are writing a code
+
 ```typescript
 // Bad
 const turnstileOk = await verifyTurnstile(token, secret)

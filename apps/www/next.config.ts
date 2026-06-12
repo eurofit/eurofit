@@ -8,6 +8,7 @@ const UNSPLASH_URL = "https://images.unsplash.com"
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  reactCompiler: true,
   transpilePackages: ["@eurofit/ui", "@eurofit/transactional"],
   redirects,
   images: {
