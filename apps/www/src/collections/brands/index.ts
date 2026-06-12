@@ -4,7 +4,10 @@ import { isAdmin } from "@/access/is-admin"
 import { activeField } from "@/fields/active"
 import type { CollectionConfig } from "payload"
 import { slugField } from "payload"
-import { revalidateBrandsTag } from "./hooks/revalidate-brands-tag"
+import {
+  revalidateBrandsTag,
+  revalidateBrandsTagOnDelete,
+} from "./hooks/revalidate-tag"
 
 export const brands: CollectionConfig = {
   slug: "brands",
@@ -26,12 +29,12 @@ export const brands: CollectionConfig = {
     description: "Manage brands associated with products in the store.",
     useAsTitle: "title",
     listSearchableFields: ["id", "title", "slug"],
-    defaultColumns: ["supplierImage", "title"],
+    defaultColumns: ["supplierImageUrl", "title"],
   },
   defaultPopulate: {
     slug: true,
     title: true,
-    supplierImage: true,
+    supplierImageUrl: true,
   },
   defaultSort: "title",
   fields: [
@@ -70,11 +73,22 @@ export const brands: CollectionConfig = {
       label: "Brand Logo",
       admin: {
         description:
-          "The logo of the brand. If you have specified the supplierImage, this will be used first and the supplierImage will be used as a fallback.",
+          "The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.",
+      },
+    },
+    {
+      name: "products",
+      label: "Products",
+      type: "join",
+      collection: "products",
+      on: "brand",
+      admin: {
+        allowCreate: true,
       },
     },
   ],
   hooks: {
     afterChange: [revalidateBrandsTag],
+    afterDelete: [revalidateBrandsTagOnDelete],
   },
 }

@@ -1,8 +1,12 @@
 import { adminOnly } from "@/access/admin"
 import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
+import { activeField } from "@/fields/active"
 import { CollectionConfig, slugField } from "payload"
-import { revalidateCategoriesTag } from "./hooks/revalidate-categories-tag"
+import {
+  revalidateCategoriesTag,
+  revalidateCategoriesTagOnDelete,
+} from "./hooks/revalidate-tag"
 
 export const categories: CollectionConfig = {
   slug: "categories",
@@ -31,6 +35,7 @@ export const categories: CollectionConfig = {
   },
   fields: [
     slugField(),
+    activeField(),
     {
       name: "title",
       type: "text",
@@ -85,23 +90,9 @@ export const categories: CollectionConfig = {
         update: isAdmin,
       },
     },
-    {
-      name: "active",
-      type: "checkbox",
-      label: "Active",
-      defaultValue: true,
-      admin: {
-        description: "Indicates whether the category is currently active.",
-        position: "sidebar",
-      },
-      access: {
-        create: isAdmin,
-        read: isAdmin,
-        update: isAdmin,
-      },
-    },
   ],
   hooks: {
     afterChange: [revalidateCategoriesTag],
+    afterDelete: [revalidateCategoriesTagOnDelete],
   },
 }
