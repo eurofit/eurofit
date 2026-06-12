@@ -4,7 +4,7 @@ import { adminOnly } from "@/access/admin"
 import { adminOnlyFieldAccess } from "@/access/admin-field"
 import { everyone } from "@/access/everyone"
 
-export const Settings: GlobalConfig = {
+export const settings: GlobalConfig = {
   slug: "settings",
   access: {
     read: everyone,

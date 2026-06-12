@@ -1,3 +1,5 @@
-import { Settings } from "./settings"
+import { footer } from "./footer"
+import { nav } from "./nav"
+import { settings } from "./settings"
 
-export const globals = [Settings]
+export const globals = [settings, nav, footer]

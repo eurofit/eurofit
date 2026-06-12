@@ -19,6 +19,7 @@ export const site = {
       text: "+254 110 990 666",
       href: "tel:+254110990666",
     },
+    whatsapp: "254110990666",
     email: {
       text: "info@eurofit.co.ke",
       href: "mailto:info@eurofit.co.ke",

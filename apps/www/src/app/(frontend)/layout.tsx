@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scrollbar-gutter-stable">
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
         <JsonLd jsonLd={[organization, website, localBusiness]} />
         <Toaster richColors duration={8000} closeButton />
