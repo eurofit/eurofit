@@ -18,16 +18,11 @@ const logoVariants = cva("font-montserrat uppercase not-italic no-underline!", {
 
 type LogoProps = {
   rootClass?: string
-  as?: Extract<React.ElementType, "h1" | "span">
+  as?: Extract<React.ElementType, "h1" | "div">
 } & VariantProps<typeof logoVariants> &
   React.HTMLAttributes<HTMLDivElement>
 
-export function Logo({
-  variant,
-  rootClass,
-  className,
-  as = "span",
-}: LogoProps) {
+export function Logo({ variant, rootClass, className, as = "div" }: LogoProps) {
   const Comp = as
   return (
     <Link href="/" aria-label={site.name} className={cn(rootClass)}>

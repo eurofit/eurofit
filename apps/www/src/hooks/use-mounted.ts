@@ -11,7 +11,7 @@ export function useMounted(): () => boolean {
     }
   }, [])
 
-  const idMounted = React.useCallback(() => mountedRef.current, [])
+  const isMounted = React.useCallback(() => mountedRef.current, [])
 
-  return idMounted
+  return isMounted
 }
