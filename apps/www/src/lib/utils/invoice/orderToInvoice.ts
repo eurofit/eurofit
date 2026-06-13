@@ -9,13 +9,13 @@ export function orderToInvoice(order: Order): Invoice | null {
     return null
   }
 
-  if (typeof order.customer !== "object" || order.customer === null) {
+  if (typeof order.user !== "object" || order.user === null) {
     return null
   }
 
   const formattedOrder = {
     id: order.id.toString(),
-    fao: order.customer.fullName ?? order.customer.firstName,
+    fao: order.user.fullName ?? order.user.firstName,
     date: order.createdAt,
     dueDate: order.createdAt,
     status: order.paymentStatus,

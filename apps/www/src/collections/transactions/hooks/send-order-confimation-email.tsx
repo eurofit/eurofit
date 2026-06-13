@@ -40,14 +40,14 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
     })
   }
 
-  let customer: User
+  let orderUser: User
 
-  if (typeof order.customer === "object" && order.customer !== null) {
-    customer = order.customer as User
+  if (typeof order.user === "object" && order.user !== null) {
+    orderUser = order.user as User
   } else {
-    customer = await req.payload.findByID({
+    orderUser = await req.payload.findByID({
       collection: "users",
-      id: order.customer,
+      id: order.user,
       req,
     })
   }
@@ -69,7 +69,7 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
 
   const invoice = orderToInvoice({
     ...order,
-    customer,
+    user: orderUser,
   })
   const invoiceBuffer = invoice ? await getInvoiceBuffer(invoice) : null
 
@@ -77,7 +77,7 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
     orderUrl: site.url + `order/${order.id}`,
     siteUrl: site.url,
     customer: {
-      name: customer.firstName,
+      name: orderUser.firstName,
     },
     order: {
       id: order.id.toString(),
@@ -96,23 +96,28 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
     },
   }
 
-  req.payload.sendEmail({
-    from: env.SMTP_NO_REPLY_USERNAME,
-    to: customer.email,
-    subject: "Order Placed",
-    text: await getOrderConfirmationEmailText(emailProps),
-    html: await getOrderConfirmationEmailHTML(emailProps),
-    replyTo: env.SMTP_INFO_USERNAME,
-    attachments: [
-      invoiceBuffer
-        ? {
-            filename: `invoice-${order.id}.pdf`,
-            content: invoiceBuffer,
-            contentType: "application/pdf",
-          }
-        : null,
-    ].filter(Boolean),
-  })
+  try {
+    await req.payload.sendEmail({
+      from: env.SMTP_NO_REPLY_USERNAME,
+      to: orderUser.email,
+      subject: "Order Placed",
+      text: await getOrderConfirmationEmailText(emailProps),
+      html: await getOrderConfirmationEmailHTML(emailProps),
+      replyTo: env.SMTP_INFO_USERNAME,
+      attachments: [
+        invoiceBuffer
+          ? {
+              filename: `invoice-${order.id}.pdf`,
+              content: invoiceBuffer,
+              contentType: "application/pdf",
+            }
+          : null,
+      ].filter(Boolean),
+    })
+  } catch (error) {
+    // TODO: implement error tracking service (see TODOS.md)
+    console.error("[order-confirmation-email] sendEmail failed:", error)
+  }
 
   return transaction
 }

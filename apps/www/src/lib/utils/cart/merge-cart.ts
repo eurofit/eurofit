@@ -27,7 +27,7 @@ export async function mergeCart(userId: string) {
 
     const { docs: userCarts } = await payload.find({
       collection: "carts",
-      where: { customer: { equals: userId } },
+      where: { user: { equals: userId } },
       limit: 1,
       pagination: false,
     })
@@ -43,7 +43,7 @@ export async function mergeCart(userId: string) {
     await payload.update({
       collection: "carts",
       id: guestCart.id,
-      data: { guestSessionId: null, customer: userId },
+      data: { guestSessionId: null, user: userId },
     })
   } catch {
     // Merge is best-effort; never surface errors to the caller.

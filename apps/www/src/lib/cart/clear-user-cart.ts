@@ -1,12 +1,12 @@
 import config from "@/payload.config"
 import { getPayload } from "payload"
 
-export async function clearCustomerCart(customerId: string) {
+export async function clearUserCart(userId: string) {
   const payload = await getPayload({ config })
 
   const { docs: carts } = await payload.find({
     collection: "carts",
-    where: { customer: { equals: customerId } },
+    where: { user: { equals: userId } },
     limit: 1,
     pagination: false,
     overrideAccess: true,

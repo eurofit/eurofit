@@ -17,7 +17,12 @@ export async function POST(req: Request) {
   // Return 200 immediately per Paystack docs — long-running work triggers retries
   after(async () => {
     if (body.event === "charge.success") {
-      await handleChargeSuccess(body.data)
+      try {
+        await handleChargeSuccess(body.data)
+      } catch (error) {
+        // TODO: implement error tracking service (see TODOS.md)
+        console.error("[paystack-webhook] handleChargeSuccess failed:", error)
+      }
     }
   })
 

@@ -25,7 +25,7 @@ export async function getInvoice(unsafeInput: Input): Promise<Invoice | null> {
       },
     },
     select: {
-      customer: true,
+      user: true,
       deliveryAddress: true,
       createdAt: true,
       items: {

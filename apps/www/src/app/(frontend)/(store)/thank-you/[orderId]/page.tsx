@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { OrderCard } from "@/components/orders/card"
+import { DELIVERY_FEE } from "@/const/delivery"
 import { addressSchema } from "@/lib/schemas/addresses/address"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
@@ -65,7 +66,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
           },
         },
         {
-          customer: {
+          user: {
             equals: user.id,
           },
         },
@@ -87,7 +88,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
       },
     },
     overrideAccess: false,
-    user: user.id,
+    user: user,
     depth: 2,
     limit: 1,
     pagination: false,
@@ -217,7 +218,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                     <dd className="text-right slashed-zero tabular-nums">
                       <span className="text-muted-foreground">Ksh</span>
                       &nbsp;
-                      <span>{formatWithCommas(2000)}</span>
+                      <span>{formatWithCommas(DELIVERY_FEE)}</span>
                     </dd>
                   </div>
                   <Separator className="my-2" />
@@ -226,7 +227,9 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                     <dd className="text-right slashed-zero tabular-nums">
                       <span className="text-muted-foreground">Ksh</span>
                       &nbsp;
-                      <span>{formatWithCommas(order.total! + 2000)}</span>
+                      <span>
+                        {formatWithCommas(order.total! + DELIVERY_FEE)}
+                      </span>
                     </dd>
                   </div>
                 </dl>

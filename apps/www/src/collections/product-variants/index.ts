@@ -12,6 +12,7 @@ import {
   revalidateProductVariantTag,
   revalidateProductVariantTagOnDelete,
 } from "./hooks/revalidate-tag"
+import { validateRetailPrice } from "./validators/validate-retail-price"
 
 export const productVariants: CollectionConfig = {
   slug: "product-variants",
@@ -213,9 +214,10 @@ export const productVariants: CollectionConfig = {
           name: "retailPrice",
           type: "number",
           label: "Retail Price (KES)",
+          validate: validateRetailPrice,
           admin: {
             description:
-              "Customer price in KES (calculated from supplier price, shipping, margin).",
+              "Customer price in KES (calculated from supplier price, shipping, margin). Must be a non-negative integer.",
           },
         },
       ],

@@ -1,6 +1,6 @@
 import { isAdmin } from "@/access/is-admin"
+import { userOwned } from "@/access/user-owned"
 import { CollectionConfig } from "payload"
-import { adminOrSelf } from "./../../access/admin-or-self"
 import { computeTotal } from "./hooks/compute-total"
 import { ensureSnapshots } from "./hooks/ensure-snapshots"
 import { revalidateCache } from "./hooks/revalidate-tag"
@@ -13,10 +13,10 @@ export const carts: CollectionConfig = {
     interface: "Cart",
   },
   access: {
-    create: adminOrSelf,
-    read: adminOrSelf,
-    update: adminOrSelf,
-    delete: adminOrSelf,
+    create: userOwned,
+    read: userOwned,
+    update: userOwned,
+    delete: userOwned,
     admin: isAdmin,
   },
   labels: {
@@ -24,12 +24,12 @@ export const carts: CollectionConfig = {
     plural: "Carts",
   },
   admin: {
-    useAsTitle: "customer",
-    defaultColumns: ["customer", "items", "total"],
+    useAsTitle: "user",
+    defaultColumns: ["user", "items", "total"],
   },
   fields: [
     {
-      name: "customer",
+      name: "user",
       type: "relationship",
       relationTo: "users",
       unique: true,

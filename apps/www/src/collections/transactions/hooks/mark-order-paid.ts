@@ -32,5 +32,5 @@ export const markOrderPaid: CollectionAfterChangeHook<Transaction> = async ({
   if (checkIfOrderIsPaid(order)) return
   if (order.total !== doc.amount) return
 
-  await markOrderAsPaid(orderId)
+  await markOrderAsPaid(orderId, req)
 }

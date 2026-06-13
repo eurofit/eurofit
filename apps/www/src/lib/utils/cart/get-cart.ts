@@ -11,7 +11,7 @@ import { getPayload, type Where } from "payload"
  */
 export function buildCartWhere({ user, guestSessionId }: Identity): Where {
   return user
-    ? { customer: { equals: user } }
+    ? { user: { equals: user } }
     : { guestSessionId: { equals: guestSessionId } }
 }
 
@@ -19,8 +19,8 @@ export function buildCartWhere({ user, guestSessionId }: Identity): Where {
 export function buildCartOwner({
   user,
   guestSessionId,
-}: Identity): { customer: string } | { guestSessionId: string } {
-  return user ? { customer: user } : { guestSessionId: guestSessionId! }
+}: Identity): { user: string } | { guestSessionId: string } {
+  return user ? { user } : { guestSessionId: guestSessionId! }
 }
 
 /**

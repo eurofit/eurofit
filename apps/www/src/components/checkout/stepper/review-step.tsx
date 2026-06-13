@@ -13,7 +13,10 @@ import {
   CardTitle,
 } from "@eurofit/ui/components/card"
 import { Spinner } from "@eurofit/ui/components/spinner"
+import type { TurnstileInstance } from "@marsidev/react-turnstile"
+import { Turnstile } from "@marsidev/react-turnstile"
 import { ChevronRight, Lock, ShoppingCart } from "lucide-react"
+import React from "react"
 import { toast } from "sonner"
 import { OrderItem } from "./order-item"
 import { OrderSummary } from "./order-summary"
@@ -26,27 +29,43 @@ export function ReviewStep() {
   const { items, itemCount, total } = useCart()
   const { checkout, isCheckingout } = useCheckout()
 
+  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
+    null
+  )
+
   const handleCheckout = () => {
     if (!address) {
       toast.info("Please provide delivery Address")
       return
     }
 
+    if (!turnstileToken) {
+      toast.error("Security check is still loading. Please wait a moment.")
+      return
+    }
+
     checkout({
-      items: items.map((item) => ({
-        id: item.id,
-        quantity: item.quantity,
-        snapshot: {
-          sku: item.sku,
-          bbe: item.expiryDate,
-          title: item.title,
-          variant: item.variant ?? "",
-          price: item.retailPrice!,
-          product: item.product,
-        },
-      })),
-      addressId: address.id,
+      data: {
+        items: items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          snapshot: {
+            sku: item.sku,
+            bbe: item.expiryDate,
+            title: item.title,
+            variant: item.variant ?? "",
+            price: item.retailPrice!,
+            product: item.product,
+          },
+        })),
+        addressId: address.id,
+      },
+      turnstileToken,
     })
+
+    setTurnstileToken(null)
+    turnstileRef.current?.reset()
   }
 
   return (
@@ -100,7 +119,11 @@ export function ReviewStep() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" onClick={handleCheckout}>
+          <Button
+            className="w-full"
+            onClick={handleCheckout}
+            disabled={isCheckingout || !turnstileToken}
+          >
             {isCheckingout && (
               <>
                 <Spinner /> Placing Order
@@ -109,6 +132,17 @@ export function ReviewStep() {
 
             {!isCheckingout && "Place Order"}
           </Button>
+
+          <Turnstile
+            ref={turnstileRef}
+            id="checkout-review-form-turnstile"
+            siteKey={
+              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
+            }
+            onSuccess={(token) => setTurnstileToken(token)}
+            onError={() => setTurnstileToken(null)}
+            onExpire={() => setTurnstileToken(null)}
+          />
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Lock className="size-4" />

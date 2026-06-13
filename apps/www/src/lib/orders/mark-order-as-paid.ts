@@ -1,13 +1,14 @@
-import config from "@/payload.config"
-import { getPayload } from "payload"
+import { PayloadRequest } from "payload"
 
-export async function markOrderAsPaid(orderId: number | string) {
-  const payload = await getPayload({ config })
-
-  await payload.update({
+export async function markOrderAsPaid(
+  orderId: number | string,
+  req: PayloadRequest
+) {
+  await req.payload.update({
     collection: "orders",
     id: orderId,
     data: { paymentStatus: "paid" },
     overrideAccess: true,
+    req,
   })
 }

@@ -1,7 +1,7 @@
 import { adminOnly } from "@/access/admin"
 import { adminOnlyFieldAccess } from "@/access/admin-field"
-import { adminOrSelf } from "@/access/admin-or-self"
 import { isAdmin } from "@/access/is-admin"
+import { userOwned } from "@/access/user-owned"
 import { orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
@@ -19,8 +19,8 @@ export const orders: CollectionConfig = {
     interface: "Order",
   },
   access: {
-    create: adminOrSelf,
-    read: adminOrSelf,
+    create: userOwned,
+    read: userOwned,
     update: adminOnly,
     delete: adminOnly,
     admin: isAdmin,
@@ -38,16 +38,23 @@ export const orders: CollectionConfig = {
       index: true,
     },
     {
-      name: "customer",
+      name: "user",
       type: "relationship",
       relationTo: "users",
       required: true,
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: "deliveryAddress",
       type: "relationship",
       relationTo: "addresses",
       required: true,
+      access: {
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: "items",
@@ -73,6 +80,10 @@ export const orders: CollectionConfig = {
           admin: {
             description: "Snapshot of the product line at the time of purchase",
             hidden: true,
+          },
+          access: {
+            create: adminOnlyFieldAccess,
+            update: adminOnlyFieldAccess,
           },
         },
       ],
@@ -109,6 +120,10 @@ export const orders: CollectionConfig = {
       required: true,
       defaultValue: "unpaid",
       options: paymentStatus,
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: "paystackAccessCode",
@@ -118,6 +133,11 @@ export const orders: CollectionConfig = {
           "Access code returned by Paystack when initiating a transaction. We can re use to charge the payment.",
         hidden: true,
       },
+      access: {
+        read: adminOnlyFieldAccess,
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: "snapshot",
@@ -126,6 +146,10 @@ export const orders: CollectionConfig = {
       admin: {
         description: "Snapshot of the order at the time of purchase",
         hidden: true,
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
       },
     },
     {

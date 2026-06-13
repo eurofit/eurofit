@@ -1,5 +1,5 @@
-import { adminOrSelf } from "@/access/admin-or-self"
 import { isAdmin } from "@/access/is-admin"
+import { userOwned } from "@/access/user-owned"
 import { titles } from "@/const/titles"
 import { CollectionConfig } from "payload"
 import { ensureSingleDefaultAddress } from "./hooks/ensure-single-default-address"
@@ -11,10 +11,10 @@ export const addresses: CollectionConfig = {
     plural: "Addresses",
   },
   access: {
-    create: adminOrSelf,
-    read: adminOrSelf,
-    update: adminOrSelf,
-    delete: adminOrSelf,
+    create: userOwned,
+    read: userOwned,
+    update: userOwned,
+    delete: userOwned,
     admin: isAdmin,
   },
   admin: {

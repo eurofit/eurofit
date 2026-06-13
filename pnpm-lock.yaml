@@ -113,6 +113,9 @@ importers:
       libphonenumber-js:
         specifier: ^1.13.6
         version: 1.13.6
+      lodash:
+        specifier: ^4.18.1
+        version: 4.18.1
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -195,6 +198,9 @@ importers:
       '@types/bwip-js':
         specifier: ^3.2.3
         version: 3.2.3
+      '@types/lodash':
+        specifier: ^4.17.24
+        version: 4.17.24
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12

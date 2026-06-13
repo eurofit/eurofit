@@ -652,7 +652,7 @@ export const wishlists = pgTable(
   "wishlists",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    customer: uuid("customer_id")
+    user: uuid("user_id")
       .notNull()
       .references(() => users.id, {
         onDelete: "set null",
@@ -678,12 +678,12 @@ export const wishlists = pgTable(
       .notNull(),
   },
   (columns) => [
-    index("wishlists_customer_idx").on(columns.customer),
+    index("wishlists_user_idx").on(columns.user),
     index("wishlists_product_variant_idx").on(columns.productVariant),
     index("wishlists_updated_at_idx").on(columns.updatedAt),
     index("wishlists_created_at_idx").on(columns.createdAt),
-    uniqueIndex("customer_productVariant_idx").on(
-      columns.customer,
+    uniqueIndex("user_productVariant_1_idx").on(
+      columns.user,
       columns.productVariant
     ),
   ]
@@ -725,7 +725,7 @@ export const carts = pgTable(
   "carts",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    customer: uuid("customer_id").references(() => users.id, {
+    user: uuid("user_id").references(() => users.id, {
       onDelete: "set null",
     }),
     guestSessionId: varchar("guest_session_id"),
@@ -750,7 +750,7 @@ export const carts = pgTable(
       .notNull(),
   },
   (columns) => [
-    uniqueIndex("carts_customer_idx").on(columns.customer),
+    uniqueIndex("carts_user_idx").on(columns.user),
     uniqueIndex("carts_guest_session_id_idx").on(columns.guestSessionId),
     index("carts_updated_at_idx").on(columns.updatedAt),
     index("carts_created_at_idx").on(columns.createdAt),
@@ -787,7 +787,7 @@ export const orders = pgTable(
   "orders",
   {
     id: numeric("id", { mode: "number" }).primaryKey(),
-    customer: uuid("customer_id")
+    user: uuid("user_id")
       .notNull()
       .references(() => users.id, {
         onDelete: "set null",
@@ -818,7 +818,7 @@ export const orders = pgTable(
       .notNull(),
   },
   (columns) => [
-    index("orders_customer_idx").on(columns.customer),
+    index("orders_user_idx").on(columns.user),
     index("orders_delivery_address_idx").on(columns.deliveryAddress),
     index("orders_updated_at_idx").on(columns.updatedAt),
     index("orders_created_at_idx").on(columns.createdAt),
@@ -900,6 +900,7 @@ export const transactions = pgTable(
   },
   (columns) => [
     index("transactions_order_idx").on(columns.order),
+    uniqueIndex("transactions_ref_idx").on(columns.ref),
     index("transactions_updated_at_idx").on(columns.updatedAt),
     index("transactions_created_at_idx").on(columns.createdAt),
   ]
@@ -1445,10 +1446,10 @@ export const relations_stock_alerts = relations(stock_alerts, ({ one }) => ({
   }),
 }))
 export const relations_wishlists = relations(wishlists, ({ one }) => ({
-  customer: one(users, {
-    fields: [wishlists.customer],
+  user: one(users, {
+    fields: [wishlists.user],
     references: [users.id],
-    relationName: "customer",
+    relationName: "user",
   }),
   productVariant: one(product_variants, {
     fields: [wishlists.productVariant],
@@ -1469,10 +1470,10 @@ export const relations_carts_items = relations(carts_items, ({ one }) => ({
   }),
 }))
 export const relations_carts = relations(carts, ({ one, many }) => ({
-  customer: one(users, {
-    fields: [carts.customer],
+  user: one(users, {
+    fields: [carts.user],
     references: [users.id],
-    relationName: "customer",
+    relationName: "user",
   }),
   items: many(carts_items, {
     relationName: "items",
@@ -1491,10 +1492,10 @@ export const relations_orders_items = relations(orders_items, ({ one }) => ({
   }),
 }))
 export const relations_orders = relations(orders, ({ one, many }) => ({
-  customer: one(users, {
-    fields: [orders.customer],
+  user: one(users, {
+    fields: [orders.user],
     references: [users.id],
-    relationName: "customer",
+    relationName: "user",
   }),
   deliveryAddress: one(addresses, {
     fields: [orders.deliveryAddress],

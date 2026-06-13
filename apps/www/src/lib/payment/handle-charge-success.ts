@@ -1,5 +1,5 @@
 import { env } from "@/env.mjs"
-import { clearCustomerCart } from "@/lib/cart/clear-customer-cart"
+import { clearUserCart } from "@/lib/cart/clear-user-cart"
 import { resolveOrderForPayment } from "@/lib/orders/resolve-order-for-payment"
 import { verifyPaystackTransaction } from "@/lib/payment/verify-paystack-transaction"
 import config from "@/payload.config"
@@ -23,7 +23,7 @@ export async function handleChargeSuccess(eventData: { reference: string }) {
     data: {
       order: order.id,
       ref: verified.reference,
-      amount: verified.amount / 100,
+      amount: Math.round(verified.amount / 100),
       provider: "paystack",
       isTest: isTestPayment,
       paidAt: verified.paid_at.toISOString(),
@@ -32,8 +32,7 @@ export async function handleChargeSuccess(eventData: { reference: string }) {
     overrideAccess: true,
   })
 
-  const customerId =
-    typeof order.customer === "string" ? order.customer : order.customer.id
+  const userId = typeof order.user === "string" ? order.user : order.user.id
 
-  await clearCustomerCart(customerId)
+  await clearUserCart(userId)
 }

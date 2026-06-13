@@ -13,7 +13,7 @@ export const checkIfWishlisted: FieldHook<
   const { totalDocs } = await req.payload.count({
     collection: "wishlists",
     where: {
-      customer: {
+      user: {
         equals: currentUserId,
       },
       productVariant: {

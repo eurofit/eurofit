@@ -1,3 +1,5 @@
+import { isAdmin } from "@/access/is-admin"
+import { userOwned } from "@/access/user-owned"
 import { CollectionConfig } from "payload"
 
 export const wishlists: CollectionConfig = {
@@ -9,9 +11,16 @@ export const wishlists: CollectionConfig = {
     singular: "Wishlist",
     plural: "Wishlists",
   },
+  access: {
+    create: userOwned,
+    read: userOwned,
+    update: userOwned,
+    delete: userOwned,
+    admin: isAdmin,
+  },
   fields: [
     {
-      name: "customer",
+      name: "user",
       type: "relationship",
       relationTo: "users",
       hasMany: false,
@@ -27,7 +36,7 @@ export const wishlists: CollectionConfig = {
   ],
   indexes: [
     {
-      fields: ["customer", "productVariant"],
+      fields: ["user", "productVariant"],
       unique: true,
     },
   ],

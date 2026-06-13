@@ -550,7 +550,7 @@ export interface ProductVariant {
    */
   costPrice?: number | null
   /**
-   * Customer price in KES (calculated from supplier price, shipping, margin).
+   * Customer price in KES (calculated from supplier price, shipping, margin). Must be a non-negative integer.
    */
   retailPrice?: number | null
   /**
@@ -637,7 +637,7 @@ export interface StockAlert {
  */
 export interface Wishlist {
   id: string
-  customer: string | User
+  user: string | User
   productVariant: string | ProductVariant
   updatedAt: string
   createdAt: string
@@ -648,7 +648,7 @@ export interface Wishlist {
  */
 export interface Cart {
   id: string
-  customer?: (string | null) | User
+  user?: (string | null) | User
   /**
    * Identifier for guest customer sessions. Programmatically generated.
    */
@@ -680,7 +680,7 @@ export interface Cart {
  */
 export interface Order {
   id: number
-  customer: string | User
+  user: string | User
   deliveryAddress: string | Address
   items: {
     productVariant: string | ProductVariant
@@ -1116,7 +1116,7 @@ export interface StockAlertsSelect<T extends boolean = true> {
  * via the `definition` "wishlists_select".
  */
 export interface WishlistsSelect<T extends boolean = true> {
-  customer?: T
+  user?: T
   productVariant?: T
   updatedAt?: T
   createdAt?: T
@@ -1126,7 +1126,7 @@ export interface WishlistsSelect<T extends boolean = true> {
  * via the `definition` "carts_select".
  */
 export interface CartsSelect<T extends boolean = true> {
-  customer?: T
+  user?: T
   guestSessionId?: T
   items?:
     | T
@@ -1153,7 +1153,7 @@ export interface CartsSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   id?: T
-  customer?: T
+  user?: T
   deliveryAddress?: T
   items?:
     | T
