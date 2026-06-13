@@ -1,4 +1,5 @@
 import { site } from "@/const/site"
+import { ServiceAreaDetail } from "@/types/service-area"
 import {
   Brand,
   BreadcrumbList,
@@ -25,6 +26,7 @@ type BrandJsonLdOptions = {
   totalProducts: number
   page?: number
   pagingCounter: number
+  area?: Pick<ServiceAreaDetail, "title" | "slug"> | null
 }
 
 export function getBrandJsonLd({
@@ -33,14 +35,25 @@ export function getBrandJsonLd({
   totalProducts,
   page = 1,
   pagingCounter,
+  area = null,
 }: BrandJsonLdOptions): WithContext<Thing>[] {
   const brandsUrl = `${site.url}/brands`
   const brandUrl = `${brandsUrl}/${brand.slug}`
-  const pageUrl = page > 1 ? `${brandUrl}?page=${page}` : brandUrl
+  // For area pages the canonical entity is the area page itself, so structured
+  // data is self-referencing (required for the page to rank locally).
+  const baseUrl = area ? `${brandUrl}/${area.slug}` : brandUrl
+  const pageUrl = page > 1 ? `${baseUrl}?page=${page}` : baseUrl
 
+  // The Brand schema stays anchored to the canonical brand page so product
+  // pages can reference a single, stable brand @id.
   const brandId = `${brandUrl}#brand`
   const breadcrumbId = `${pageUrl}#breadcrumb`
   const productListId = `${pageUrl}#product-list`
+
+  const collectionName = area
+    ? `${brand.title} Supplements in ${area.title}`
+    : `${brand.title} Supplements in Kenya`
+  const locationLabel = area ? area.title : "Kenya"
 
   // --- Breadcrumbs ---
   const breadcrumb: WithContext<BreadcrumbList> = {
@@ -66,6 +79,16 @@ export function getBrandJsonLd({
         name: brand.title,
         item: brandUrl,
       },
+      ...(area
+        ? [
+            {
+              "@type": "ListItem" as const,
+              position: 4,
+              name: area.title,
+              item: baseUrl,
+            },
+          ]
+        : []),
     ],
   }
 
@@ -85,7 +108,7 @@ export function getBrandJsonLd({
     "@type": "ItemList",
     "@id": productListId,
     name: `${brand.title} Supplements Available at ${site.name}`,
-    description: `Paginated list of authentic ${brand.title} supplements available in Kenya at ${site.name}.`,
+    description: `Paginated list of authentic ${brand.title} supplements available in ${locationLabel} at ${site.name}.`,
     itemListOrder: "https://schema.org/ItemListOrderAlphabetical",
     numberOfItems: totalProducts,
     itemListElement: products.map<ListItem>((product, index) => {
@@ -112,8 +135,8 @@ export function getBrandJsonLd({
     "@type": "CollectionPage",
     "@id": `${pageUrl}#webpage`,
     url: pageUrl,
-    name: `${brand.title} Supplements in Kenya`,
-    description: `Browse authentic ${brand.title} supplements available in Kenya at ${site.name}.`,
+    name: collectionName,
+    description: `Browse authentic ${brand.title} supplements available in ${locationLabel} at ${site.name}.`,
     inLanguage: "en",
     isPartOf: { "@id": `${site.url}/#website` },
     about: { "@id": brandId },

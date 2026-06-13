@@ -1,4 +1,5 @@
 import { getBrand } from "@/actions/brands/get-brand"
+import { ServiceAreaDetail } from "@/types/service-area"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,10 +12,15 @@ import { Skeleton } from "@eurofit/ui/components/skeleton"
 
 type BrandBreadcrumbsProps = {
   slug: Promise<string>
+  area?: Promise<ServiceAreaDetail | null>
 }
 
-export async function BrandBreadcrumbs({ slug }: BrandBreadcrumbsProps) {
-  const brand = await getBrand({ slug: await slug })
+export async function BrandBreadcrumbs({
+  slug: slugPromise,
+  area: areaPromise,
+}: BrandBreadcrumbsProps) {
+  const [slug, area] = await Promise.all([slugPromise, areaPromise ?? null])
+  const brand = await getBrand({ slug })
 
   if (!brand) return null
 
@@ -30,8 +36,22 @@ export async function BrandBreadcrumbs({ slug }: BrandBreadcrumbsProps) {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>{brand.title}</BreadcrumbPage>
+          {area ? (
+            <BreadcrumbLink href={`/brands/${slug}`}>
+              {brand.title}
+            </BreadcrumbLink>
+          ) : (
+            <BreadcrumbPage>{brand.title}</BreadcrumbPage>
+          )}
         </BreadcrumbItem>
+        {area && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{area.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </>
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   )

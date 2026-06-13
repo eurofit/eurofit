@@ -11,6 +11,7 @@ import { BRAND_PRODUCTS_PER_PAGE } from "@/const/brand-filters"
 import { site } from "@/const/site"
 import { BrandSearchParams } from "@/lib/utils/brands/brand-search-params"
 import { getBrandJsonLd } from "@/lib/utils/brands/get-brand-jsonld"
+import { ServiceAreaDetail } from "@/types/service-area"
 import pluralize from "pluralize-esm"
 import * as React from "react"
 
@@ -18,17 +19,20 @@ type BrandProductsProps = {
   slug: Promise<string>
   searchParams: Promise<BrandSearchParams>
   mobileFiltersSlot?: React.ReactNode
+  area?: Promise<ServiceAreaDetail | null>
 }
 
 export async function BrandProducts({
   slug: slugPromise,
   searchParams: searchParamsPromise,
   mobileFiltersSlot,
+  area: areaPromise,
 }: BrandProductsProps) {
-  const [slug, searchParams, user] = await Promise.all([
+  const [slug, searchParams, user, area] = await Promise.all([
     slugPromise,
     searchParamsPromise,
     getCurrentUser(),
+    areaPromise ?? null,
   ])
 
   const { page, sortDirection, category, size, flavourColour } = searchParams
@@ -50,7 +54,14 @@ export async function BrandProducts({
   ])
 
   const brandJsonLd = brand
-    ? getBrandJsonLd({ brand, products, totalProducts, page, pagingCounter })
+    ? getBrandJsonLd({
+        brand,
+        products,
+        totalProducts,
+        page,
+        pagingCounter,
+        area,
+      })
     : null
 
   if (totalProducts === 0) {
