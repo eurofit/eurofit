@@ -1,9 +1,8 @@
 "use client"
 
+import { DELIVERY_FEE } from "@/const/delivery"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Separator } from "@eurofit/ui/components/separator"
-
-const DELIVERY_FEE = 2000
 
 type OrderSummaryProps = {
   total: number

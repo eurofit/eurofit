@@ -1,5 +1,6 @@
-import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
-import { Order } from "@/payload-types"
+import { buildOrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
+import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
+import { Order, Product } from "@/payload-types"
 import { APIError, CollectionBeforeChangeHook } from "payload"
 
 export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
@@ -24,32 +25,30 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
     )
   }
 
-  // find the corrosponding product line, inorder to verify prices and stocks
   const { docs: productVariants } = await req.payload.find({
     collection: "product-variants",
     where: {
-      id: {
-        in: productVariantIds,
-      },
-      active: {
-        equals: true,
-      },
-      retailPrice: {
-        exists: true,
-      },
+      id: { in: productVariantIds },
+      isActive: { equals: true },
+      retailPrice: { exists: true },
     },
     select: {
+      sku: true,
+      title: true,
+      variant: true,
+      expiryDate: true,
       retailPrice: true,
       stock: true,
-      srcStock: true,
+      supplierStock: true,
       isOutOfStock: true,
+      product: true,
     },
+    depth: 1,
     pagination: false,
     user: userId,
     req,
   })
 
-  // incase some product lines not found or inactive
   if (productVariants.length !== productVariantIds.length) {
     throw new APIError(
       "One or more products in the order are not found or inactive.",
@@ -59,47 +58,58 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
     )
   }
 
-  for (const item of data.items!) {
+  const correctedItems = data.items!.map((item) => {
     const itemId =
       typeof item.productVariant === "string"
         ? item.productVariant
         : item.productVariant.id
-    const quantity = item.quantity
-    const productVariant = productVariants.find((pl) => pl.id === itemId)
+
+    const productVariant = productVariants.find((pv) => pv.id === itemId)
 
     if (!productVariant) {
-      throw new Error(`Product line with ID ${itemId} not found.`)
+      throw new APIError(
+        `Product with ID ${itemId} not found.`,
+        400,
+        null,
+        true
+      )
     }
 
-    // check stock
     if (productVariant.isOutOfStock) {
       throw new APIError(
-        `Product line with ID ${itemId} is out of stock.`,
+        `Product with ID ${itemId} is out of stock.`,
         400,
         null,
         true
       )
     }
 
-    // check requested quantity against available stock
-    const availableStock = productVariant.stock ?? productVariant.supplierStock
+    const availableStock = resolveAvailableStock(
+      productVariant.stock,
+      productVariant.supplierStock
+    )
 
-    if (quantity > availableStock) {
-      throw new Error(`Insufficient stock for product line with ID ${itemId}.`)
-    }
-
-    const itemSnapshot = orderItemSnapShotSchema.parse(item.snapshot)
-
-    // validate price
-    if (itemSnapshot.price !== productVariant.retailPrice) {
+    if (item.quantity > availableStock) {
       throw new APIError(
-        `Price mismatch for product line with ID ${itemId}.`,
+        `Insufficient stock for product with ID ${itemId}.`,
         400,
         null,
         true
       )
     }
-  }
 
-  return data
+    // Snapshot is always built server-side from verified DB data — client input is ignored
+    const snapshot = buildOrderItemSnapshot({
+      sku: productVariant.sku,
+      title: productVariant.title,
+      variant: productVariant.variant,
+      expiryDate: productVariant.expiryDate,
+      retailPrice: productVariant.retailPrice,
+      product: productVariant.product as Product,
+    })
+
+    return { ...item, snapshot }
+  })
+
+  return { ...data, items: correctedItems }
 }

@@ -1,5 +1,8 @@
+import { adminOnly } from "@/access/admin"
+import { isAdmin } from "@/access/is-admin"
 import { CollectionConfig } from "payload"
 import { markOrderPaid } from "./hooks/mark-order-paid"
+import { sendOrderConfimationEmail } from "./hooks/send-order-confimation-email"
 import { validatePaidAmount } from "./hooks/validate-amount-paid"
 
 export const transactions: CollectionConfig = {
@@ -10,6 +13,13 @@ export const transactions: CollectionConfig = {
   },
   typescript: {
     interface: "Transaction",
+  },
+  access: {
+    create: adminOnly,
+    read: adminOnly,
+    update: adminOnly,
+    delete: adminOnly,
+    admin: isAdmin,
   },
   fields: [
     {
@@ -27,6 +37,7 @@ export const transactions: CollectionConfig = {
       name: "ref",
       type: "text",
       required: true,
+      unique: true,
     },
     {
       name: "provider",
@@ -55,6 +66,6 @@ export const transactions: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [validatePaidAmount],
-    afterChange: [markOrderPaid],
+    afterChange: [markOrderPaid, sendOrderConfimationEmail],
   },
 }

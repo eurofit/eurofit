@@ -7,6 +7,7 @@ import { addressWithIdSchema } from "@/lib/schemas/addresses/address"
 import { orderSchema } from "@/lib/schemas/orders/order"
 import { Order } from "@/payload-types"
 import config from "@/payload.config"
+import { after } from "next/server"
 import { getPayload } from "payload"
 import * as z from "zod"
 
@@ -90,7 +91,7 @@ export async function checkout(unSafCheckoutData: CheckoutArgs) {
     reference: order.id.toString(),
     email: user.email,
     amount: (order.total * 100).toString(), // convert to cents
-    callback_url: site.url + "/thank-you/" + order.id,
+    callback_url: `${site.url}/thank-you/${order.id}`,
     metadata: {
       cancel_action: site.url + "/checkout",
       order_id: order.id.toString(),
@@ -110,13 +111,15 @@ export async function checkout(unSafCheckoutData: CheckoutArgs) {
     throw new Error("Failed to initialize payment")
   }
 
-  // update order with paystack access code, so that we can recharge the payment if the user does not complete the payment after being redirected to paystack
-  await payload.update({
-    collection: "orders",
-    id: order.id,
-    data: {
-      paystackAccessCode: res.data.access_code,
-    },
+  after(async () => {
+    // update order with paystack access code, so that we can recharge the payment if the user does not complete the payment after being redirected to paystack
+    await payload.update({
+      collection: "orders",
+      id: order.id,
+      data: {
+        paystackAccessCode: res.data.access_code,
+      },
+    })
   })
 
   return res

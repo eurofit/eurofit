@@ -5,6 +5,7 @@ import { isAdmin } from "@/access/is-admin"
 import { orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
+import { getOrderTotal } from "./hooks/get-order-total"
 import { getOrderStatus } from "./hooks/status"
 import { validateOrderItems } from "./hooks/validate-order-items"
 
@@ -83,6 +84,9 @@ export const orders: CollectionConfig = {
       virtual: true,
       admin: {
         readOnly: true,
+      },
+      hooks: {
+        afterRead: [getOrderTotal],
       },
     },
     {

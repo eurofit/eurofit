@@ -1,13 +1,11 @@
+import { validateTransactionAmount } from "@/lib/payment/validate-transaction-amount"
 import { Order, Transaction } from "@/payload-types"
 import { APIError, CollectionBeforeChangeHook } from "payload"
 
-// before you create a transaction, check if the amount paid matches the order total, if not throw an error and do not create the transaction
 export const validatePaidAmount: CollectionBeforeChangeHook<
   Transaction
 > = async ({ data: transaction, req, operation, context }) => {
-  if (operation !== "create") {
-    return
-  }
+  if (operation !== "create") return
 
   const isOrderPopulated =
     typeof transaction.order === "object" && transaction.order !== null
@@ -28,11 +26,16 @@ export const validatePaidAmount: CollectionBeforeChangeHook<
     })
   }
 
-  if (transaction.amount && transaction.amount !== order.total) {
-    throw new APIError("Invalid transaction amount")
+  if (!order.total) {
+    throw new APIError("Order total is missing", 400, null, true)
   }
 
-  // use the context to pass the order to the afterChange hook
+  if (transaction.amount === undefined || transaction.amount === null) {
+    throw new APIError("Transaction amount is required", 400, null, true)
+  }
+
+  validateTransactionAmount(transaction.amount, order.total)
+
   context.order = order
 
   return transaction

@@ -1,3 +1,4 @@
+import { DELIVERY_FEE } from "@/const/delivery"
 import { site } from "@/const/site"
 import { env } from "@/env.mjs"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
@@ -89,9 +90,9 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
           image: item.product.image,
         },
       })),
-      total: order.total! + 300,
+      total: order.total! + DELIVERY_FEE,
       subtotal: order.total!,
-      deliveryFee: 350,
+      deliveryFee: DELIVERY_FEE,
     },
   }
 

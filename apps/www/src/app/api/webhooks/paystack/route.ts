@@ -1,97 +1,25 @@
-import { env } from "@/env.mjs"
-import config from "@/payload.config"
-import { NextResponse } from "next/server"
-import crypto from "node:crypto"
-import { getPayload } from "payload"
-
-const paystackSecretKey = env.PAYSTACK_SECRET_KEY
+import { handleChargeSuccess } from "@/lib/payment/handle-charge-success"
+import { validatePaystackSignature } from "@/lib/payment/validate-paystack-signature"
+import { after } from "next/server"
 
 export async function POST(req: Request) {
   const body = await req.json()
 
-  const hash = crypto
-    .createHmac("sha512", paystackSecretKey)
-    .update(JSON.stringify(body))
-    .digest("hex")
+  const isPaystackSignatureValid = validatePaystackSignature(
+    body,
+    req.headers.get("x-paystack-signature")
+  )
 
-  const paystackSignature = req.headers.get("x-paystack-signature")
-
-  if (hash != paystackSignature) {
-    return Response.json(
-      {
-        success: false,
-      },
-      {
-        status: 401,
-      }
-    )
+  if (!isPaystackSignatureValid) {
+    return Response.json({ success: false }, { status: 401 })
   }
 
-  const payload = await getPayload({
-    config,
+  // Return 200 immediately per Paystack docs — long-running work triggers retries
+  after(async () => {
+    if (body.event === "charge.success") {
+      await handleChargeSuccess(body.data)
+    }
   })
 
-  if (body.event == "charge.success") {
-    const eventData = body.data
-    // check if order exists and is not already paid
-    const { docs: orders } = await payload.find({
-      collection: "orders",
-      where: {
-        and: [
-          {
-            id: {
-              equals: eventData.reference,
-            },
-          },
-          {
-            paymentStatus: {
-              equals: "unpaid",
-            },
-          },
-        ],
-      },
-      limit: 1,
-      pagination: false,
-    })
-
-    const order = orders[0]
-
-    if (!order) {
-      return Response.json(
-        {
-          success: false,
-          message: "Order not found",
-        },
-        {
-          status: 404,
-        }
-      )
-    }
-
-    // check if the amount matches, done is transaction collection beforechange hook
-    // send order confirmation email to user, done in transaction collection afterchange hook
-
-    await payload.create({
-      collection: "transactions",
-      data: {
-        order: order.id,
-        ref: body.data.reference,
-        amount: body.data.amount / 100,
-        provider: "paystack",
-        isTest: body.data.domain !== "live",
-        paidAt: body.data.paid_at,
-        snapshot: body.data,
-      },
-      draft: false,
-    })
-  }
-
-  return NextResponse.json(
-    {
-      success: true,
-    },
-    {
-      status: 200,
-    }
-  )
+  return Response.json({ success: true })
 }
