@@ -28,9 +28,28 @@ export const enum_users_roles = pgEnum("enum_users_roles", [
   "customer",
 ])
 export const enum_users_gender = pgEnum("enum_users_gender", ["male", "female"])
+export const enum_addresses_title = pgEnum("enum_addresses_title", [
+  "mr",
+  "ms",
+  "mrs",
+  "dr",
+  "prof",
+])
 export const enum_categories_type = pgEnum("enum_categories_type", [
   "product",
   "post",
+])
+export const enum_orders_payment_status = pgEnum("enum_orders_payment_status", [
+  "unpaid",
+  "paid",
+  "refunded",
+])
+export const enum_order_statuses_status = pgEnum("enum_order_statuses_status", [
+  "pending",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
 ])
 
 export const users_roles = pgTable(
@@ -125,6 +144,50 @@ export const users = pgTable(
     index("users_updated_at_idx").on(columns.updatedAt),
     index("users_created_at_idx").on(columns.createdAt),
     uniqueIndex("users_email_idx").on(columns.email),
+  ]
+)
+
+export const addresses = pgTable(
+  "addresses",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    user: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    title: enum_addresses_title("title").notNull(),
+    firstName: varchar("first_name").notNull(),
+    lastName: varchar("last_name").notNull(),
+    phone: varchar("phone").notNull(),
+    label: varchar("label"),
+    line1: varchar("line1").notNull(),
+    line2: varchar("line2"),
+    area: varchar("area"),
+    landmark: varchar("landmark"),
+    city: varchar("city").notNull(),
+    county: varchar("county").notNull(),
+    country: varchar("country").notNull().default("Kenya"),
+    postalCode: varchar("postal_code").notNull(),
+    note: varchar("note"),
+    isDefault: boolean("is_default").notNull().default(false),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("addresses_user_idx").on(columns.user),
+    index("addresses_updated_at_idx").on(columns.updatedAt),
+    index("addresses_created_at_idx").on(columns.createdAt),
   ]
 )
 
@@ -694,6 +757,154 @@ export const carts = pgTable(
   ]
 )
 
+export const orders_items = pgTable(
+  "orders_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: numeric("_parent_id", { mode: "number" }).notNull(),
+    id: varchar("id").primaryKey(),
+    productVariant: uuid("product_variant_id")
+      .notNull()
+      .references(() => product_variants.id, {
+        onDelete: "set null",
+      }),
+    quantity: numeric("quantity", { mode: "number" }).notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+  },
+  (columns) => [
+    index("orders_items_order_idx").on(columns._order),
+    index("orders_items_parent_id_idx").on(columns._parentID),
+    index("orders_items_product_variant_idx").on(columns.productVariant),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [orders.id],
+      name: "orders_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: numeric("id", { mode: "number" }).primaryKey(),
+    customer: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    deliveryAddress: uuid("delivery_address_id")
+      .notNull()
+      .references(() => addresses.id, {
+        onDelete: "set null",
+      }),
+    paymentStatus: enum_orders_payment_status("payment_status")
+      .notNull()
+      .default("unpaid"),
+    paystackAccessCode: varchar("paystack_access_code"),
+    snapshot: jsonb("snapshot").notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("orders_customer_idx").on(columns.customer),
+    index("orders_delivery_address_idx").on(columns.deliveryAddress),
+    index("orders_updated_at_idx").on(columns.updatedAt),
+    index("orders_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const order_statuses = pgTable(
+  "order_statuses",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    order: numeric("order_id", { mode: "number" })
+      .notNull()
+      .references(() => orders.id, {
+        onDelete: "set null",
+      }),
+    staff: uuid("staff_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    status: enum_order_statuses_status("status").notNull().default("pending"),
+    visibleToCustomer: boolean("visible_to_customer").notNull().default(true),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("order_statuses_order_idx").on(columns.order),
+    index("order_statuses_staff_idx").on(columns.staff),
+    index("order_statuses_updated_at_idx").on(columns.updatedAt),
+    index("order_statuses_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const transactions = pgTable(
+  "transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    order: numeric("order_id", { mode: "number" })
+      .notNull()
+      .references(() => orders.id, {
+        onDelete: "set null",
+      }),
+    amount: numeric("amount", { mode: "number" }).notNull(),
+    ref: varchar("ref").notNull(),
+    provider: varchar("provider").notNull(),
+    isTest: boolean("is_test").default(false),
+    paidAt: timestamp("paid_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("transactions_order_idx").on(columns.order),
+    index("transactions_updated_at_idx").on(columns.updatedAt),
+    index("transactions_created_at_idx").on(columns.createdAt),
+  ]
+)
+
 export const payload_kv = pgTable(
   "payload_kv",
   {
@@ -739,6 +950,7 @@ export const payload_locked_documents_rels = pgTable(
     parent: uuid("parent_id").notNull(),
     path: varchar("path").notNull(),
     usersID: uuid("users_id"),
+    addressesID: uuid("addresses_id"),
     mediaID: uuid("media_id"),
     packagesID: uuid("packages_id"),
     "service-areasID": uuid("service_areas_id"),
@@ -749,12 +961,18 @@ export const payload_locked_documents_rels = pgTable(
     "stock-alertsID": uuid("stock_alerts_id"),
     wishlistsID: uuid("wishlists_id"),
     cartsID: uuid("carts_id"),
+    ordersID: numeric("orders_id", { mode: "number" }),
+    "order-statusesID": uuid("order_statuses_id"),
+    transactionsID: uuid("transactions_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
     index("payload_locked_documents_rels_parent_idx").on(columns.parent),
     index("payload_locked_documents_rels_path_idx").on(columns.path),
     index("payload_locked_documents_rels_users_id_idx").on(columns.usersID),
+    index("payload_locked_documents_rels_addresses_id_idx").on(
+      columns.addressesID
+    ),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
     index("payload_locked_documents_rels_packages_id_idx").on(
       columns.packagesID
@@ -779,6 +997,13 @@ export const payload_locked_documents_rels = pgTable(
       columns.wishlistsID
     ),
     index("payload_locked_documents_rels_carts_id_idx").on(columns.cartsID),
+    index("payload_locked_documents_rels_orders_id_idx").on(columns.ordersID),
+    index("payload_locked_documents_rels_order_statuses_id_idx").on(
+      columns["order-statusesID"]
+    ),
+    index("payload_locked_documents_rels_transactions_id_idx").on(
+      columns.transactionsID
+    ),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [payload_locked_documents.id],
@@ -788,6 +1013,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["usersID"]],
       foreignColumns: [users.id],
       name: "payload_locked_documents_rels_users_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["addressesID"]],
+      foreignColumns: [addresses.id],
+      name: "payload_locked_documents_rels_addresses_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["mediaID"]],
@@ -838,6 +1068,21 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["cartsID"]],
       foreignColumns: [carts.id],
       name: "payload_locked_documents_rels_carts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["ordersID"]],
+      foreignColumns: [orders.id],
+      name: "payload_locked_documents_rels_orders_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["order-statusesID"]],
+      foreignColumns: [order_statuses.id],
+      name: "payload_locked_documents_rels_order_statuses_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["transactionsID"]],
+      foreignColumns: [transactions.id],
+      name: "payload_locked_documents_rels_transactions_fk",
     }).onDelete("cascade"),
   ]
 )
@@ -1070,6 +1315,13 @@ export const relations_users = relations(users, ({ many }) => ({
     relationName: "sessions",
   }),
 }))
+export const relations_addresses = relations(addresses, ({ one }) => ({
+  user: one(users, {
+    fields: [addresses.user],
+    references: [users.id],
+    relationName: "user",
+  }),
+}))
 export const relations_media_texts = relations(media_texts, ({ one }) => ({
   parent: one(media, {
     fields: [media_texts.parent],
@@ -1226,6 +1478,55 @@ export const relations_carts = relations(carts, ({ one, many }) => ({
     relationName: "items",
   }),
 }))
+export const relations_orders_items = relations(orders_items, ({ one }) => ({
+  _parentID: one(orders, {
+    fields: [orders_items._parentID],
+    references: [orders.id],
+    relationName: "items",
+  }),
+  productVariant: one(product_variants, {
+    fields: [orders_items.productVariant],
+    references: [product_variants.id],
+    relationName: "productVariant",
+  }),
+}))
+export const relations_orders = relations(orders, ({ one, many }) => ({
+  customer: one(users, {
+    fields: [orders.customer],
+    references: [users.id],
+    relationName: "customer",
+  }),
+  deliveryAddress: one(addresses, {
+    fields: [orders.deliveryAddress],
+    references: [addresses.id],
+    relationName: "deliveryAddress",
+  }),
+  items: many(orders_items, {
+    relationName: "items",
+  }),
+}))
+export const relations_order_statuses = relations(
+  order_statuses,
+  ({ one }) => ({
+    order: one(orders, {
+      fields: [order_statuses.order],
+      references: [orders.id],
+      relationName: "order",
+    }),
+    staff: one(users, {
+      fields: [order_statuses.staff],
+      references: [users.id],
+      relationName: "staff",
+    }),
+  })
+)
+export const relations_transactions = relations(transactions, ({ one }) => ({
+  order: one(orders, {
+    fields: [transactions.order],
+    references: [orders.id],
+    relationName: "order",
+  }),
+}))
 export const relations_payload_kv = relations(payload_kv, () => ({}))
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -1239,6 +1540,11 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.usersID],
       references: [users.id],
       relationName: "users",
+    }),
+    addressesID: one(addresses, {
+      fields: [payload_locked_documents_rels.addressesID],
+      references: [addresses.id],
+      relationName: "addresses",
     }),
     mediaID: one(media, {
       fields: [payload_locked_documents_rels.mediaID],
@@ -1289,6 +1595,21 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.cartsID],
       references: [carts.id],
       relationName: "carts",
+    }),
+    ordersID: one(orders, {
+      fields: [payload_locked_documents_rels.ordersID],
+      references: [orders.id],
+      relationName: "orders",
+    }),
+    "order-statusesID": one(order_statuses, {
+      fields: [payload_locked_documents_rels["order-statusesID"]],
+      references: [order_statuses.id],
+      relationName: "order-statuses",
+    }),
+    transactionsID: one(transactions, {
+      fields: [payload_locked_documents_rels.transactionsID],
+      references: [transactions.id],
+      relationName: "transactions",
     }),
   })
 )
@@ -1383,10 +1704,14 @@ export const relations_footer = relations(footer, ({ many }) => ({
 type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
   enum_users_gender: typeof enum_users_gender
+  enum_addresses_title: typeof enum_addresses_title
   enum_categories_type: typeof enum_categories_type
+  enum_orders_payment_status: typeof enum_orders_payment_status
+  enum_order_statuses_status: typeof enum_order_statuses_status
   users_roles: typeof users_roles
   users_sessions: typeof users_sessions
   users: typeof users
+  addresses: typeof addresses
   media: typeof media
   media_texts: typeof media_texts
   packages: typeof packages
@@ -1403,6 +1728,10 @@ type DatabaseSchema = {
   wishlists: typeof wishlists
   carts_items: typeof carts_items
   carts: typeof carts
+  orders_items: typeof orders_items
+  orders: typeof orders
+  order_statuses: typeof order_statuses
+  transactions: typeof transactions
   payload_kv: typeof payload_kv
   payload_locked_documents: typeof payload_locked_documents
   payload_locked_documents_rels: typeof payload_locked_documents_rels
@@ -1419,6 +1748,7 @@ type DatabaseSchema = {
   relations_users_roles: typeof relations_users_roles
   relations_users_sessions: typeof relations_users_sessions
   relations_users: typeof relations_users
+  relations_addresses: typeof relations_addresses
   relations_media_texts: typeof relations_media_texts
   relations_media: typeof relations_media
   relations_packages: typeof relations_packages
@@ -1435,6 +1765,10 @@ type DatabaseSchema = {
   relations_wishlists: typeof relations_wishlists
   relations_carts_items: typeof relations_carts_items
   relations_carts: typeof relations_carts
+  relations_orders_items: typeof relations_orders_items
+  relations_orders: typeof relations_orders
+  relations_order_statuses: typeof relations_order_statuses
+  relations_transactions: typeof relations_transactions
   relations_payload_kv: typeof relations_payload_kv
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels
   relations_payload_locked_documents: typeof relations_payload_locked_documents
