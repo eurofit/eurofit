@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@eurofit/typescript-config": "workspace:*",
-    "@react-email/ui": "latest",
+    "@react-email/ui": "6.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.39.4",
