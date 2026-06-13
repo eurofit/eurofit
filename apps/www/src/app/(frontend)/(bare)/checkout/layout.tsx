@@ -1,8 +1,6 @@
-import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { CheckoutHeader } from "@/components/checkout/header"
 import { CartHydrator } from "@/providers/cart"
 import { Metadata } from "next"
-import { redirect } from "next/navigation"
 import * as React from "react"
 
 export const metadata: Metadata = {
@@ -19,15 +17,7 @@ type CheckoutLayoutProps = Readonly<{
   children: React.ReactNode
 }>
 
-export default async function CheckoutLayout({
-  children,
-}: CheckoutLayoutProps) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect("/login" + "?next=" + encodeURIComponent("/checkout"))
-  }
-
+export default function CheckoutLayout({ children }: CheckoutLayoutProps) {
   return (
     <>
       <React.Suspense fallback={null}>
