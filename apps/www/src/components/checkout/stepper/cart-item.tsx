@@ -5,22 +5,28 @@ import { useCartQuantity } from "@/hooks/use-cart-quantity"
 import { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Button } from "@eurofit/ui/components/button"
-import {
-  ButtonGroup,
-  ButtonGroupText,
-} from "@eurofit/ui/components/button-group"
-import { Spinner } from "@eurofit/ui/components/spinner"
-import { ImageOff, Minus, Plus, Trash } from "lucide-react"
+import { ButtonGroup } from "@eurofit/ui/components/button-group"
+import { Input } from "@eurofit/ui/components/input"
+import { ImageOff, Minus, Plus, Trash2 } from "lucide-react"
 
 type CartItemProps = {
   item: FormattedCartItem
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { quantity, increment, decrement, remove, canIncrement, isPending } =
-    useCartQuantity({ variant: item })
-
-  const isLastOne = quantity === 1
+  const {
+    quantity,
+    isDirty,
+    min,
+    canIncrement,
+    canDecrement,
+    setQuantity,
+    increment,
+    decrement,
+    add,
+    remove,
+    isPending,
+  } = useCartQuantity({ variant: item })
 
   return (
     <div className="flex items-start gap-2">
@@ -55,38 +61,58 @@ export function CartItem({ item }: CartItemProps) {
           <span>{formatWithCommas(item.retailPrice!)}</span>
         </div>
 
-        <ButtonGroup>
+        <div className="flex items-center justify-end gap-2">
+          <ButtonGroup>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Decrease quantity"
+              onClick={decrement}
+              disabled={!canDecrement || isPending}
+            >
+              <Minus aria-hidden="true" />
+            </Button>
+            <Input
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              max={item.stock}
+              min={min}
+              value={quantity}
+              onChange={(event) =>
+                setQuantity(
+                  Number.isNaN(event.target.valueAsNumber)
+                    ? min
+                    : event.target.valueAsNumber
+                )
+              }
+              onBlur={() => {
+                if (isDirty) void add()
+              }}
+              aria-label="Quantity input"
+              placeholder="0"
+              className="h-8 w-14 text-center"
+            />
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Increase quantity"
+              onClick={increment}
+              disabled={!canIncrement || isPending}
+            >
+              <Plus aria-hidden="true" />
+            </Button>
+          </ButtonGroup>
           <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={isLastOne ? remove : decrement}
+            variant="ghost"
+            className="size-8 rounded-sm p-0 text-destructive hover:bg-destructive/10 *:[svg]:text-destructive!"
+            onClick={remove}
             disabled={isPending}
           >
-            {isLastOne ? (
-              <>
-                <Trash aria-hidden="true" />
-                <span className="sr-only">Remove item</span>
-              </>
-            ) : (
-              <>
-                <Minus aria-hidden="true" />
-                <span className="sr-only">Decrease quantity</span>
-              </>
-            )}
+            <Trash2 className="size-3.5" />
+            <span className="sr-only">Remove item</span>
           </Button>
-          <ButtonGroupText className="min-w-6.5">
-            {isPending ? <Spinner aria-label="Updating quantity" /> : quantity}
-          </ButtonGroupText>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={increment}
-            disabled={isPending || !canIncrement}
-          >
-            <Plus aria-hidden="true" />
-            <span className="sr-only">Increase quantity</span>
-          </Button>
-        </ButtonGroup>
+        </div>
       </div>
     </div>
   )
