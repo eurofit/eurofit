@@ -1,5 +1,6 @@
 import { CartItem } from "@/types/cart"
 import { getPayloadImageUrl } from "../payload-image"
+import { resolveAvailableStock } from "../stock/resolve-available-stock"
 
 export function formatCartItem(item: CartItem) {
   const { productVariant, ...restItem } = item
@@ -26,6 +27,10 @@ export function formatCartItem(item: CartItem) {
     },
     ...restItem,
     ...restProductVariant,
+    stock: resolveAvailableStock(
+      restProductVariant.stock,
+      restProductVariant.supplierStock
+    ),
   }
 }
 
