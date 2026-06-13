@@ -54,7 +54,9 @@ export async function POST(req: Request) {
       pagination: false,
     })
 
-    if (!orders || orders.length === 0) {
+    const order = orders[0]
+
+    if (!order) {
       return Response.json(
         {
           success: false,
@@ -65,8 +67,6 @@ export async function POST(req: Request) {
         }
       )
     }
-
-    const order = orders[0]
 
     // check if the amount matches, done is transaction collection beforechange hook
     // send order confirmation email to user, done in transaction collection afterchange hook
