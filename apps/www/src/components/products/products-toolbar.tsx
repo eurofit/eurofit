@@ -6,16 +6,16 @@ import { PRODUCT_SORT_OPTIONS } from "@/const/brand-filters"
 import type { BrandSortDirection } from "@/lib/utils/brands/brand-search-params"
 import * as React from "react"
 
-type BrandProductsToolbarProps = {
+type ProductsToolbarProps = {
   sortDirection: BrandSortDirection
   mobileFiltersSlot?: React.ReactNode
 }
 
 /** Row above the product grid: sort control plus the mobile filters trigger. */
-export function BrandProductsToolbar({
+export function ProductsToolbar({
   sortDirection,
   mobileFiltersSlot,
-}: BrandProductsToolbarProps) {
+}: ProductsToolbarProps) {
   return (
     <div className="flex items-center gap-3">
       <React.Suspense fallback={<ProductSortFallback />}>

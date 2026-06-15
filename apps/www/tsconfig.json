@@ -1,6 +1,7 @@
 {
   "extends": "@eurofit/typescript-config/nextjs.json",
   "compilerOptions": {
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "paths": {
       "@/*": ["./src/*"],
       "@payload-config": ["./src/payload.config.ts"],

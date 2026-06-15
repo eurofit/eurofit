@@ -3,7 +3,6 @@
 import { FilterAccordion } from "@/components/products/filter-accordion"
 import { FilterClearButton } from "@/components/products/filter-clear-button"
 import { ProductFilterTitle } from "@/components/products/filter-primitives"
-import { BRAND_FILTER_KEYS } from "@/const/brand-filters"
 import { FilterGroup } from "@/types/filter"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
@@ -21,15 +20,19 @@ import { SlidersHorizontal } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import * as React from "react"
 
-type MobileFiltersDrawerProps = {
+type MobileProductFiltersDrawerProps = {
   filters: FilterGroup[]
+  filterKeys: readonly string[]
 }
 
-export function MobileFiltersDrawer({ filters }: MobileFiltersDrawerProps) {
+export function MobileProductFiltersDrawer({
+  filters,
+  filterKeys,
+}: MobileProductFiltersDrawerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const searchParams = useSearchParams()
 
-  const activeCount = BRAND_FILTER_KEYS.reduce(
+  const activeCount = filterKeys.reduce(
     (total, key) => total + searchParams.getAll(key).length,
     0
   )
@@ -62,7 +65,7 @@ export function MobileFiltersDrawer({ filters }: MobileFiltersDrawerProps) {
                 <span>Filter By</span>
               </ProductFilterTitle>
             </DrawerTitle>
-            <FilterClearButton keys={[...BRAND_FILTER_KEYS]} />
+            <FilterClearButton keys={[...filterKeys]} />
           </div>
         </DrawerHeader>
 
@@ -82,7 +85,7 @@ export function MobileFiltersDrawer({ filters }: MobileFiltersDrawerProps) {
   )
 }
 
-export function MobileFiltersDrawerTriggerSkeleton() {
+export function MobileProductFiltersTriggerSkeleton() {
   return (
     <Button variant="outline" size="sm" className="gap-1.5 md:hidden" disabled>
       <SlidersHorizontal aria-hidden="true" />

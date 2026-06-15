@@ -1,6 +1,7 @@
 "use server"
 
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
+import { buildProductSearchMatchCondition } from "@/lib/utils/products/build-product-search-match-condition"
 import { product_variants, products } from "@/payload-generated-schema"
 import payloadConfig from "@/payload.config"
 import { asc, eq, sql } from "@payloadcms/db-postgres/drizzle"
@@ -25,19 +26,7 @@ export async function searchProductSuggestions(args: Args) {
     return null
   }
 
-  // we pass the tsQuery as a bound parameter into to_tsquery('english', $1)
-  const matchCondition = sql`
-  (
-    setweight(to_tsvector('english', coalesce(${products.title}, '')), 'A') ||
-    setweight(to_tsvector('english', coalesce(${products.slug}, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.title}, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.sku}, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.barcode}, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.supplierProductCode}, '')), 'C') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.flavorColor}, '')), 'C') ||
-    setweight(to_tsvector('english', coalesce(${product_variants.size}, '')), 'C')
-    ) @@ to_tsquery('english', ${tsQuery})
-    `
+  const matchCondition = buildProductSearchMatchCondition(tsQuery)
 
   const productsPromise = payload.db.drizzle
     .select({

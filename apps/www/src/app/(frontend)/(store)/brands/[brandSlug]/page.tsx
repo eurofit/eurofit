@@ -10,11 +10,14 @@ import {
   BrandHeaderSkeleton,
 } from "@/components/brands/brand-header"
 import { BrandProducts } from "@/components/brands/brand-products"
-import { MobileBrandFilters } from "@/components/brands/mobile-brand-filters"
-import { MobileFiltersDrawerTriggerSkeleton } from "@/components/brands/mobile-filters-drawer"
 import { FilterSkeleton } from "@/components/products/filter-primitives"
+import {
+  MobileProductFilters,
+  MobileProductFiltersTriggerSkeleton,
+} from "@/components/products/mobile-product-filters"
 import { ProductCardSkeleton } from "@/components/products/product-card"
 import { ProductFiltersSidebar } from "@/components/products/product-filters-sidebar"
+import { BRAND_FILTER_KEYS } from "@/const/brand-filters"
 import { site } from "@/const/site"
 import { parseBrandSearchParams } from "@/lib/utils/brands/brand-search-params"
 import { Metadata } from "next"
@@ -87,7 +90,10 @@ export default function BrandPage({ params, searchParams }: BrandPageProps) {
       <div className="relative flex items-start md:min-h-[calc(100vh-4rem)] md:gap-8 lg:gap-16">
         {/* SIDEBAR  */}
         <React.Suspense fallback={<FilterSkeleton />}>
-          <ProductFiltersSidebar getFilters={getFilters} />
+          <ProductFiltersSidebar
+            getFilters={getFilters}
+            filterKeys={BRAND_FILTER_KEYS}
+          />
         </React.Suspense>
 
         {/* MAIN CONTENT   */}
@@ -101,9 +107,12 @@ export default function BrandPage({ params, searchParams }: BrandPageProps) {
               searchParams={brandSearchParams}
               mobileFiltersSlot={
                 <React.Suspense
-                  fallback={<MobileFiltersDrawerTriggerSkeleton />}
+                  fallback={<MobileProductFiltersTriggerSkeleton />}
                 >
-                  <MobileBrandFilters getFilters={getFilters} />
+                  <MobileProductFilters
+                    getFilters={getFilters}
+                    filterKeys={BRAND_FILTER_KEYS}
+                  />
                 </React.Suspense>
               }
             />

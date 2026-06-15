@@ -6,17 +6,19 @@ import {
   ProductFilterHeader,
   ProductFilterTitle,
 } from "@/components/products/filter-primitives"
-import { BRAND_FILTER_KEYS } from "@/const/brand-filters"
 import { FilterGroup } from "@/types/filter"
 import { FunnelIcon } from "lucide-react"
 
 type ProductFiltersSidebarProps = {
   getFilters: () => Promise<FilterGroup[]>
+  /** Query keys the "Clear all" button should reset (one per filter group). */
+  filterKeys: readonly string[]
 }
 
-/** Desktop sidebar that fetches the brand's filter groups and renders them. */
+/** Desktop sidebar that fetches the page's filter groups and renders them. */
 export function ProductFiltersSidebar({
   getFilters,
+  filterKeys,
 }: ProductFiltersSidebarProps) {
   return (
     <FilterBoundary getFilters={getFilters}>
@@ -27,7 +29,7 @@ export function ProductFiltersSidebar({
               <FunnelIcon aria-hidden="true" />
               <h2>Filter By</h2>
             </ProductFilterTitle>
-            <FilterClearButton keys={[...BRAND_FILTER_KEYS]} />
+            <FilterClearButton keys={[...filterKeys]} />
           </ProductFilterHeader>
           <FilterAccordion filters={filters} />
         </ProductFilter>

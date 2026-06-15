@@ -1,12 +1,12 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { getBrand } from "@/actions/brands/get-brand"
 import { getProductsByBrand } from "@/actions/products/get-products-by-brand"
-import { BrandProductsToolbar } from "@/components/brands/brand-products-toolbar"
 import { EndMessage } from "@/components/end-message"
 import { JsonLd } from "@/components/json-ld"
 import { Pagination } from "@/components/pagination"
 import { EmptyProducts } from "@/components/products/empty-products"
 import { ProductCard } from "@/components/products/product-card"
+import { ProductsToolbar } from "@/components/products/products-toolbar"
 import { BRAND_PRODUCTS_PER_PAGE } from "@/const/brand-filters"
 import { site } from "@/const/site"
 import { BrandSearchParams } from "@/lib/utils/brands/brand-search-params"
@@ -77,7 +77,7 @@ export async function BrandProducts({
     <div className="flex flex-col space-y-6">
       {brandJsonLd && <JsonLd jsonLd={brandJsonLd} />}
 
-      <BrandProductsToolbar
+      <ProductsToolbar
         sortDirection={sortDirection}
         mobileFiltersSlot={mobileFiltersSlot}
       />

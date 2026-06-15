@@ -12,31 +12,40 @@ import {
 import usePagination, {
   type UsePaginationProps,
 } from "@mui/material/usePagination"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 
 type PaginationProps = UsePaginationProps & {
   /** Query-string key that carries the page number. Defaults to "page". */
   pageParam?: string
+  /**
+   * Keep the current query string (search query, filters, sort) when changing
+   * page. Defaults to `false`, where each anchor points to `?page=N` only.
+   */
+  preserveParams?: boolean
   className?: string
 }
 
 /**
  * shadcn-rendered pagination driven by MUI's `usePagination` truncation logic.
  * Props mirror `UsePaginationProps`, so it stays drop-in compatible with MUI's
- * own `Pagination`. Navigation is link-based and self-contained: each anchor
- * points to `?page=N` only, dropping every other query param on page change.
+ * own `Pagination`. Navigation is link-based: each anchor points to `?page=N`,
+ * optionally preserving the rest of the query string via `preserveParams`.
  */
 export function Pagination({
   pageParam = "page",
+  preserveParams = false,
   className,
   ...paginationProps
 }: PaginationProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const { items } = usePagination(paginationProps)
 
   const buildHref = (targetPage: number) => {
-    const params = new URLSearchParams()
+    const params = preserveParams
+      ? new URLSearchParams(searchParams.toString())
+      : new URLSearchParams()
     params.set(pageParam, String(targetPage))
 
     return `${pathname}?${params.toString()}`
