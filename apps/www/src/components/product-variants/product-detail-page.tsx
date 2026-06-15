@@ -110,6 +110,7 @@ export function ProductDetailPage({
               brand={product.product?.brand || null}
               price={product.retailPrice}
               inStock={!product.isOutOfStock}
+              isPreorder={product.isPreorder}
               stock={product.stock}
               variant={product.variant}
               isWishlisted={product.isWishlisted}

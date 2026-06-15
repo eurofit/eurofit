@@ -15,6 +15,7 @@ interface ProductInfoProps {
   } | null
   price?: number | null
   inStock: boolean
+  isPreorder: boolean
   stock: number
   variant?: string | null
   isWishlisted: boolean
@@ -27,6 +28,7 @@ export function ProductInfo({
   brand,
   price,
   inStock,
+  isPreorder,
   stock,
   variant,
   isWishlisted,
@@ -92,7 +94,12 @@ export function ProductInfo({
             <>
               <div className="size-2 rounded-full bg-green-500" />
               <span className="text-sm font-medium text-green-700">
-                {formatWithCommas(stock)} In stock
+                {formatWithCommas(stock)} In stock{" "}
+                {isPreorder && (
+                  <span className="text-xs text-muted-foreground">
+                    &nbsp;(preorder)
+                  </span>
+                )}
               </span>
             </>
           ) : (
