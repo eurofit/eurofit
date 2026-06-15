@@ -6,3 +6,8 @@ node_modules/
 coverage/
 pnpm-lock.yaml
 .pnpm-store/
+
+# Payload-generated files
+apps/www/src/payload-types.ts
+apps/www/src/payload-generated-schema.ts
+apps/www/src/app/(payload)/
