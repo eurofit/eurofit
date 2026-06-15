@@ -2,7 +2,7 @@
 
 import { Invoice } from "@/lib/schemas/invoice"
 import { orderToInvoice } from "@/lib/utils/invoice/orderToInvoice"
-import config from "@/payload.config"
+import config from "@payload-config"
 import { getPayload } from "payload"
 import * as z from "zod"
 

@@ -6,7 +6,6 @@ import { addressSchema } from "@/lib/schemas/addresses/address"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
-import config from "@/payload.config"
 import {
   Alert,
   AlertDescription,
@@ -19,6 +18,7 @@ import {
   CollapsibleTrigger,
 } from "@eurofit/ui/components/collapsible"
 import { Separator } from "@eurofit/ui/components/separator"
+import config from "@payload-config"
 import { format as formatDate } from "date-fns"
 import {
   Box,

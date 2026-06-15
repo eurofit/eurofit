@@ -2,7 +2,7 @@ import { env } from "@/env.mjs"
 import { clearUserCart } from "@/lib/cart/clear-user-cart"
 import { resolveOrderForPayment } from "@/lib/orders/resolve-order-for-payment"
 import { verifyPaystackTransaction } from "@/lib/payment/verify-paystack-transaction"
-import config from "@/payload.config"
+import config from "@payload-config"
 import { getPayload } from "payload"
 
 export async function handleChargeSuccess(eventData: { reference: string }) {

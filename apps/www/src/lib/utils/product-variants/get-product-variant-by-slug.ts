@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
-import config from "@/payload.config"
+import config from "@payload-config"
 import { getPayload } from "payload"
 
 type Args = {

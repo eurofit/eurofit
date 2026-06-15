@@ -1,7 +1,7 @@
 import { RenderBlocks } from "@/blocks/render-blocks"
 import { JsonLd } from "@/components/json-ld"
 import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
-import config from "@/payload.config"
+import config from "@payload-config"
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext"
 import { notFound } from "next/navigation"
 import { getPayload } from "payload"

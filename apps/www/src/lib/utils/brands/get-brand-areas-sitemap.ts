@@ -1,6 +1,6 @@
 import { getAllServiceAreas } from "@/actions/service-areas/get-service-areas"
 import { site } from "@/const/site"
-import payloadConfig from "@/payload.config"
+import payloadConfig from "@payload-config"
 import { MetadataRoute } from "next"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
