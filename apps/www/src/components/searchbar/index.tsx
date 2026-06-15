@@ -213,17 +213,19 @@ export function SearchBar() {
 
 export function SearchBarSkeleton() {
   return (
-    <InputGroup className="bg-background! opacity-100! has-[[data-slot=input-group-control]:focus-visible]:ring-0! has-[[data-slot][aria-invalid=true]]:ring-0!">
-      <InputGroupAddon align="inline-start">
-        <Search aria-hidden="true" />
-      </InputGroupAddon>
-      <InputGroupInput
-        type="search"
-        name="q"
-        placeholder="Search here…"
-        autoComplete="off"
-        disabled
-      />
-    </InputGroup>
+    <div className="relative hidden max-w-sm grow md:flex">
+      <InputGroup className="bg-background! opacity-100! has-[[data-slot=input-group-control]:focus-visible]:ring-0! has-[[data-slot][aria-invalid=true]]:ring-0!">
+        <InputGroupAddon align="inline-start">
+          <Search aria-hidden="true" />
+        </InputGroupAddon>
+        <InputGroupInput
+          type="search"
+          name="q"
+          placeholder="Search here…"
+          autoComplete="off"
+          disabled
+        />
+      </InputGroup>
+    </div>
   )
 }
