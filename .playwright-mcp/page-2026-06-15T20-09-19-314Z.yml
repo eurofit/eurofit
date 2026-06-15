@@ -1,0 +1,112 @@
+- generic [active] [ref=e1]:
+    - region "Notifications alt+T"
+    - generic [ref=e2]:
+        - banner [ref=e3]:
+            - generic [ref=e4]:
+                - link "EUROFIT" [ref=e6] [cursor=pointer]:
+                    - /url: /
+                    - generic [ref=e7]: Eurofit
+                - navigation "Main" [ref=e8]:
+                    - list [ref=e10]:
+                        - listitem [ref=e11]:
+                            - link "Shop by brand" [ref=e12] [cursor=pointer]:
+                                - /url: /brands
+                        - listitem [ref=e13]:
+                            - link "Shop by category" [ref=e14] [cursor=pointer]:
+                                - /url: /categories
+                        - listitem [ref=e15]:
+                            - link "Contact us" [ref=e16] [cursor=pointer]:
+                                - /url: /contact-us
+                        - listitem [ref=e17]:
+                            - link "About us" [ref=e18] [cursor=pointer]:
+                                - /url: /about-us
+                - generic [ref=e19]:
+                    - search [ref=e21]:
+                        - search "Sitewide" [ref=e22]:
+                            - group [ref=e23]:
+                                - group [ref=e24]:
+                                    - img [ref=e25]
+                                - searchbox "Search here…" [ref=e28]
+                    - link "User menu" [ref=e29] [cursor=pointer]:
+                        - /url: /login
+                        - img
+                        - generic [ref=e30]: User menu
+                    - button "View Cart" [ref=e31] [cursor=pointer]:
+                        - img
+                        - generic [ref=e32]: Cart Button
+        - region [ref=e35]:
+            - generic:
+                - generic:
+                    - group:
+                        - img "Slide 1"
+                        - link:
+                            - /url: /brands/cellucor
+                    - group:
+                        - img "Slide 2"
+                        - link:
+                            - /url: /brands/per4m
+            - button "Previous slide" [disabled]:
+                - img
+                - generic: Previous slide
+            - button "Next slide" [disabled]:
+                - img
+                - generic: Next slide
+        - contentinfo "Footer" [ref=e36]:
+            - heading "Footer" [level=2] [ref=e37]
+            - generic [ref=e38]:
+                - generic [ref=e39]:
+                    - generic [ref=e40]:
+                        - link "EUROFIT" [ref=e41] [cursor=pointer]:
+                            - /url: /
+                            - generic [ref=e42]: Eurofit
+                        - paragraph
+                    - generic [ref=e43]:
+                        - text: Seventh St, Easleigh,
+                        - text: Nairobi, kenya
+                    - generic [ref=e44]:
+                        - link "Visit us on Mail" [ref=e45] [cursor=pointer]:
+                            - /url: mailto:info@eurofit.co.ke
+                            - img [ref=e46]
+                            - generic [ref=e49]: Visit us on Mail
+                        - link "Visit us on Whatsapp" [ref=e50] [cursor=pointer]:
+                            - /url: https://wa.me/254110990666
+                            - img [ref=e51]
+                            - generic [ref=e53]: Visit us on Whatsapp
+                        - link "Visit us on Tiktok" [ref=e54] [cursor=pointer]:
+                            - /url: https://www.tiktok.com/@eurofitltd
+                            - img [ref=e55]
+                            - generic [ref=e57]: Visit us on Tiktok
+                        - link "Visit us on Instagram" [ref=e58] [cursor=pointer]:
+                            - /url: https://www.instagram.com/eurofitltd
+                            - img [ref=e59]
+                            - generic [ref=e61]: Visit us on Instagram
+                        - link "Visit us on Facebook" [ref=e62] [cursor=pointer]:
+                            - /url: https://www.facebook.com/eurofitltd
+                            - img [ref=e63]
+                            - generic [ref=e65]: Visit us on Facebook
+                        - link "Visit us on Twitter" [ref=e66] [cursor=pointer]:
+                            - /url: https://www.x.com/eurofitltd
+                            - img [ref=e67]
+                            - generic [ref=e69]: Visit us on Twitter
+                        - link "Visit us on Youtube" [ref=e70] [cursor=pointer]:
+                            - /url: https://www.youtube.com/@eurofitltd
+                            - img [ref=e71]
+                            - generic [ref=e73]: Visit us on Youtube
+                - navigation
+            - generic [ref=e74]:
+                - generic [ref=e75]:
+                    - paragraph [ref=e76]: © 2026 EUROFIT. All Rights Reserved.
+                    - paragraph [ref=e77]: "|"
+                    - paragraph [ref=e78]: "VAT: EU123456789"
+                - navigation "Legal" [ref=e79]:
+                    - link "Terms of Service" [ref=e80] [cursor=pointer]:
+                        - /url: "#"
+                    - link "Privacy Policy" [ref=e81] [cursor=pointer]:
+                        - /url: "#"
+                    - link "Cookie Policy" [ref=e82] [cursor=pointer]:
+                        - /url: "#"
+                    - link "Returns Policy" [ref=e83] [cursor=pointer]:
+                        - /url: "#"
+    - button "Open Next.js Dev Tools" [ref=e89] [cursor=pointer]:
+        - img [ref=e90]
+    - alert [ref=e93]

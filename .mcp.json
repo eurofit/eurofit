@@ -4,8 +4,12 @@
       "type": "http",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
-        "CONTEXT7_API_KEY": "ctx7sk-0c629085-99a0-4418-9f2a-8578ff7aaf63"
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
     }
   }
 }
