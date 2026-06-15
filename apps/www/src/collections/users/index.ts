@@ -11,10 +11,12 @@ import { generateForgotPasswordEmailHTML } from "@eurofit/transactional/forgot-p
 import { generateVerificationEmailHTML } from "@eurofit/transactional/verification"
 import { CollectionConfig } from "payload"
 import { ensureFirstUserIsAdmin } from "./hooks/ensureFirstUserIsAdmin"
+import { getUserFullName } from "./hooks/get-user-full-name"
 import { preventSuspendedLogin } from "./hooks/prevent-suspended-login"
 import { preventDeactivatingLastAdmin } from "./hooks/preventDeactivatingLastAdmin"
 import { preventLastAdminDeletion } from "./hooks/preventLastAdminDeletion"
 import { preventLastAdminDemotion } from "./hooks/preventLastAdminDemotion"
+import { syncToPaystack } from "./hooks/sync-to-paystack"
 
 export const users: CollectionConfig = {
   slug: "users",
@@ -63,12 +65,16 @@ export const users: CollectionConfig = {
   },
   hooks: {
     beforeLogin: [preventSuspendedLogin],
-    beforeChange: [preventLastAdminDemotion],
+    beforeChange: [preventLastAdminDemotion, syncToPaystack],
     beforeDelete: [preventLastAdminDeletion],
   },
   admin: {
     useAsTitle: "email",
     defaultColumns: ["email", "roles", "isActive"],
+  },
+  forceSelect: {
+    firstName: true,
+    lastName: true,
   },
   disableDuplicate: true,
   fields: [
@@ -146,6 +152,46 @@ export const users: CollectionConfig = {
         },
       ],
       required: true,
+    },
+    {
+      name: "paystackCustomerCode",
+      type: "text",
+      required: true,
+      admin: {
+        description:
+          "The Paystack customer code for this user. This is given by external payment processor Paystack.",
+        readOnly: true,
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: "fullName",
+      type: "text",
+      virtual: true,
+      admin: {
+        position: "sidebar",
+        description: "The full name of the user.",
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [getUserFullName],
+      },
+      saveToJWT: true,
+    },
+    {
+      name: "addresses",
+      type: "join",
+      collection: "addresses",
+      hasMany: true,
+      on: "user",
+      admin: {
+        allowCreate: true,
+      },
+      saveToJWT: true,
     },
   ],
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { verifyEmail as verifyEmailAction } from "@/actions/auth/verify-email"
+import verified from "@/assets/illustrations/verified.svg"
 import { Button, buttonVariants } from "@eurofit/ui/components/button"
 import {
   Card,
@@ -102,12 +103,7 @@ export function VerifyEmail() {
     return (
       <div className="flex h-full flex-col items-center justify-center">
         <div className="relative mb-6 flex size-32 items-center justify-center text-muted-foreground">
-          <Image
-            src="/illustrations/verified.svg"
-            fill
-            alt="Verified"
-            sizes="128px"
-          />
+          <Image src={verified} fill alt="Verified" sizes="128px" />
         </div>
         <h3 className="text-2xl font-semibold text-balance">
           You&apos;re All Set!

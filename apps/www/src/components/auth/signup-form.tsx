@@ -2,6 +2,7 @@
 
 import { signUp as signUpAction } from "@/actions/auth/sign-up"
 import { PasswordInput } from "@/components/password-input"
+import { env } from "@/env.mjs"
 import { SignupData, SignUpSchema } from "@/lib/schemas/auth/signup"
 import { Button } from "@eurofit/ui/components/button"
 import {
@@ -272,7 +273,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             <Turnstile
               id="signup-form-turnstile"
               ref={turnstileRef}
-              siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY!}
+              siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY}
+              className="w-full"
+              options={{ size: "flexible", theme: "light" }}
             />
             <Button type="submit" className="w-full" disabled={isSigningUp}>
               {isSigningUp && <Spinner />}

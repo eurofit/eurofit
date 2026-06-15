@@ -3,14 +3,17 @@ import { site } from "@/const/site"
 import { env, publicUrl } from "@/env.mjs"
 import { postgresAdapter } from "@payloadcms/db-postgres"
 import { resendAdapter } from "@payloadcms/email-resend"
+import { formBuilderPlugin } from "@payloadcms/plugin-form-builder"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import { s3Storage } from "@payloadcms/storage-s3"
 import path from "path"
 import { buildConfig } from "payload"
 import sharp from "sharp"
 import { fileURLToPath } from "url"
+import { blocks } from "./blocks"
 import { collections } from "./collections"
 import { users } from "./collections/users"
+import { globals } from "./globals"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -29,7 +32,9 @@ export default buildConfig({
   routes: {
     api: "/payload/api",
   },
+  blocks,
   collections,
+  globals,
   editor: lexicalEditor(),
   secret: env.PAYLOAD_SECRET,
   typescript: {
@@ -70,6 +75,7 @@ export default buildConfig({
         endpoint: env.SUPABASE_S3_ENDPOINT,
       },
     }),
+    formBuilderPlugin({}),
   ],
   sharp,
 })

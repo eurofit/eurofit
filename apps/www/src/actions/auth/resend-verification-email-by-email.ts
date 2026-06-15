@@ -17,11 +17,11 @@ export async function resendVerificationEmailByEmail(
   unsafeData: ResendVerificationData,
   turnstileToken: string
 ): Promise<ActionResult<{ status: "sent" }>> {
-  const turnstileOk = await verifyTurnstile(
+  const isTurnstileValid = await verifyTurnstile(
     turnstileToken,
     env.CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY
   )
-  if (!turnstileOk) {
+  if (!isTurnstileValid) {
     return {
       success: false,
       code: 400,
@@ -29,8 +29,19 @@ export async function resendVerificationEmailByEmail(
     }
   }
 
+  const validationRes = resendVerificationSchema.safeParse(unsafeData)
+
+  if (!validationRes.success) {
+    return {
+      success: false,
+      code: 400,
+      message: "Invalid email address.",
+    }
+  }
+
+  const { email } = validationRes.data
+
   try {
-    const { email } = resendVerificationSchema.parse(unsafeData)
     const payload = await getPayload({ config })
 
     const { docs } = await payload.find({
@@ -38,8 +49,10 @@ export async function resendVerificationEmailByEmail(
       where: { email: { equals: email } },
       limit: 1,
       pagination: false,
+      showHiddenFields: true,
       overrideAccess: true,
     })
+
     const user = docs[0] ?? null
 
     // Anti-enumeration: treat not-found and already-verified the same as sent

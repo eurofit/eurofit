@@ -2,6 +2,7 @@
 
 import { resetPassword } from "@/actions/auth/reset-password"
 import { PasswordInput } from "@/components/password-input"
+import { env } from "@/env.mjs"
 import {
   ResetPasswordData,
   resetPasswordSchema,
@@ -35,6 +36,9 @@ import { toast } from "sonner"
 export function ResetPassword() {
   const [showPassword, setShowPassword] = React.useState(false)
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
+    null
+  )
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get("token")
@@ -45,10 +49,12 @@ export function ResetPassword() {
   })
 
   const onSubmit = async (data: ResetPasswordData) => {
-    const turnstileToken = turnstileRef.current?.getResponse() ?? ""
-    const result = await resetPassword(data, turnstileToken)
+    const result = await resetPassword(data, turnstileToken ?? "")
 
     if (!result.success) {
+      // Clear the consumed token; the invisible widget re-solves and fires
+      // onSuccess again, which re-enables the submit button.
+      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error(result.message)
       return
@@ -132,15 +138,16 @@ export function ResetPassword() {
           <Turnstile
             id="reset-password-form-turnstile"
             ref={turnstileRef}
-            siteKey={
-              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-            }
+            siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
             options={{ size: "invisible" }}
+            onSuccess={(token) => setTurnstileToken(token)}
+            onError={() => setTurnstileToken(null)}
+            onExpire={() => setTurnstileToken(null)}
           />
           <Button
             type="submit"
             className="w-full"
-            disabled={form.formState.isSubmitting}
+            disabled={!turnstileToken || form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && <Spinner aria-hidden="true" />}
             {form.formState.isSubmitting ? "Resetting…" : "Reset Password"}

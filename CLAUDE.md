@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Security
 
 - Never surface unexpected error messages to the user.
@@ -23,6 +25,8 @@ Boolean variables must use semantic prefixes that make their truthiness obvious:
 | `should` | Conditional intent — `shouldRedirect`, `shouldRefetch`   |
 | `did`    | Past action — `didAcceptTerms`                           |
 
+- Use strictly clean code-skill, everytime you are writing a code
+
 ```typescript
 // Bad
 const turnstileOk = await verifyTurnstile(token, secret)
@@ -44,7 +48,10 @@ Applies everywhere: variables, function return values, Zod output fields, and st
 
 ## Next.js
 
+> **Next.js 16 note**: APIs, conventions, and file structure may differ from training data. When in doubt, read `node_modules/next/dist/docs/` before writing code. Heed deprecation notices.
+
 - **Server Actions**: Never throw expected errors. Return `ActionResult<T>` from `@/types/action-result.ts`.
+- Use Server actions only as post. When client need an action or query payload data, use api routes.
 - **Navigation**: Use `useRouter` from `nextjs-toploader/app`, not `next/navigation`, for programmatic client-side navigation — only inside children of the NextJS Top Loader provider.
 - **Auth-guarded pages**: Call `getCurrentUser()` from `@/actions/auth/get-current-user` and `redirect()` before any rendering logic.
 
@@ -66,6 +73,10 @@ Applies everywhere: variables, function return values, Zod output fields, and st
   ```bash
   pnpm dlx shadcn@latest add <component> -c apps/www
   ```
+
+## Env variables
+
+- Always use env from @/env.mjs to get the variable, not directly the process.env
 
 ---
 
@@ -128,6 +139,20 @@ pnpm --filter www payload migrate              # run pending migrations
 | `app/(frontend)/(store)/` | Storefront + `verify-email` (requires store shell)                          |
 | `app/(payload)/`          | Payload CMS admin — auto-generated, do not edit                             |
 
+### Collections
+
+All registered collections (in `src/collections/index.ts`): `users`, `addresses`, `media`, `packages`, `serviceAreas`, `brands`, `categories`, `products`, `productVariants`, `stockAlerts`, `wishlists`, `carts`, `orders`, `orderStatus`, `transactions`.
+
+### Globals
+
+Three globals (`src/globals/`): `nav`, `footer`, `settings`. Fetched server-side via actions in `src/actions/get-nav.ts` etc.
+
+### Middleware / Guest Session
+
+The app uses `src/proxy.ts` (not a `middleware.ts` file) as the Next.js middleware entry point. It calls `ensureGuestSession` on every non-API/admin/static request to maintain a sliding-expiry guest session cookie (`_ef_g`, 30 days).
+
+Cart is identified by **either** `userId` (authenticated) or the `guestSessionId` cookie (anonymous). The `ensureGuestSessionId()` server action in `src/actions/ensure-guest-session-id.ts` creates the cookie on first visit; sliding expiry is handled by the middleware.
+
 ### State Management
 
 - **Jotai** — client/global UI state; provider at `src/providers/jotai.tsx`
@@ -142,14 +167,15 @@ pnpm --filter www payload migrate              # run pending migrations
 
 **Access control** (`src/access/`):
 
-| Export                   | Scope      | Description                           |
-| ------------------------ | ---------- | ------------------------------------- |
-| `adminOnly`              | Collection | Admins only                           |
-| `adminOrSelf`            | Collection | Admins or the record's own user       |
-| `isAdmin`                | Boolean    | Underlying admin check                |
-| `adminOnlyFieldAccess`   | Field      | Admins only                           |
-| `everyone`               | Collection | Public                                |
-| `checkRole(roles, user)` | Utility    | Base role check used by all the above |
+| Export                   | Scope      | Description                                              |
+| ------------------------ | ---------- | -------------------------------------------------------- |
+| `adminOnly`              | Collection | Admins only                                              |
+| `adminOrSelf`            | Collection | Admins or the record's own user                          |
+| `userOwned`              | Collection | Admins or records where `user` field equals current user |
+| `isAdmin`                | Boolean    | Underlying admin check                                   |
+| `adminOnlyFieldAccess`   | Field      | Admins only                                              |
+| `everyone`               | Collection | Public                                                   |
+| `checkRole(roles, user)` | Utility    | Base role check used by all the above                    |
 
 - Add access control to every collection and every sensitive field.
 
@@ -183,7 +209,7 @@ Validated at startup via `@t3-oss/env-nextjs` in `src/env.mjs`.
 | Email     | `RESEND_API_KEY`, `SMTP_*`                                                                                              |
 | Storage   | `SUPABASE_S3_*` (bucket, access key, secret, region, endpoint)                                                          |
 | Payments  | `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`                                                                            |
-| Turnstile | `CLOUDFLARE_TURNSTILE_SECRET_KEY`, `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                                          |
+| Turnstile | `CLOUDFLARE_TURNSTILE_SECRET_KEY`(Managed Turnstile), `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                       |
 | Public    | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY` |
 
 ### Email Templates
@@ -198,6 +224,14 @@ Validated at startup via `@t3-oss/env-nextjs` in `src/env.mjs`.
 ### User Roles
 
 Defined in `src/const/user-roles.ts`: `admin` and `customer`. Roles are stored in JWT. The first user created is automatically promoted to admin via the `ensureFirstUserIsAdmin` hook.
+
+### Known Open Issues
+
+`TODOS.md` tracks three deliberate deferred gaps — do not close them without the prescribed fix:
+
+- **C-01 (CRITICAL)** — Stock oversell race condition in `validateOrderItems` (`src/collections/orders/hooks/validate-order-items.ts`): stock is read but never atomically decremented/locked.
+- **H-03 (HIGH)** — No error tracking service wired up; payment webhook failures currently log to `console.error` only.
+- **M-08 (MEDIUM)** — No orphan-reconciliation cron: if a Paystack webhook is never delivered, the customer is charged but their order stays `paymentStatus = "unpaid"`.
 
 ### UI Components
 

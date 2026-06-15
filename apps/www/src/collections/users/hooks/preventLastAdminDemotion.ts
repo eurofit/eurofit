@@ -1,6 +1,6 @@
+import type { User } from "@/payload-types"
 import type { CollectionBeforeChangeHook } from "payload"
 import { APIError } from "payload"
-import type { User } from "@/payload-types"
 
 export const preventLastAdminDemotion: CollectionBeforeChangeHook<
   User

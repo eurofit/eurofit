@@ -1,7 +1,10 @@
 "use server"
 
+import { site } from "@/const/site"
+import { resend } from "@/lib/resend"
 import { ActionResult } from "@/types/action-result"
 import payloadConfig from "@payload-config"
+import { after } from "next/server"
 import { getPayload } from "payload"
 import { z } from "zod"
 
@@ -11,6 +14,18 @@ export async function verifyEmail(
   try {
     const validToken = z.string().parse(token)
     const payload = await getPayload({ config: payloadConfig })
+
+    // Capture the user before verifying — verifyEmail clears _verificationToken.
+    const { docs } = await payload.find({
+      collection: "users",
+      where: { _verificationToken: { equals: validToken } },
+      limit: 1,
+      pagination: false,
+      showHiddenFields: true,
+      overrideAccess: true,
+    })
+
+    const user = docs[0] ?? null
 
     const isVerified = await payload.verifyEmail({
       collection: "users",
@@ -25,6 +40,17 @@ export async function verifyEmail(
       }
     }
 
+    if (user) {
+      // Fire-and-forget welcome email — best-effort, must not block or fail verification.
+      after(() =>
+        sendWelcomeEmail({
+          email: user.email,
+          firstName: user.firstName,
+          siteUrl: site.url,
+        })
+      )
+    }
+
     return { success: true, data: { verified: true } }
   } catch {
     return {
@@ -32,5 +58,32 @@ export async function verifyEmail(
       code: 410,
       message: "This token is not valid or might be expired.",
     }
+  }
+}
+
+type SendWelcomeEmailArgs = {
+  email: string
+  firstName: string
+  siteUrl: string
+}
+
+async function sendWelcomeEmail({
+  email,
+  firstName,
+  siteUrl,
+}: SendWelcomeEmailArgs) {
+  try {
+    await resend.emails.send({
+      to: [email],
+      template: {
+        id: "welcome",
+        variables: {
+          siteUrl,
+          firstName,
+        },
+      },
+    })
+  } catch {
+    // Swallow — the welcome email is best-effort.
   }
 }

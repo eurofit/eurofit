@@ -1,6 +1,7 @@
 "use client"
 
 import { resendVerificationEmailByEmail } from "@/actions/auth/resend-verification-email-by-email"
+import { env } from "@/env.mjs"
 import {
   ResendVerificationData,
   resendVerificationSchema,
@@ -34,19 +35,27 @@ import { toast } from "sonner"
 
 export function ResendVerificationForm() {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
+    null
+  )
 
   const { mutate, isPending, data } = useMutation({
-    mutationFn: async (formData: ResendVerificationData) => {
-      const token = turnstileRef.current?.getResponse() ?? ""
-      const result = await resendVerificationEmailByEmail(formData, token)
+    mutationFn: async (data: ResendVerificationData) => {
+      const result = await resendVerificationEmailByEmail(
+        data,
+        turnstileToken ?? ""
+      )
       if (!result.success) throw new Error(result.message)
       return result.data
     },
-    onError: () => {
+    onError: (error) => {
+      toast.error(error.message)
+    },
+    onSettled: () => {
+      // Clear the consumed token; the invisible widget re-solves and fires
+      // onSuccess again, which re-enables the submit button.
+      setTurnstileToken(null)
       turnstileRef.current?.reset()
-      toast.error("Something went wrong", {
-        description: "Please try again.",
-      })
     },
   })
 
@@ -126,13 +135,17 @@ export function ResendVerificationForm() {
               <Turnstile
                 id="resend-verification-form-turnstile"
                 ref={turnstileRef}
-                siteKey={
-                  process.env
-                    .NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-                }
+                siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setTurnstileToken(null)}
+                onExpire={() => setTurnstileToken(null)}
               />
-              <Button type="submit" className="w-full" disabled={isPending}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={!turnstileToken || isPending}
+              >
                 {isPending && <Spinner aria-hidden />}
                 {isPending ? "Sending…" : "Send Verification Link"}
               </Button>
