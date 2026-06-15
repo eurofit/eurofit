@@ -70,7 +70,7 @@ export function ReviewStep() {
 
   return (
     <Stepper.Content step="place-order">
-      <Card>
+      <Card className="max-md:pb-4!">
         <CardHeader>
           <CardTitle>Review Order</CardTitle>
           <CardDescription>Review your order & place it.</CardDescription>
@@ -118,38 +118,70 @@ export function ReviewStep() {
             <OrderSummary total={total} />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button
-            className="w-full"
-            onClick={handleCheckout}
-            disabled={isCheckingout || !turnstileToken}
-          >
-            {isCheckingout && (
-              <>
-                <Spinner /> Placing Order
-              </>
-            )}
-
-            {!isCheckingout && "Place Order"}
-          </Button>
-
-          <Turnstile
-            ref={turnstileRef}
-            id="checkout-review-form-turnstile"
-            siteKey={
-              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
-            }
-            onSuccess={(token) => setTurnstileToken(token)}
-            onError={() => setTurnstileToken(null)}
-            onExpire={() => setTurnstileToken(null)}
+        <CardFooter className="hidden flex-col gap-2 md:flex">
+          <PlaceOrderAction
+            isCheckingout={isCheckingout}
+            isReady={Boolean(turnstileToken)}
+            onCheckout={handleCheckout}
           />
-
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Lock className="size-4" />
-            <p>You will be redirected to complete payment securely.</p>
-          </div>
         </CardFooter>
       </Card>
+
+      <Turnstile
+        ref={turnstileRef}
+        id="checkout-review-form-turnstile"
+        siteKey={
+          process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
+        }
+        onSuccess={(token) => setTurnstileToken(token)}
+        onError={() => setTurnstileToken(null)}
+        onExpire={() => setTurnstileToken(null)}
+      />
+
+      {/* mobile sticky  */}
+      <div className="sticky bottom-3 z-50 mt-6 flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-lg ring-1 ring-foreground/10 md:hidden">
+        <PlaceOrderAction
+          isCheckingout={isCheckingout}
+          isReady={Boolean(turnstileToken)}
+          onCheckout={handleCheckout}
+        />
+      </div>
     </Stepper.Content>
+  )
+}
+
+type PlaceOrderActionProps = {
+  isCheckingout: boolean
+  isReady: boolean
+  onCheckout: () => void
+}
+
+function PlaceOrderAction({
+  isCheckingout,
+  isReady,
+  onCheckout,
+}: PlaceOrderActionProps) {
+  return (
+    <>
+      <Button
+        size="lg"
+        className="h-12 w-full px-6 text-base font-semibold"
+        onClick={onCheckout}
+        disabled={isCheckingout || !isReady}
+      >
+        {isCheckingout && (
+          <>
+            <Spinner /> Placing Order
+          </>
+        )}
+
+        {!isCheckingout && "Place Order"}
+      </Button>
+
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Lock className="size-4" />
+        <p>Secure payment redirect.</p>
+      </div>
+    </>
   )
 }
