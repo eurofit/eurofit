@@ -18,6 +18,7 @@ import {
   pgEnum,
   pgTable,
   serial,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -35,6 +36,10 @@ export const enum_addresses_title = pgEnum("enum_addresses_title", [
   "dr",
   "prof",
 ])
+export const enum_pages_blocks_slider_snaps = pgEnum(
+  "enum_pages_blocks_slider_snaps",
+  ["1", "3"]
+)
 export const enum_categories_type = pgEnum("enum_categories_type", [
   "product",
   "post",
@@ -244,6 +249,171 @@ export const media_texts = pgTable(
       foreignColumns: [media.id],
       name: "media_texts_parent_fk",
     }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_slider_slides_images = pgTable(
+  "pages_blocks_slider_slides_images",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    image: uuid("image_id")
+      .notNull()
+      .references(() => media.id, {
+        onDelete: "set null",
+      }),
+    isDefault: boolean("is_default").notNull().default(false),
+    isMobile: boolean("is_mobile").notNull().default(false),
+  },
+  (columns) => [
+    index("pages_blocks_slider_slides_images_order_idx").on(columns._order),
+    index("pages_blocks_slider_slides_images_parent_id_idx").on(
+      columns._parentID
+    ),
+    index("pages_blocks_slider_slides_images_image_idx").on(columns.image),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_slider_slides.id],
+      name: "pages_blocks_slider_slides_images_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_slider_slides = pgTable(
+  "pages_blocks_slider_slides",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    link: varchar("link"),
+  },
+  (columns) => [
+    index("pages_blocks_slider_slides_order_idx").on(columns._order),
+    index("pages_blocks_slider_slides_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_slider.id],
+      name: "pages_blocks_slider_slides_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_slider = pgTable(
+  "pages_blocks_slider",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    snaps: enum_pages_blocks_slider_snaps("snaps").notNull().default("1"),
+    active: boolean("active").notNull().default(true),
+    showArrows: boolean("show_arrows").default(true),
+    showDots: boolean("show_dots").default(true),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_slider_order_idx").on(columns._order),
+    index("pages_blocks_slider_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_slider_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_slider_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_faq_faqs = pgTable(
+  "pages_blocks_faq_faqs",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    question: varchar("question").notNull(),
+    answer: jsonb("answer").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_faq_faqs_order_idx").on(columns._order),
+    index("pages_blocks_faq_faqs_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_faq.id],
+      name: "pages_blocks_faq_faqs_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_faq = pgTable(
+  "pages_blocks_faq",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    center: boolean("center").notNull().default(false),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_faq_order_idx").on(columns._order),
+    index("pages_blocks_faq_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_faq_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_faq_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_rich_text = pgTable(
+  "pages_blocks_rich_text",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    content: jsonb("content").notNull(),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_rich_text_order_idx").on(columns._order),
+    index("pages_blocks_rich_text_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_rich_text_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_rich_text_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages = pgTable(
+  "pages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title").notNull(),
+    generateSlug: boolean("generate_slug").default(true),
+    slug: varchar("slug").notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("pages_slug_idx").on(columns.slug),
+    index("pages_updated_at_idx").on(columns.updatedAt),
+    index("pages_created_at_idx").on(columns.createdAt),
   ]
 )
 
@@ -953,6 +1123,7 @@ export const payload_locked_documents_rels = pgTable(
     usersID: uuid("users_id"),
     addressesID: uuid("addresses_id"),
     mediaID: uuid("media_id"),
+    pagesID: uuid("pages_id"),
     packagesID: uuid("packages_id"),
     "service-areasID": uuid("service_areas_id"),
     brandsID: uuid("brands_id"),
@@ -975,6 +1146,7 @@ export const payload_locked_documents_rels = pgTable(
       columns.addressesID
     ),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
+    index("payload_locked_documents_rels_pages_id_idx").on(columns.pagesID),
     index("payload_locked_documents_rels_packages_id_idx").on(
       columns.packagesID
     ),
@@ -1024,6 +1196,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["mediaID"]],
       foreignColumns: [media.id],
       name: "payload_locked_documents_rels_media_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "payload_locked_documents_rels_pages_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["packagesID"]],
@@ -1335,6 +1512,91 @@ export const relations_media = relations(media, ({ many }) => ({
     relationName: "_texts",
   }),
 }))
+export const relations_pages_blocks_slider_slides_images = relations(
+  pages_blocks_slider_slides_images,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_slider_slides, {
+      fields: [pages_blocks_slider_slides_images._parentID],
+      references: [pages_blocks_slider_slides.id],
+      relationName: "images",
+    }),
+    image: one(media, {
+      fields: [pages_blocks_slider_slides_images.image],
+      references: [media.id],
+      relationName: "image",
+    }),
+  })
+)
+export const relations_pages_blocks_slider_slides = relations(
+  pages_blocks_slider_slides,
+  ({ one, many }) => ({
+    _parentID: one(pages_blocks_slider, {
+      fields: [pages_blocks_slider_slides._parentID],
+      references: [pages_blocks_slider.id],
+      relationName: "slides",
+    }),
+    images: many(pages_blocks_slider_slides_images, {
+      relationName: "images",
+    }),
+  })
+)
+export const relations_pages_blocks_slider = relations(
+  pages_blocks_slider,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_slider._parentID],
+      references: [pages.id],
+      relationName: "_blocks_slider",
+    }),
+    slides: many(pages_blocks_slider_slides, {
+      relationName: "slides",
+    }),
+  })
+)
+export const relations_pages_blocks_faq_faqs = relations(
+  pages_blocks_faq_faqs,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_faq, {
+      fields: [pages_blocks_faq_faqs._parentID],
+      references: [pages_blocks_faq.id],
+      relationName: "faqs",
+    }),
+  })
+)
+export const relations_pages_blocks_faq = relations(
+  pages_blocks_faq,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_faq._parentID],
+      references: [pages.id],
+      relationName: "_blocks_faq",
+    }),
+    faqs: many(pages_blocks_faq_faqs, {
+      relationName: "faqs",
+    }),
+  })
+)
+export const relations_pages_blocks_rich_text = relations(
+  pages_blocks_rich_text,
+  ({ one }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_rich_text._parentID],
+      references: [pages.id],
+      relationName: "_blocks_richText",
+    }),
+  })
+)
+export const relations_pages = relations(pages, ({ many }) => ({
+  _blocks_slider: many(pages_blocks_slider, {
+    relationName: "_blocks_slider",
+  }),
+  _blocks_faq: many(pages_blocks_faq, {
+    relationName: "_blocks_faq",
+  }),
+  _blocks_richText: many(pages_blocks_rich_text, {
+    relationName: "_blocks_richText",
+  }),
+}))
 export const relations_packages = relations(packages, () => ({}))
 export const relations_service_areas_shipping_rates = relations(
   service_areas_shipping_rates,
@@ -1552,6 +1814,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [media.id],
       relationName: "media",
     }),
+    pagesID: one(pages, {
+      fields: [payload_locked_documents_rels.pagesID],
+      references: [pages.id],
+      relationName: "pages",
+    }),
     packagesID: one(packages, {
       fields: [payload_locked_documents_rels.packagesID],
       references: [packages.id],
@@ -1706,6 +1973,7 @@ type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
   enum_users_gender: typeof enum_users_gender
   enum_addresses_title: typeof enum_addresses_title
+  enum_pages_blocks_slider_snaps: typeof enum_pages_blocks_slider_snaps
   enum_categories_type: typeof enum_categories_type
   enum_orders_payment_status: typeof enum_orders_payment_status
   enum_order_statuses_status: typeof enum_order_statuses_status
@@ -1715,6 +1983,13 @@ type DatabaseSchema = {
   addresses: typeof addresses
   media: typeof media
   media_texts: typeof media_texts
+  pages_blocks_slider_slides_images: typeof pages_blocks_slider_slides_images
+  pages_blocks_slider_slides: typeof pages_blocks_slider_slides
+  pages_blocks_slider: typeof pages_blocks_slider
+  pages_blocks_faq_faqs: typeof pages_blocks_faq_faqs
+  pages_blocks_faq: typeof pages_blocks_faq
+  pages_blocks_rich_text: typeof pages_blocks_rich_text
+  pages: typeof pages
   packages: typeof packages
   service_areas_shipping_rates: typeof service_areas_shipping_rates
   service_areas: typeof service_areas
@@ -1752,6 +2027,13 @@ type DatabaseSchema = {
   relations_addresses: typeof relations_addresses
   relations_media_texts: typeof relations_media_texts
   relations_media: typeof relations_media
+  relations_pages_blocks_slider_slides_images: typeof relations_pages_blocks_slider_slides_images
+  relations_pages_blocks_slider_slides: typeof relations_pages_blocks_slider_slides
+  relations_pages_blocks_slider: typeof relations_pages_blocks_slider
+  relations_pages_blocks_faq_faqs: typeof relations_pages_blocks_faq_faqs
+  relations_pages_blocks_faq: typeof relations_pages_blocks_faq
+  relations_pages_blocks_rich_text: typeof relations_pages_blocks_rich_text
+  relations_pages: typeof relations_pages
   relations_packages: typeof relations_packages
   relations_service_areas_shipping_rates: typeof relations_service_areas_shipping_rates
   relations_service_areas: typeof relations_service_areas

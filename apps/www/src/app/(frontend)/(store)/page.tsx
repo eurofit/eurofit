@@ -1,19 +1,57 @@
-import { Button } from "@eurofit/ui/components/button"
+import { RenderBlocks } from "@/blocks/render-blocks"
+import { JsonLd } from "@/components/json-ld"
+import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
+import config from "@/payload.config"
+import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext"
+import { notFound } from "next/navigation"
+import { getPayload } from "payload"
 
-export default function Page() {
+export default async function Home() {
+  const payload = await getPayload({
+    config,
+  })
+
+  const {
+    docs: [page],
+  } = await payload.find({
+    collection: "pages",
+    where: {
+      slug: {
+        equals: "home",
+      },
+    },
+    populate: {
+      products: {
+        slug: true,
+        title: true,
+        supplierImageUrl: true,
+      },
+    },
+    limit: 1,
+    pagination: false,
+  })
+
+  if (!page) {
+    notFound()
+  }
+
+  const faqs = page?.layout
+    ?.filter((block) => block.blockType == "faq")
+    .flatMap((block) =>
+      block.faqs.map((faq) => ({
+        ...faq,
+        answer: convertLexicalToPlaintext({ data: faq.answer }),
+      }))
+    )
+
+  const faqJsonLd = getFaqJsonLd(faqs)
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
+    <>
+      <JsonLd jsonLd={[faqJsonLd]} />
+      <div className="relative w-full space-y-10 lg:space-y-14">
+        <RenderBlocks blocks={page?.layout} />
       </div>
-    </div>
+    </>
   )
 }

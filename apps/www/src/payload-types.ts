@@ -65,11 +65,17 @@ export interface Config {
   auth: {
     users: UserAuthOperations;
   };
-  blocks: {};
+  blocks: {
+    slider: SliderBlock;
+    productList: ProductListBlock;
+    faq: FAQBlock;
+    richText: RichTextBlock;
+  };
   collections: {
     users: User;
     addresses: Address;
     media: Media;
+    pages: Page;
     packages: Package;
     'service-areas': ServiceArea;
     brands: Brand;
@@ -105,6 +111,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     packages: PackagesSelect<false> | PackagesSelect<true>;
     'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     brands: BrandsSelect<false> | BrandsSelect<true>;
@@ -166,111 +173,26 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "SliderBlock".
  */
-export interface User {
-  id: string;
-  roles: ('admin' | 'customer')[];
-  isActive: boolean;
-  firstName: string;
-  lastName: string;
-  gender: 'male' | 'female';
-  /**
-   * The Paystack customer code for this user. This is given by external payment processor Paystack.
-   */
-  paystackCustomerCode: string;
-  /**
-   * The full name of the user.
-   */
-  fullName?: string | null;
-  addresses?: {
-    docs?: (string | Address)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-  /**
-   * The email address of the user. This will be used for login.
-   */
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  _verified?: boolean | null;
-  _verificationToken?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * Customer delivery addresses.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses".
- */
-export interface Address {
-  id: string;
-  user?: (string | null) | User;
-  title: 'mr' | 'ms' | 'mrs' | 'dr' | 'prof';
-  firstName: string;
-  lastName: string;
-  phone: string;
-  /**
-   * Short name to identify this address. Example: Home, Work, Shop, Warehouse, Cargo.
-   */
-  label?: string | null;
-  /**
-   * Primary address details. Example: Building name, house number, or plot number.
-   */
-  line1: string;
-  /**
-   * Optional extra details. Example: Apartment number, floor, or suite.
-   */
-  line2?: string | null;
-  /**
-   * Area or neighborhood. Example: Eastleigh, Kibera, Embakasi, Westlands.
-   */
-  area?: string | null;
-  /**
-   * Landmark or direction to the address. Example: Near the main gate, Behind the school.
-   */
-  landmark?: string | null;
-  /**
-   * City or town. Example: Nairobi, Thika, Nakuru.
-   */
-  city: string;
-  /**
-   * County name. Example: Nairobi, Kiambu, Mombasa.
-   */
-  county: string;
-  /**
-   * Country where this address is located.
-   */
-  country: string;
-  /**
-   * Postal code for the area. Example: 00100, 00200.
-   */
-  postalCode: string;
-  /**
-   * Extra delivery instructions. Example: Call when at the gate, Ask for caretaker.
-   */
-  note?: string | null;
-  /**
-   * Set this as the user’s default delivery address.
-   */
-  isDefault: boolean;
-  updatedAt: string;
-  createdAt: string;
+export interface SliderBlock {
+  slides: {
+    images: {
+      image: string | Media;
+      isDefault: boolean;
+      isMobile: boolean;
+      id?: string | null;
+    }[];
+    link?: string | null;
+    id?: string | null;
+  }[];
+  snaps: '1' | '3';
+  active: boolean;
+  showArrows?: boolean | null;
+  showDots?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'slider';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -300,101 +222,26 @@ export interface Media {
   focalY?: number | null;
 }
 /**
- * Shipping package tiers with their physical dimensions and weight limits.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "packages".
+ * via the `definition` "ProductListBlock".
  */
-export interface Package {
-  id: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  isActive: boolean;
-  /**
-   * The name of the package tier, e.g. "Small package".
-   */
+export interface ProductListBlock {
   title: string;
-  length: number;
-  width: number;
-  height: number;
-  maxWeight: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Geographic areas the store serves.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "service-areas".
- */
-export interface ServiceArea {
-  id: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  isActive: boolean;
-  /**
-   * The name of the service area.
-   */
-  title: string;
-  /**
-   * Expected delivery timeline for this service area, in business days.
-   */
-  deliveryTime: {
-    minDays: number;
-    maxDays: number;
-  };
-  /**
-   * Shipping price per package tier for this area.
-   */
-  shippingRates?:
+  products?:
     | {
-        package: string | Package;
-        price: number;
+        product?: (string | null) | Product;
         id?: string | null;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Manage brands associated with products in the store.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brands".
- */
-export interface Brand {
-  id: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  isActive: boolean;
-  /**
-   * The name of the brand, used for display and identification.
-   */
-  title: string;
-  /**
-   * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
-   */
-  supplierImageUrl?: string | null;
-  /**
-   * The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.
-   */
-  logo?: (string | null) | Media;
-  products?: {
-    docs?: (string | Product)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
+  styles?: {
+    headerBg?: string | null;
+    headerFg?: string | null;
+    contentBg?: string | null;
+    contentFg?: string | null;
   };
-  updatedAt: string;
-  createdAt: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productList';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -443,6 +290,40 @@ export interface Product {
   categories?: (string | Category)[] | null;
   productVariants: {
     docs?: (string | ProductVariant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage brands associated with products in the store.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
+  /**
+   * The name of the brand, used for display and identification.
+   */
+  title: string;
+  /**
+   * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
+   */
+  supplierImageUrl?: string | null;
+  /**
+   * The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.
+   */
+  logo?: (string | null) | Media;
+  products?: {
+    docs?: (string | Product)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -609,6 +490,246 @@ export interface ProductVariant {
    * Indicates if the product is back-orderable. Managed programmatically.
    */
   isPreorder: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  faqs: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    id?: string | null;
+  }[];
+  center: boolean;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: string;
+  roles: ('admin' | 'customer')[];
+  isActive: boolean;
+  firstName: string;
+  lastName: string;
+  gender: 'male' | 'female';
+  /**
+   * The Paystack customer code for this user. This is given by external payment processor Paystack.
+   */
+  paystackCustomerCode: string;
+  /**
+   * The full name of the user.
+   */
+  fullName?: string | null;
+  addresses?: {
+    docs?: (string | Address)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+  /**
+   * The email address of the user. This will be used for login.
+   */
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * Customer delivery addresses.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: string;
+  user?: (string | null) | User;
+  title: 'mr' | 'ms' | 'mrs' | 'dr' | 'prof';
+  firstName: string;
+  lastName: string;
+  phone: string;
+  /**
+   * Short name to identify this address. Example: Home, Work, Shop, Warehouse, Cargo.
+   */
+  label?: string | null;
+  /**
+   * Primary address details. Example: Building name, house number, or plot number.
+   */
+  line1: string;
+  /**
+   * Optional extra details. Example: Apartment number, floor, or suite.
+   */
+  line2?: string | null;
+  /**
+   * Area or neighborhood. Example: Eastleigh, Kibera, Embakasi, Westlands.
+   */
+  area?: string | null;
+  /**
+   * Landmark or direction to the address. Example: Near the main gate, Behind the school.
+   */
+  landmark?: string | null;
+  /**
+   * City or town. Example: Nairobi, Thika, Nakuru.
+   */
+  city: string;
+  /**
+   * County name. Example: Nairobi, Kiambu, Mombasa.
+   */
+  county: string;
+  /**
+   * Country where this address is located.
+   */
+  country: string;
+  /**
+   * Postal code for the area. Example: 00100, 00200.
+   */
+  postalCode: string;
+  /**
+   * Extra delivery instructions. Example: Call when at the gate, Ask for caretaker.
+   */
+  note?: string | null;
+  /**
+   * Set this as the user’s default delivery address.
+   */
+  isDefault: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  layout: (SliderBlock | FAQBlock | RichTextBlock)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Shipping package tiers with their physical dimensions and weight limits.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "packages".
+ */
+export interface Package {
+  id: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
+  /**
+   * The name of the package tier, e.g. "Small package".
+   */
+  title: string;
+  length: number;
+  width: number;
+  height: number;
+  maxWeight: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Geographic areas the store serves.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas".
+ */
+export interface ServiceArea {
+  id: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
+  /**
+   * The name of the service area.
+   */
+  title: string;
+  /**
+   * Expected delivery timeline for this service area, in business days.
+   */
+  deliveryTime: {
+    minDays: number;
+    maxDays: number;
+  };
+  /**
+   * Shipping price per package tier for this area.
+   */
+  shippingRates?:
+    | {
+        package: string | Package;
+        price: number;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -795,6 +916,10 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
         relationTo: 'packages';
         value: string | Package;
       } | null)
@@ -959,6 +1084,18 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  layout?: T | {};
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

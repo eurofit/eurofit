@@ -9,6 +9,7 @@ import path from "path"
 import { buildConfig } from "payload"
 import sharp from "sharp"
 import { fileURLToPath } from "url"
+import { blocks } from "./blocks"
 import { collections } from "./collections"
 import { users } from "./collections/users"
 import { globals } from "./globals"
@@ -30,6 +31,7 @@ export default buildConfig({
   routes: {
     api: "/payload/api",
   },
+  blocks,
   collections,
   globals,
   editor: lexicalEditor(),

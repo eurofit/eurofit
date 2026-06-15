@@ -26,7 +26,9 @@ export function JsonLd({ jsonLd }: JsonLdProps) {
           key={schemaToId(item)}
           id={schemaToId(item)}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(item).replace(/</g, "\\u003c"),
+          }}
         />
       ))}
     </>

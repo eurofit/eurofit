@@ -6,6 +6,7 @@ import { media } from "./media"
 import { orders } from "./orders"
 import { orderStatus } from "./orders/order-status"
 import { packages } from "./packages"
+import { pages } from "./pages"
 import { productVariants } from "./product-variants"
 import { products } from "./products"
 import { serviceAreas } from "./service-areas"
@@ -18,6 +19,7 @@ export const collections = [
   users,
   addresses,
   media,
+  pages,
   packages,
   serviceAreas,
   brands,
