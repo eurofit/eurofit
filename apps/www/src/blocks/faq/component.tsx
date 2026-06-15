@@ -1,11 +1,11 @@
 import { smConverters } from "@/components/rich-text/converters/sm"
+import { FAQBlock } from "@/payload-types"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { FAQBlock } from "@/payload-types"
+} from "@eurofit/ui/components/accordion"
 import { cn } from "@eurofit/ui/lib/utils"
 import { RichText } from "@payloadcms/richtext-lexical/react"
 
