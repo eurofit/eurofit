@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Security
 
 - Never surface unexpected error messages to the user.
@@ -45,6 +47,8 @@ Applies everywhere: variables, function return values, Zod output fields, and st
   - ✅ `"@/components"`
 
 ## Next.js
+
+> **Next.js 16 note**: APIs, conventions, and file structure may differ from training data. When in doubt, read `node_modules/next/dist/docs/` before writing code. Heed deprecation notices.
 
 - **Server Actions**: Never throw expected errors. Return `ActionResult<T>` from `@/types/action-result.ts`.
 - Use Server actions only as post. When client need an action or query payload data, use api routes.
@@ -135,6 +139,20 @@ pnpm --filter www payload migrate              # run pending migrations
 | `app/(frontend)/(store)/` | Storefront + `verify-email` (requires store shell)                          |
 | `app/(payload)/`          | Payload CMS admin — auto-generated, do not edit                             |
 
+### Collections
+
+All registered collections (in `src/collections/index.ts`): `users`, `addresses`, `media`, `packages`, `serviceAreas`, `brands`, `categories`, `products`, `productVariants`, `stockAlerts`, `wishlists`, `carts`, `orders`, `orderStatus`, `transactions`.
+
+### Globals
+
+Three globals (`src/globals/`): `nav`, `footer`, `settings`. Fetched server-side via actions in `src/actions/get-nav.ts` etc.
+
+### Middleware / Guest Session
+
+The app uses `src/proxy.ts` (not a `middleware.ts` file) as the Next.js middleware entry point. It calls `ensureGuestSession` on every non-API/admin/static request to maintain a sliding-expiry guest session cookie (`_ef_g`, 30 days).
+
+Cart is identified by **either** `userId` (authenticated) or the `guestSessionId` cookie (anonymous). The `ensureGuestSessionId()` server action in `src/actions/ensure-guest-session-id.ts` creates the cookie on first visit; sliding expiry is handled by the middleware.
+
 ### State Management
 
 - **Jotai** — client/global UI state; provider at `src/providers/jotai.tsx`
@@ -149,14 +167,15 @@ pnpm --filter www payload migrate              # run pending migrations
 
 **Access control** (`src/access/`):
 
-| Export                   | Scope      | Description                           |
-| ------------------------ | ---------- | ------------------------------------- |
-| `adminOnly`              | Collection | Admins only                           |
-| `adminOrSelf`            | Collection | Admins or the record's own user       |
-| `isAdmin`                | Boolean    | Underlying admin check                |
-| `adminOnlyFieldAccess`   | Field      | Admins only                           |
-| `everyone`               | Collection | Public                                |
-| `checkRole(roles, user)` | Utility    | Base role check used by all the above |
+| Export                   | Scope      | Description                                              |
+| ------------------------ | ---------- | -------------------------------------------------------- |
+| `adminOnly`              | Collection | Admins only                                              |
+| `adminOrSelf`            | Collection | Admins or the record's own user                          |
+| `userOwned`              | Collection | Admins or records where `user` field equals current user |
+| `isAdmin`                | Boolean    | Underlying admin check                                   |
+| `adminOnlyFieldAccess`   | Field      | Admins only                                              |
+| `everyone`               | Collection | Public                                                   |
+| `checkRole(roles, user)` | Utility    | Base role check used by all the above                    |
 
 - Add access control to every collection and every sensitive field.
 
@@ -205,6 +224,14 @@ Validated at startup via `@t3-oss/env-nextjs` in `src/env.mjs`.
 ### User Roles
 
 Defined in `src/const/user-roles.ts`: `admin` and `customer`. Roles are stored in JWT. The first user created is automatically promoted to admin via the `ensureFirstUserIsAdmin` hook.
+
+### Known Open Issues
+
+`TODOS.md` tracks three deliberate deferred gaps — do not close them without the prescribed fix:
+
+- **C-01 (CRITICAL)** — Stock oversell race condition in `validateOrderItems` (`src/collections/orders/hooks/validate-order-items.ts`): stock is read but never atomically decremented/locked.
+- **H-03 (HIGH)** — No error tracking service wired up; payment webhook failures currently log to `console.error` only.
+- **M-08 (MEDIUM)** — No orphan-reconciliation cron: if a Paystack webhook is never delivered, the customer is charged but their order stays `paymentStatus = "unpaid"`.
 
 ### UI Components
 
