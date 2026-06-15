@@ -13,212 +13,204 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
-  | "Pacific/Midway"
-  | "Pacific/Niue"
-  | "Pacific/Honolulu"
-  | "Pacific/Rarotonga"
-  | "America/Anchorage"
-  | "Pacific/Gambier"
-  | "America/Los_Angeles"
-  | "America/Tijuana"
-  | "America/Denver"
-  | "America/Phoenix"
-  | "America/Chicago"
-  | "America/Guatemala"
-  | "America/New_York"
-  | "America/Bogota"
-  | "America/Caracas"
-  | "America/Santiago"
-  | "America/Buenos_Aires"
-  | "America/Sao_Paulo"
-  | "Atlantic/South_Georgia"
-  | "Atlantic/Azores"
-  | "Atlantic/Cape_Verde"
-  | "Europe/London"
-  | "Europe/Berlin"
-  | "Africa/Lagos"
-  | "Europe/Athens"
-  | "Africa/Cairo"
-  | "Europe/Moscow"
-  | "Asia/Riyadh"
-  | "Asia/Dubai"
-  | "Asia/Baku"
-  | "Asia/Karachi"
-  | "Asia/Tashkent"
-  | "Asia/Calcutta"
-  | "Asia/Dhaka"
-  | "Asia/Almaty"
-  | "Asia/Jakarta"
-  | "Asia/Bangkok"
-  | "Asia/Shanghai"
-  | "Asia/Singapore"
-  | "Asia/Tokyo"
-  | "Asia/Seoul"
-  | "Australia/Brisbane"
-  | "Australia/Sydney"
-  | "Pacific/Guam"
-  | "Pacific/Noumea"
-  | "Pacific/Auckland"
-  | "Pacific/Fiji"
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Brisbane'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
 
 export interface Config {
   auth: {
-    users: UserAuthOperations
-  }
-  blocks: {}
+    users: UserAuthOperations;
+  };
+  blocks: {};
   collections: {
-    users: User
-    addresses: Address
-    media: Media
-    packages: Package
-    "service-areas": ServiceArea
-    brands: Brand
-    categories: Category
-    products: Product
-    "product-variants": ProductVariant
-    "stock-alerts": StockAlert
-    wishlists: Wishlist
-    carts: Cart
-    orders: Order
-    "order-statuses": OrderStatus
-    transactions: Transaction
-    "payload-kv": PayloadKv
-    "payload-locked-documents": PayloadLockedDocument
-    "payload-preferences": PayloadPreference
-    "payload-migrations": PayloadMigration
-  }
+    users: User;
+    addresses: Address;
+    media: Media;
+    packages: Package;
+    'service-areas': ServiceArea;
+    brands: Brand;
+    categories: Category;
+    products: Product;
+    'product-variants': ProductVariant;
+    'stock-alerts': StockAlert;
+    wishlists: Wishlist;
+    carts: Cart;
+    orders: Order;
+    'order-statuses': OrderStatus;
+    transactions: Transaction;
+    'payload-kv': PayloadKv;
+    'payload-locked-documents': PayloadLockedDocument;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
+  };
   collectionsJoins: {
     users: {
-      addresses: "addresses"
-    }
+      addresses: 'addresses';
+    };
     brands: {
-      products: "products"
-    }
+      products: 'products';
+    };
     products: {
-      productVariants: "product-variants"
-    }
+      productVariants: 'product-variants';
+    };
     orders: {
-      transactions: "transactions"
-    }
-  }
+      transactions: 'transactions';
+    };
+  };
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>
-    addresses: AddressesSelect<false> | AddressesSelect<true>
-    media: MediaSelect<false> | MediaSelect<true>
-    packages: PackagesSelect<false> | PackagesSelect<true>
-    "service-areas": ServiceAreasSelect<false> | ServiceAreasSelect<true>
-    brands: BrandsSelect<false> | BrandsSelect<true>
-    categories: CategoriesSelect<false> | CategoriesSelect<true>
-    products: ProductsSelect<false> | ProductsSelect<true>
-    "product-variants":
-      | ProductVariantsSelect<false>
-      | ProductVariantsSelect<true>
-    "stock-alerts": StockAlertsSelect<false> | StockAlertsSelect<true>
-    wishlists: WishlistsSelect<false> | WishlistsSelect<true>
-    carts: CartsSelect<false> | CartsSelect<true>
-    orders: OrdersSelect<false> | OrdersSelect<true>
-    "order-statuses": OrderStatusesSelect<false> | OrderStatusesSelect<true>
-    transactions: TransactionsSelect<false> | TransactionsSelect<true>
-    "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>
-    "payload-locked-documents":
-      | PayloadLockedDocumentsSelect<false>
-      | PayloadLockedDocumentsSelect<true>
-    "payload-preferences":
-      | PayloadPreferencesSelect<false>
-      | PayloadPreferencesSelect<true>
-    "payload-migrations":
-      | PayloadMigrationsSelect<false>
-      | PayloadMigrationsSelect<true>
-  }
+    users: UsersSelect<false> | UsersSelect<true>;
+    addresses: AddressesSelect<false> | AddressesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    packages: PackagesSelect<false> | PackagesSelect<true>;
+    'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
+    brands: BrandsSelect<false> | BrandsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
+    'stock-alerts': StockAlertsSelect<false> | StockAlertsSelect<true>;
+    wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
+    carts: CartsSelect<false> | CartsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'order-statuses': OrderStatusesSelect<false> | OrderStatusesSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+  };
   db: {
-    defaultIDType: string
-  }
-  fallbackLocale: null
+    defaultIDType: string;
+  };
+  fallbackLocale: null;
   globals: {
-    settings: Setting
-    nav: Nav
-    footer: Footer
-  }
+    settings: Setting;
+    nav: Nav;
+    footer: Footer;
+  };
   globalsSelect: {
-    settings: SettingsSelect<false> | SettingsSelect<true>
-    nav: NavSelect<false> | NavSelect<true>
-    footer: FooterSelect<false> | FooterSelect<true>
-  }
-  locale: null
+    settings: SettingsSelect<false> | SettingsSelect<true>;
+    nav: NavSelect<false> | NavSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
+  locale: null;
   widgets: {
-    collections: CollectionsWidget
-  }
-  user: User
+    collections: CollectionsWidget;
+  };
+  user: User;
   jobs: {
-    tasks: unknown
-    workflows: unknown
-  }
+    tasks: unknown;
+    workflows: unknown;
+  };
 }
 export interface UserAuthOperations {
   forgotPassword: {
-    email: string
-    password: string
-  }
+    email: string;
+    password: string;
+  };
   login: {
-    email: string
-    password: string
-  }
+    email: string;
+    password: string;
+  };
   registerFirstUser: {
-    email: string
-    password: string
-  }
+    email: string;
+    password: string;
+  };
   unlock: {
-    email: string
-    password: string
-  }
+    email: string;
+    password: string;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
-  id: string
-  roles: ("admin" | "customer")[]
-  isActive: boolean
-  firstName: string
-  lastName: string
-  gender: "male" | "female"
+  id: string;
+  roles: ('admin' | 'customer')[];
+  isActive: boolean;
+  firstName: string;
+  lastName: string;
+  gender: 'male' | 'female';
   /**
    * The Paystack customer code for this user. This is given by external payment processor Paystack.
    */
-  paystackCustomerCode: string
+  paystackCustomerCode: string;
   /**
    * The full name of the user.
    */
-  fullName?: string | null
+  fullName?: string | null;
   addresses?: {
-    docs?: (string | Address)[]
-    hasNextPage?: boolean
-    totalDocs?: number
-  }
-  updatedAt: string
-  createdAt: string
+    docs?: (string | Address)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
   /**
    * The email address of the user. This will be used for login.
    */
-  email: string
-  resetPasswordToken?: string | null
-  resetPasswordExpiration?: string | null
-  salt?: string | null
-  hash?: string | null
-  _verified?: boolean | null
-  _verificationToken?: string | null
-  loginAttempts?: number | null
-  lockUntil?: string | null
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
   sessions?:
     | {
-        id: string
-        createdAt?: string | null
-        expiresAt: string
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
       }[]
-    | null
-  password?: string | null
-  collection: "users"
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * Customer delivery addresses.
@@ -227,85 +219,85 @@ export interface User {
  * via the `definition` "addresses".
  */
 export interface Address {
-  id: string
-  user?: (string | null) | User
-  title: "mr" | "ms" | "mrs" | "dr" | "prof"
-  firstName: string
-  lastName: string
-  phone: string
+  id: string;
+  user?: (string | null) | User;
+  title: 'mr' | 'ms' | 'mrs' | 'dr' | 'prof';
+  firstName: string;
+  lastName: string;
+  phone: string;
   /**
    * Short name to identify this address. Example: Home, Work, Shop, Warehouse, Cargo.
    */
-  label?: string | null
+  label?: string | null;
   /**
    * Primary address details. Example: Building name, house number, or plot number.
    */
-  line1: string
+  line1: string;
   /**
    * Optional extra details. Example: Apartment number, floor, or suite.
    */
-  line2?: string | null
+  line2?: string | null;
   /**
    * Area or neighborhood. Example: Eastleigh, Kibera, Embakasi, Westlands.
    */
-  area?: string | null
+  area?: string | null;
   /**
    * Landmark or direction to the address. Example: Near the main gate, Behind the school.
    */
-  landmark?: string | null
+  landmark?: string | null;
   /**
    * City or town. Example: Nairobi, Thika, Nakuru.
    */
-  city: string
+  city: string;
   /**
    * County name. Example: Nairobi, Kiambu, Mombasa.
    */
-  county: string
+  county: string;
   /**
    * Country where this address is located.
    */
-  country: string
+  country: string;
   /**
    * Postal code for the area. Example: 00100, 00200.
    */
-  postalCode: string
+  postalCode: string;
   /**
    * Extra delivery instructions. Example: Call when at the gate, Ask for caretaker.
    */
-  note?: string | null
+  note?: string | null;
   /**
    * Set this as the user’s default delivery address.
    */
-  isDefault: boolean
-  updatedAt: string
-  createdAt: string
+  isDefault: boolean;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: string
+  id: string;
   /**
    * Alternative text for the media, used for accessibility and SEO.
    */
-  alt?: string | null
+  alt?: string | null;
   /**
    * Tags for the media, used for categorization and search.
    */
-  tags?: string[] | null
-  prefix?: string | null
-  updatedAt: string
-  createdAt: string
-  url?: string | null
-  thumbnailURL?: string | null
-  filename?: string | null
-  mimeType?: string | null
-  filesize?: number | null
-  width?: number | null
-  height?: number | null
-  focalX?: number | null
-  focalY?: number | null
+  tags?: string[] | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * Shipping package tiers with their physical dimensions and weight limits.
@@ -314,23 +306,23 @@ export interface Media {
  * via the `definition` "packages".
  */
 export interface Package {
-  id: string
+  id: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
-  isActive: boolean
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
   /**
    * The name of the package tier, e.g. "Small package".
    */
-  title: string
-  length: number
-  width: number
-  height: number
-  maxWeight: number
-  updatedAt: string
-  createdAt: string
+  title: string;
+  length: number;
+  width: number;
+  height: number;
+  maxWeight: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Geographic areas the store serves.
@@ -339,36 +331,36 @@ export interface Package {
  * via the `definition` "service-areas".
  */
 export interface ServiceArea {
-  id: string
+  id: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
-  isActive: boolean
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
   /**
    * The name of the service area.
    */
-  title: string
+  title: string;
   /**
    * Expected delivery timeline for this service area, in business days.
    */
   deliveryTime: {
-    minDays: number
-    maxDays: number
-  }
+    minDays: number;
+    maxDays: number;
+  };
   /**
    * Shipping price per package tier for this area.
    */
   shippingRates?:
     | {
-        package: string | Package
-        price: number
-        id?: string | null
+        package: string | Package;
+        price: number;
+        id?: string | null;
       }[]
-    | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Manage brands associated with products in the store.
@@ -377,922 +369,922 @@ export interface ServiceArea {
  * via the `definition` "brands".
  */
 export interface Brand {
-  id: string
+  id: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
-  isActive: boolean
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
   /**
    * The name of the brand, used for display and identification.
    */
-  title: string
+  title: string;
   /**
    * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
    */
-  supplierImageUrl?: string | null
+  supplierImageUrl?: string | null;
   /**
    * The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.
    */
-  logo?: (string | null) | Media
+  logo?: (string | null) | Media;
   products?: {
-    docs?: (string | Product)[]
-    hasNextPage?: boolean
-    totalDocs?: number
-  }
-  updatedAt: string
-  createdAt: string
+    docs?: (string | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
 export interface Product {
-  id: string
-  isActive: boolean
+  id: string;
+  isActive: boolean;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
+  generateSlug?: boolean | null;
+  slug: string;
   /**
    * A descriptive title for the product, used for display purposes.
    */
-  title: string
+  title: string;
   /**
    * Select the brand associated with this product.
    */
-  brand: string | Brand
+  brand: string | Brand;
   /**
    * Specify the origin of the product, such as country or region.
    */
-  origin?: string | null
-  images?: (string | Media)[] | null
+  origin?: string | null;
+  images?: (string | Media)[] | null;
   /**
    * Enter the URL of the product image provided by the supplier or your source.
    */
-  supplierImageUrl?: string | null
+  supplierImageUrl?: string | null;
   /**
    * Provide detailed information about the product, including features, specifications, and usage instructions.
    */
-  productInformation?: string | null
+  productInformation?: string | null;
   /**
    * Provide nutritional information for the product.
    */
-  nutritionalInformation?: string | null
+  nutritionalInformation?: string | null;
   /**
    * Enter the URL of the product page on the supplier's website.
    */
-  supplierUrl?: string | null
+  supplierUrl?: string | null;
   /**
    * Select categories that this product belongs to.
    */
-  categories?: (string | Category)[] | null
+  categories?: (string | Category)[] | null;
   productVariants: {
-    docs?: (string | ProductVariant)[]
-    hasNextPage?: boolean
-    totalDocs?: number
-  }
-  updatedAt: string
-  createdAt: string
+    docs?: (string | ProductVariant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
-  id: string
+  id: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
-  isActive: boolean
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
   /**
    * Enter the name of the category.
    */
-  title: string
-  type?: ("product" | "post")[] | null
+  title: string;
+  type?: ('product' | 'post')[] | null;
   /**
    * Provide a brief description of the category.
    */
-  description?: string | null
+  description?: string | null;
   /**
    * This is the URL of the supplier's page for this category.
    */
-  srcUrl?: string | null
-  updatedAt: string
-  createdAt: string
+  srcUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-variants".
  */
 export interface ProductVariant {
-  id: string
+  id: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  generateSlug?: boolean | null
-  slug: string
-  isActive: boolean
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
   /**
    * Unique internal ID for managing inventory.
    */
-  sku: string
+  sku: string;
   /**
    * Full name of the product, e.g. "Optimum Nutrition Whey 900g Banana".
    */
-  title: string
+  title: string;
   /**
    * Longer descriptive title used on the product detail page
    */
-  detailTitle?: string | null
+  detailTitle?: string | null;
   /**
    * Package size, e.g. "900g".
    */
-  size?: string | null
+  size?: string | null;
   /**
    * Flavor or color of this product variant.
    */
-  flavorColor?: string | null
+  flavorColor?: string | null;
   /**
    * Display name like "900g / Banana Cream". Auto or manual.
    */
-  variant?: string | null
+  variant?: string | null;
   /**
    * The main product this variation belongs to.
    */
-  product: string | Product
+  product: string | Product;
   /**
    * Product type like "Protein", "Vitamins".
    */
-  category?: string | null
+  category?: string | null;
   /**
    * Upload up to 6 images for this product. If none, it will use the parent product image.
    */
-  images?: (string | Media)[] | null
+  images?: (string | Media)[] | null;
   /**
    * Original price from the supplier in GBP.
    */
-  supplierPrice?: number | null
+  supplierPrice?: number | null;
   /**
    * Discounted supplier price, if any.
    */
-  supplierDiscountedPrice?: number | null
+  supplierDiscountedPrice?: number | null;
   /**
    * When the supplier price was last updated. Used to determine if price refresh is needed.
    */
-  priceFetchedAt?: string | null
+  priceFetchedAt?: string | null;
   /**
    * Calculated cost price in KES (from supplier price + shipping + import costs). Used for margin calculations.
    */
-  costPrice?: number | null
+  costPrice?: number | null;
   /**
    * Customer price in KES (calculated from supplier price, shipping, margin). Must be a non-negative integer.
    */
-  retailPrice?: number | null
+  retailPrice?: number | null;
   /**
    * Units you have on hand.
    */
-  stock: number
+  stock: number;
   /**
    * Units available from manufacturer / distributor or any external source.
    */
-  supplierStock?: number | null
+  supplierStock?: number | null;
   /**
    * How many units fit on one pallet.
    */
-  onPallet?: number | null
+  onPallet?: number | null;
   /**
    * How many units in one box / case.
    */
-  inCase?: number | null
+  inCase?: number | null;
   /**
    * Product expiration (if applies).
    */
-  expiryDate?: string | null
+  expiryDate?: string | null;
   /**
    * Used for shipping cost calc.
    */
-  weight?: number | null
+  weight?: number | null;
   /**
    * How much product is in the pack (helps predict how long it lasts).
    */
-  servingSizePerContainer?: number | null
+  servingSizePerContainer?: number | null;
   /**
    * Recommended daily amount. Used to estimate finish date.
    */
-  servingSize?: number | null
+  servingSize?: number | null;
   /**
    * Supplier’s product code.
    */
-  supplierProductCode?: string | null
+  supplierProductCode?: string | null;
   /**
    * Retail scan code (EAN/UPC).
    */
-  barcode?: string | null
+  barcode?: string | null;
   /**
    * Customs / HS code for export.
    */
-  exportCommodityCode?: string | null
+  exportCommodityCode?: string | null;
   /**
    * Indicates if a customer has requested notification for back-in-stock status. Managed programmatically.
    */
-  isNotifyRequested: boolean
+  isNotifyRequested: boolean;
   /**
    * Indicates if a customer has added the product to their wishlist. Managed programmatically.
    */
-  isWishlisted: boolean
+  isWishlisted: boolean;
   /**
    * Indicates if the product stock is below the low stock threshold. Managed programmatically.
    */
-  isLowStock: boolean
+  isLowStock: boolean;
   /**
    * Indicates if the product is out of stock. Managed programmatically.
    */
-  isOutOfStock: boolean
+  isOutOfStock: boolean;
   /**
    * Indicates if the product is back-orderable. Managed programmatically.
    */
-  isPreorder: boolean
-  updatedAt: string
-  createdAt: string
+  isPreorder: boolean;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-alerts".
  */
 export interface StockAlert {
-  id: string
-  user: string | User
-  productVariant: string | ProductVariant
-  updatedAt: string
-  createdAt: string
+  id: string;
+  user: string | User;
+  productVariant: string | ProductVariant;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "wishlists".
  */
 export interface Wishlist {
-  id: string
-  user: string | User
-  productVariant: string | ProductVariant
-  updatedAt: string
-  createdAt: string
+  id: string;
+  user: string | User;
+  productVariant: string | ProductVariant;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "carts".
  */
 export interface Cart {
-  id: string
-  user?: (string | null) | User
+  id: string;
+  user?: (string | null) | User;
   /**
    * Identifier for guest customer sessions. Programmatically generated.
    */
-  guestSessionId?: string | null
+  guestSessionId?: string | null;
   items: {
-    productVariant: string | ProductVariant
-    quantity: number
+    productVariant: string | ProductVariant;
+    quantity: number;
     /**
      * A snapshot of the product variant at the time it was added to the cart.
      */
     snapshot?: {
-      retailPrice?: number | null
-      inventoryStock?: number | null
-      supplierStock?: number | null
-    }
-    id?: string | null
-  }[]
-  total?: number | null
+      retailPrice?: number | null;
+      inventoryStock?: number | null;
+      supplierStock?: number | null;
+    };
+    id?: string | null;
+  }[];
+  total?: number | null;
   /**
    * Timestamp of the last activity on this cart by its owner.
    */
-  lastActiveAt: string
-  updatedAt: string
-  createdAt: string
+  lastActiveAt: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
-  id: number
-  user: string | User
-  deliveryAddress: string | Address
+  id: number;
+  user: string | User;
+  deliveryAddress: string | Address;
   items: {
-    productVariant: string | ProductVariant
-    quantity: number
+    productVariant: string | ProductVariant;
+    quantity: number;
     /**
      * Snapshot of the product line at the time of purchase
      */
     snapshot:
       | {
-          [k: string]: unknown
+          [k: string]: unknown;
         }
       | unknown[]
       | string
       | number
       | boolean
-      | null
-    id?: string | null
-  }[]
-  total?: number | null
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
-  paymentStatus: "unpaid" | "paid" | "refunded"
+      | null;
+    id?: string | null;
+  }[];
+  total?: number | null;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentStatus: 'unpaid' | 'paid' | 'refunded';
   /**
    * Access code returned by Paystack when initiating a transaction. We can re use to charge the payment.
    */
-  paystackAccessCode?: string | null
+  paystackAccessCode?: string | null;
   /**
    * Snapshot of the order at the time of purchase
    */
   snapshot:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
   transactions?: {
-    docs?: (string | Transaction)[]
-    hasNextPage?: boolean
-    totalDocs?: number
-  }
-  updatedAt: string
-  createdAt: string
+    docs?: (string | Transaction)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions".
  */
 export interface Transaction {
-  id: string
-  order: number | Order
-  amount: number
-  ref: string
-  provider: string
+  id: string;
+  order: number | Order;
+  amount: number;
+  ref: string;
+  provider: string;
   /**
    * Indicates if the transaction is a test transaction
    */
-  isTest?: boolean | null
-  paidAt: string
+  isTest?: boolean | null;
+  paidAt: string;
   snapshot:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "order-statuses".
  */
 export interface OrderStatus {
-  id: string
-  order: number | Order
-  staff: string | User
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
-  visibleToCustomer: boolean
-  updatedAt: string
-  createdAt: string
+  id: string;
+  order: number | Order;
+  staff: string | User;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  visibleToCustomer: boolean;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string
-  key: string
+  id: string;
+  key: string;
   data:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string
+  id: string;
   document?:
     | ({
-        relationTo: "users"
-        value: string | User
+        relationTo: 'users';
+        value: string | User;
       } | null)
     | ({
-        relationTo: "addresses"
-        value: string | Address
+        relationTo: 'addresses';
+        value: string | Address;
       } | null)
     | ({
-        relationTo: "media"
-        value: string | Media
+        relationTo: 'media';
+        value: string | Media;
       } | null)
     | ({
-        relationTo: "packages"
-        value: string | Package
+        relationTo: 'packages';
+        value: string | Package;
       } | null)
     | ({
-        relationTo: "service-areas"
-        value: string | ServiceArea
+        relationTo: 'service-areas';
+        value: string | ServiceArea;
       } | null)
     | ({
-        relationTo: "brands"
-        value: string | Brand
+        relationTo: 'brands';
+        value: string | Brand;
       } | null)
     | ({
-        relationTo: "categories"
-        value: string | Category
+        relationTo: 'categories';
+        value: string | Category;
       } | null)
     | ({
-        relationTo: "products"
-        value: string | Product
+        relationTo: 'products';
+        value: string | Product;
       } | null)
     | ({
-        relationTo: "product-variants"
-        value: string | ProductVariant
+        relationTo: 'product-variants';
+        value: string | ProductVariant;
       } | null)
     | ({
-        relationTo: "stock-alerts"
-        value: string | StockAlert
+        relationTo: 'stock-alerts';
+        value: string | StockAlert;
       } | null)
     | ({
-        relationTo: "wishlists"
-        value: string | Wishlist
+        relationTo: 'wishlists';
+        value: string | Wishlist;
       } | null)
     | ({
-        relationTo: "carts"
-        value: string | Cart
+        relationTo: 'carts';
+        value: string | Cart;
       } | null)
     | ({
-        relationTo: "orders"
-        value: number | Order
+        relationTo: 'orders';
+        value: number | Order;
       } | null)
     | ({
-        relationTo: "order-statuses"
-        value: string | OrderStatus
+        relationTo: 'order-statuses';
+        value: string | OrderStatus;
       } | null)
     | ({
-        relationTo: "transactions"
-        value: string | Transaction
-      } | null)
-  globalSlug?: string | null
+        relationTo: 'transactions';
+        value: string | Transaction;
+      } | null);
+  globalSlug?: string | null;
   user: {
-    relationTo: "users"
-    value: string | User
-  }
-  updatedAt: string
-  createdAt: string
+    relationTo: 'users';
+    value: string | User;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string
+  id: string;
   user: {
-    relationTo: "users"
-    value: string | User
-  }
-  key?: string | null
+    relationTo: 'users';
+    value: string | User;
+  };
+  key?: string | null;
   value?:
     | {
-        [k: string]: unknown
+        [k: string]: unknown;
       }
     | unknown[]
     | string
     | number
     | boolean
-    | null
-  updatedAt: string
-  createdAt: string
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string
-  name?: string | null
-  batch?: number | null
-  updatedAt: string
-  createdAt: string
+  id: string;
+  name?: string | null;
+  batch?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  roles?: T
-  isActive?: T
-  firstName?: T
-  lastName?: T
-  gender?: T
-  paystackCustomerCode?: T
-  fullName?: T
-  addresses?: T
-  updatedAt?: T
-  createdAt?: T
-  email?: T
-  resetPasswordToken?: T
-  resetPasswordExpiration?: T
-  salt?: T
-  hash?: T
-  _verified?: T
-  _verificationToken?: T
-  loginAttempts?: T
-  lockUntil?: T
+  roles?: T;
+  isActive?: T;
+  firstName?: T;
+  lastName?: T;
+  gender?: T;
+  paystackCustomerCode?: T;
+  fullName?: T;
+  addresses?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  _verified?: T;
+  _verificationToken?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
   sessions?:
     | T
     | {
-        id?: T
-        createdAt?: T
-        expiresAt?: T
-      }
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "addresses_select".
  */
 export interface AddressesSelect<T extends boolean = true> {
-  user?: T
-  title?: T
-  firstName?: T
-  lastName?: T
-  phone?: T
-  label?: T
-  line1?: T
-  line2?: T
-  area?: T
-  landmark?: T
-  city?: T
-  county?: T
-  country?: T
-  postalCode?: T
-  note?: T
-  isDefault?: T
-  updatedAt?: T
-  createdAt?: T
+  user?: T;
+  title?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
+  label?: T;
+  line1?: T;
+  line2?: T;
+  area?: T;
+  landmark?: T;
+  city?: T;
+  county?: T;
+  country?: T;
+  postalCode?: T;
+  note?: T;
+  isDefault?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  alt?: T
-  tags?: T
-  prefix?: T
-  updatedAt?: T
-  createdAt?: T
-  url?: T
-  thumbnailURL?: T
-  filename?: T
-  mimeType?: T
-  filesize?: T
-  width?: T
-  height?: T
-  focalX?: T
-  focalY?: T
+  alt?: T;
+  tags?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "packages_select".
  */
 export interface PackagesSelect<T extends boolean = true> {
-  generateSlug?: T
-  slug?: T
-  isActive?: T
-  title?: T
-  length?: T
-  width?: T
-  height?: T
-  maxWeight?: T
-  updatedAt?: T
-  createdAt?: T
+  generateSlug?: T;
+  slug?: T;
+  isActive?: T;
+  title?: T;
+  length?: T;
+  width?: T;
+  height?: T;
+  maxWeight?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "service-areas_select".
  */
 export interface ServiceAreasSelect<T extends boolean = true> {
-  generateSlug?: T
-  slug?: T
-  isActive?: T
-  title?: T
+  generateSlug?: T;
+  slug?: T;
+  isActive?: T;
+  title?: T;
   deliveryTime?:
     | T
     | {
-        minDays?: T
-        maxDays?: T
-      }
+        minDays?: T;
+        maxDays?: T;
+      };
   shippingRates?:
     | T
     | {
-        package?: T
-        price?: T
-        id?: T
-      }
-  updatedAt?: T
-  createdAt?: T
+        package?: T;
+        price?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "brands_select".
  */
 export interface BrandsSelect<T extends boolean = true> {
-  generateSlug?: T
-  slug?: T
-  isActive?: T
-  title?: T
-  supplierImageUrl?: T
-  logo?: T
-  products?: T
-  updatedAt?: T
-  createdAt?: T
+  generateSlug?: T;
+  slug?: T;
+  isActive?: T;
+  title?: T;
+  supplierImageUrl?: T;
+  logo?: T;
+  products?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
-  generateSlug?: T
-  slug?: T
-  isActive?: T
-  title?: T
-  type?: T
-  description?: T
-  srcUrl?: T
-  updatedAt?: T
-  createdAt?: T
+  generateSlug?: T;
+  slug?: T;
+  isActive?: T;
+  title?: T;
+  type?: T;
+  description?: T;
+  srcUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
-  isActive?: T
-  generateSlug?: T
-  slug?: T
-  title?: T
-  brand?: T
-  origin?: T
-  images?: T
-  supplierImageUrl?: T
-  productInformation?: T
-  nutritionalInformation?: T
-  supplierUrl?: T
-  categories?: T
-  productVariants?: T
-  updatedAt?: T
-  createdAt?: T
+  isActive?: T;
+  generateSlug?: T;
+  slug?: T;
+  title?: T;
+  brand?: T;
+  origin?: T;
+  images?: T;
+  supplierImageUrl?: T;
+  productInformation?: T;
+  nutritionalInformation?: T;
+  supplierUrl?: T;
+  categories?: T;
+  productVariants?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-variants_select".
  */
 export interface ProductVariantsSelect<T extends boolean = true> {
-  generateSlug?: T
-  slug?: T
-  isActive?: T
-  sku?: T
-  title?: T
-  detailTitle?: T
-  size?: T
-  flavorColor?: T
-  variant?: T
-  product?: T
-  category?: T
-  images?: T
-  supplierPrice?: T
-  supplierDiscountedPrice?: T
-  priceFetchedAt?: T
-  costPrice?: T
-  retailPrice?: T
-  stock?: T
-  supplierStock?: T
-  onPallet?: T
-  inCase?: T
-  expiryDate?: T
-  weight?: T
-  servingSizePerContainer?: T
-  servingSize?: T
-  supplierProductCode?: T
-  barcode?: T
-  exportCommodityCode?: T
-  isNotifyRequested?: T
-  isWishlisted?: T
-  isLowStock?: T
-  isOutOfStock?: T
-  isPreorder?: T
-  updatedAt?: T
-  createdAt?: T
+  generateSlug?: T;
+  slug?: T;
+  isActive?: T;
+  sku?: T;
+  title?: T;
+  detailTitle?: T;
+  size?: T;
+  flavorColor?: T;
+  variant?: T;
+  product?: T;
+  category?: T;
+  images?: T;
+  supplierPrice?: T;
+  supplierDiscountedPrice?: T;
+  priceFetchedAt?: T;
+  costPrice?: T;
+  retailPrice?: T;
+  stock?: T;
+  supplierStock?: T;
+  onPallet?: T;
+  inCase?: T;
+  expiryDate?: T;
+  weight?: T;
+  servingSizePerContainer?: T;
+  servingSize?: T;
+  supplierProductCode?: T;
+  barcode?: T;
+  exportCommodityCode?: T;
+  isNotifyRequested?: T;
+  isWishlisted?: T;
+  isLowStock?: T;
+  isOutOfStock?: T;
+  isPreorder?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-alerts_select".
  */
 export interface StockAlertsSelect<T extends boolean = true> {
-  user?: T
-  productVariant?: T
-  updatedAt?: T
-  createdAt?: T
+  user?: T;
+  productVariant?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "wishlists_select".
  */
 export interface WishlistsSelect<T extends boolean = true> {
-  user?: T
-  productVariant?: T
-  updatedAt?: T
-  createdAt?: T
+  user?: T;
+  productVariant?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "carts_select".
  */
 export interface CartsSelect<T extends boolean = true> {
-  user?: T
-  guestSessionId?: T
+  user?: T;
+  guestSessionId?: T;
   items?:
     | T
     | {
-        productVariant?: T
-        quantity?: T
+        productVariant?: T;
+        quantity?: T;
         snapshot?:
           | T
           | {
-              retailPrice?: T
-              inventoryStock?: T
-              supplierStock?: T
-            }
-        id?: T
-      }
-  total?: T
-  lastActiveAt?: T
-  updatedAt?: T
-  createdAt?: T
+              retailPrice?: T;
+              inventoryStock?: T;
+              supplierStock?: T;
+            };
+        id?: T;
+      };
+  total?: T;
+  lastActiveAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
-  id?: T
-  user?: T
-  deliveryAddress?: T
+  id?: T;
+  user?: T;
+  deliveryAddress?: T;
   items?:
     | T
     | {
-        productVariant?: T
-        quantity?: T
-        snapshot?: T
-        id?: T
-      }
-  total?: T
-  status?: T
-  paymentStatus?: T
-  paystackAccessCode?: T
-  snapshot?: T
-  transactions?: T
-  updatedAt?: T
-  createdAt?: T
+        productVariant?: T;
+        quantity?: T;
+        snapshot?: T;
+        id?: T;
+      };
+  total?: T;
+  status?: T;
+  paymentStatus?: T;
+  paystackAccessCode?: T;
+  snapshot?: T;
+  transactions?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "order-statuses_select".
  */
 export interface OrderStatusesSelect<T extends boolean = true> {
-  order?: T
-  staff?: T
-  status?: T
-  visibleToCustomer?: T
-  updatedAt?: T
-  createdAt?: T
+  order?: T;
+  staff?: T;
+  status?: T;
+  visibleToCustomer?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions_select".
  */
 export interface TransactionsSelect<T extends boolean = true> {
-  order?: T
-  amount?: T
-  ref?: T
-  provider?: T
-  isTest?: T
-  paidAt?: T
-  snapshot?: T
-  updatedAt?: T
-  createdAt?: T
+  order?: T;
+  amount?: T;
+  ref?: T;
+  provider?: T;
+  isTest?: T;
+  paidAt?: T;
+  snapshot?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
-  key?: T
-  data?: T
+  key?: T;
+  data?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
-  document?: T
-  globalSlug?: T
-  user?: T
-  updatedAt?: T
-  createdAt?: T
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences_select".
  */
 export interface PayloadPreferencesSelect<T extends boolean = true> {
-  user?: T
-  key?: T
-  value?: T
-  updatedAt?: T
-  createdAt?: T
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations_select".
  */
 export interface PayloadMigrationsSelect<T extends boolean = true> {
-  name?: T
-  batch?: T
-  updatedAt?: T
-  createdAt?: T
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "settings".
  */
 export interface Setting {
-  id: string
-  areas?: string[] | null
-  updatedAt?: string | null
-  createdAt?: string | null
+  id: string;
+  areas?: string[] | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "nav".
  */
 export interface Nav {
-  id: string
+  id: string;
   items: {
-    label: string
-    url: string
-    id?: string | null
-  }[]
-  updatedAt?: string | null
-  createdAt?: string | null
+    label: string;
+    url: string;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string
-  tagline: string
+  id: string;
+  tagline: string;
   nav: {
-    label: string
+    label: string;
     links?:
       | {
-          label: string
-          url: string
-          id?: string | null
+          label: string;
+          url: string;
+          id?: string | null;
         }[]
-      | null
-    id?: string | null
-  }[]
-  updatedAt?: string | null
-  createdAt?: string | null
+      | null;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "settings_select".
  */
 export interface SettingsSelect<T extends boolean = true> {
-  areas?: T
-  updatedAt?: T
-  createdAt?: T
-  globalType?: T
+  areas?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1302,36 +1294,36 @@ export interface NavSelect<T extends boolean = true> {
   items?:
     | T
     | {
-        label?: T
-        url?: T
-        id?: T
-      }
-  updatedAt?: T
-  createdAt?: T
-  globalType?: T
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  tagline?: T
+  tagline?: T;
   nav?:
     | T
     | {
-        label?: T
+        label?: T;
         links?:
           | T
           | {
-              label?: T
-              url?: T
-              id?: T
-            }
-        id?: T
-      }
-  updatedAt?: T
-  createdAt?: T
-  globalType?: T
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1339,18 +1331,19 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface CollectionsWidget {
   data?: {
-    [k: string]: unknown
-  }
-  width: "full"
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
-  [k: string]: unknown
+  [k: string]: unknown;
 }
 
-declare module "payload" {
+
+declare module 'payload' {
   export interface GeneratedTypes extends Config {}
 }
