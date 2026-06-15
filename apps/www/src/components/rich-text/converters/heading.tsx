@@ -1,5 +1,5 @@
 import { H1, H2, H3, H4, H5, H6 } from "@/components/typography"
-import { slugify } from "@/utils/slugify"
+import { slugify } from "@/lib/utils/slugify"
 import { SerializedHeadingNode } from "@payloadcms/richtext-lexical"
 import { JSXConverters } from "@payloadcms/richtext-lexical/react"
 import * as React from "react"
