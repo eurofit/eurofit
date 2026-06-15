@@ -2,8 +2,8 @@
 
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
 import { brands } from "@/payload-generated-schema"
-import config from "@/payload.config"
 import { ActionResult } from "@/types/action-result"
+import config from "@payload-config"
 import { asc, sql } from "@payloadcms/db-postgres/drizzle"
 import { getPayload } from "payload"
 import { z } from "zod"

@@ -9,10 +9,10 @@ import {
   products,
   products_rels,
 } from "@/payload-generated-schema"
-import payloadConfig from "@/payload.config"
 import { Brand } from "@/types/brand"
 import { Category } from "@/types/categories"
 import { FilterGroup, FilterItem } from "@/types/filter"
+import payloadConfig from "@payload-config"
 import { asc, eq, sql } from "@payloadcms/db-postgres/drizzle"
 import sortBy from "lodash-es/sortBy"
 import uniqBy from "lodash-es/uniqBy"

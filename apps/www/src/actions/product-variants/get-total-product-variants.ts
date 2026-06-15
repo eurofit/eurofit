@@ -1,6 +1,6 @@
 "use server"
 
-import payloadConfig from "@/payload.config"
+import payloadConfig from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 

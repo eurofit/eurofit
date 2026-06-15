@@ -3,7 +3,7 @@
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
 import { buildProductSearchMatchCondition } from "@/lib/utils/products/build-product-search-match-condition"
 import { product_variants, products } from "@/payload-generated-schema"
-import payloadConfig from "@/payload.config"
+import payloadConfig from "@payload-config"
 import { asc, eq, sql } from "@payloadcms/db-postgres/drizzle"
 import { getPayload } from "payload"
 import { z } from "zod"

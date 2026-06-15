@@ -1,8 +1,8 @@
 "use server"
 
-import payloadConfig from "@/payload.config"
 import { ActionResult } from "@/types/action-result"
 import { Category } from "@/types/categories"
+import payloadConfig from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 import { z } from "zod"

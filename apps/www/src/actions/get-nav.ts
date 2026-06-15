@@ -1,4 +1,4 @@
-import config from "@/payload.config"
+import config from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 

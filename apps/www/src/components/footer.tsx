@@ -1,6 +1,6 @@
 import { site } from "@/const/site"
 import { slugify } from "@/lib/utils/slugify"
-import config from "@/payload.config"
+import config from "@payload-config"
 import Link from "next/link"
 import { getPayload } from "payload"
 import CurrentYear from "./current-year"
