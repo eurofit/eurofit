@@ -1,5 +1,6 @@
 "use client"
 
+import { ImageWithRetry } from "@/components/image-with-retry"
 import { CarouselDots } from "@/components/ui/carousel"
 import { useInView } from "@/hooks/use-in-view"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -26,6 +27,7 @@ export function Slider({
 
   const isActive = active && isInView && slides.length > 1
   const hasSlides = slides.length > 0
+  const sizes = getSlideSizes(snaps)
 
   if (!hasSlides) {
     return null
@@ -45,30 +47,36 @@ export function Slider({
     >
       <CarouselContent className="h-full rounded">
         {slides.map(({ images, link }, index) => {
-          const { defaultUrl, sources } = getImageSources(images)
+          const { desktopUrl, mobileUrl } = getImageSources(images)
+          const isPriority = index < 3
           return (
             <CarouselItem
               key={index}
-              className="rounded"
+              className="relative h-full rounded"
               style={{
                 flexBasis: getSnapBasis(snaps),
               }}
             >
-              <picture>
-                {sources.map((src) => (
-                  <source
-                    key={src.srcSet}
-                    srcSet={src.srcSet}
-                    media={src.media}
-                  />
-                ))}
-
-                <img
-                  src={defaultUrl ?? undefined}
+              {desktopUrl && (
+                <ImageWithRetry
+                  src={desktopUrl}
                   alt={`Slide ${index + 1}`}
-                  className="size-full rounded object-cover"
+                  fill
+                  priority={isPriority}
+                  sizes={sizes}
+                  className="hidden rounded object-cover md:block"
                 />
-              </picture>
+              )}
+              {mobileUrl && (
+                <ImageWithRetry
+                  src={mobileUrl}
+                  alt={`Slide ${index + 1}`}
+                  fill
+                  priority={isPriority}
+                  sizes={sizes}
+                  className="rounded object-cover md:hidden"
+                />
+              )}
               {link && <Link href={link} className="absolute inset-0" />}
             </CarouselItem>
           )
@@ -94,25 +102,32 @@ export function Slider({
 }
 
 function getImageSources(images: SliderBlock["slides"][number]["images"]) {
+  const resolveUrl = (
+    image: SliderBlock["slides"][number]["images"][number]
+  ) =>
+    typeof image.image === "string" ? image.image : (image.image?.url ?? null)
+
   const defaultImage = images.find((img) => img.isDefault)
+  const desktopImage = images.find((img) => !img.isMobile)
+  const mobileImage = images.find((img) => img.isMobile)
 
-  const sources = images
-    .sort((a, b) => {
-      if (a.isMobile && !b.isMobile) return -1
-      if (!a.isMobile && b.isMobile) return 1
-      return 0
-    })
-    .map(({ image, isMobile }) => ({
-      srcSet: typeof image === "string" ? image : (image?.url ?? undefined),
-      media: isMobile ? "(max-width: 767px)" : "(min-width: 768px)",
-    }))
+  const desktopUrl =
+    (desktopImage ? resolveUrl(desktopImage) : null) ??
+    (defaultImage ? resolveUrl(defaultImage) : null)
+  const mobileUrl =
+    (mobileImage ? resolveUrl(mobileImage) : null) ??
+    (defaultImage ? resolveUrl(defaultImage) : null) ??
+    desktopUrl
 
-  return {
-    defaultUrl:
-      typeof defaultImage?.image === "string"
-        ? defaultImage.image
-        : defaultImage?.image?.url,
-    sources,
+  return { desktopUrl, mobileUrl }
+}
+
+function getSlideSizes(snaps: SliderBlock["snaps"]) {
+  switch (snaps) {
+    case "3":
+      return "(max-width: 767px) 100vw, 33vw"
+    default:
+      return "100vw"
   }
 }
 
