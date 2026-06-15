@@ -15,7 +15,7 @@ import {
 import { Spinner } from "@eurofit/ui/components/spinner"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
-import { ChevronRight, Lock, ShoppingCart } from "lucide-react"
+import { ChevronRight, Lock } from "lucide-react"
 import React from "react"
 import { toast } from "sonner"
 import { OrderItem } from "./order-item"
@@ -84,11 +84,11 @@ export function ReviewStep() {
 
             <div className="space-y-6 rounded-md bg-muted/50 p-2">
               <div className="flex items-center gap-2.5">
-                <div className="flex size-16 rounded-md bg-muted">
+                {/* <div className="flex size-16 rounded-md bg-muted">
                   <ShoppingCart className="m-auto size-8" />
-                </div>
+                </div> */}
                 <div>
-                  <h3 className="font-medium text-foreground">
+                  <h3 className="text-base font-medium text-foreground">
                     Cart&nbsp;
                     <span className="text-xs text-muted-foreground" aria-hidden>
                       ({itemCount})
@@ -178,7 +178,7 @@ function PlaceOrderAction({
         {!isCheckingout && "Place Order"}
       </Button>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground not-only:text-center">
         <Lock className="size-4" />
         <p>Secure payment redirect.</p>
       </div>
