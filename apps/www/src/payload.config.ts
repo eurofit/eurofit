@@ -3,6 +3,7 @@ import { site } from "@/const/site"
 import { env, publicUrl } from "@/env.mjs"
 import { postgresAdapter } from "@payloadcms/db-postgres"
 import { resendAdapter } from "@payloadcms/email-resend"
+import { formBuilderPlugin } from "@payloadcms/plugin-form-builder"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import { s3Storage } from "@payloadcms/storage-s3"
 import path from "path"
@@ -74,6 +75,7 @@ export default buildConfig({
         endpoint: env.SUPABASE_S3_ENDPOINT,
       },
     }),
+    formBuilderPlugin({}),
   ],
   sharp,
 })
