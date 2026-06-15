@@ -44,6 +44,7 @@ export function SearchBar() {
     handleChange,
     handleClear,
     handleRecentSearchClick,
+    recordRecentSearch,
   } = useProductSearch()
 
   const { value: isOpen, setOn: setOpen, setOff } = useToggle()
@@ -58,6 +59,7 @@ export function SearchBar() {
       <search className="grow">
         <form
           action="/search"
+          onSubmit={() => recordRecentSearch(trimmedQuery)}
           className="relative w-full"
           role="search"
           aria-label="Sitewide"
@@ -85,6 +87,7 @@ export function SearchBar() {
             {query && !isSearching && (
               <InputGroupAddon align="inline-end">
                 <Button
+                  type="button"
                   size="icon-sm"
                   variant="ghost"
                   onClick={() => {
@@ -103,6 +106,7 @@ export function SearchBar() {
             {isSearching && (
               <InputGroupAddon align="inline-end">
                 <Button
+                  type="button"
                   size="icon-sm"
                   variant="ghost"
                   disabled={true}
@@ -172,7 +176,10 @@ export function SearchBar() {
               {products.map((product) => (
                 <SearchResultListItem
                   key={"search-result-list-" + product.slug}
-                  onClose={setOff}
+                  onClose={() => {
+                    recordRecentSearch(trimmedQuery)
+                    setOff()
+                  }}
                   {...product}
                 />
               ))}
@@ -181,6 +188,7 @@ export function SearchBar() {
               <Link
                 href={`/search?q=${encodeURIComponent(trimmedQuery)}`}
                 className="text-xs not-hover:text-muted-foreground hover:underline hover:underline-offset-4"
+                onClick={() => recordRecentSearch(trimmedQuery)}
                 onNavigate={setOff}
               >
                 View All {totalProducts} Product{totalProducts > 1 ? "s" : ""} →

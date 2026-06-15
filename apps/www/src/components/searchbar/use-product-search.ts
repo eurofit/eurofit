@@ -48,15 +48,6 @@ export function useProductSearch() {
         setTotalProducts(result.totalProducts)
         setProducts(result.products)
       }
-
-      setRecentSearches((prev = []) => {
-        if (!result.query) return prev
-        const updatedSearches = [
-          result.query,
-          ...prev.filter((term) => term !== result.query),
-        ]
-        return updatedSearches.slice(0, 5)
-      })
     },
     onError: () => {
       setProducts([])
@@ -102,6 +93,14 @@ export function useProductSearch() {
     search({ query: term })
   }
 
+  const recordRecentSearch = (term: string) => {
+    const value = term.trim()
+    if (!value) return
+    setRecentSearches((prev = []) =>
+      [value, ...prev.filter((t) => t !== value)].slice(0, 5)
+    )
+  }
+
   return {
     query,
     trimmedQuery,
@@ -115,5 +114,6 @@ export function useProductSearch() {
     handleChange,
     handleClear,
     handleRecentSearchClick,
+    recordRecentSearch,
   }
 }
