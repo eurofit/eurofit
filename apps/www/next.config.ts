@@ -11,6 +11,20 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   transpilePackages: ["@eurofit/ui", "@eurofit/transactional"],
   redirects,
+  headers: async () => [
+    {
+      source: "/admin/:path*",
+      headers: [
+        { key: "Cache-Control", value: "no-store, no-cache, no-transform" },
+      ],
+    },
+    {
+      source: "/payload/api/:path*",
+      headers: [
+        { key: "Cache-Control", value: "no-store, no-cache, no-transform" },
+      ],
+    },
+  ],
   images: {
     qualities: [100],
     remotePatterns: [
