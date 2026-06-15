@@ -3,6 +3,7 @@ import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
 import { titleCase } from "@/payload-hooks/title-case"
 import { CollectionConfig, slugField } from "payload"
+import { revalidatePageTag } from "./hooks/revalidate-page-tag"
 
 export const pages: CollectionConfig = {
   slug: "pages",
@@ -46,4 +47,7 @@ export const pages: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterChange: [revalidatePageTag],
+  },
 }

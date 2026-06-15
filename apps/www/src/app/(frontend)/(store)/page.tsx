@@ -1,35 +1,12 @@
+import { getPage } from "@/actions/pages/get-page"
 import { RenderBlocks } from "@/blocks/render-blocks"
 import { JsonLd } from "@/components/json-ld"
 import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
-import config from "@payload-config"
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext"
 import { notFound } from "next/navigation"
-import { getPayload } from "payload"
 
 export default async function Home() {
-  const payload = await getPayload({
-    config,
-  })
-
-  const {
-    docs: [page],
-  } = await payload.find({
-    collection: "pages",
-    where: {
-      slug: {
-        equals: "home",
-      },
-    },
-    populate: {
-      products: {
-        slug: true,
-        title: true,
-        supplierImageUrl: true,
-      },
-    },
-    limit: 1,
-    pagination: false,
-  })
+  const page = await getPage("home")
 
   if (!page) {
     notFound()
