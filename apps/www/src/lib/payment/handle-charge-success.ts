@@ -6,15 +6,37 @@ import config from "@payload-config"
 import { getPayload } from "payload"
 
 export async function handleChargeSuccess(eventData: { reference: string }) {
+  console.log("[handle-charge-success] start, reference:", eventData.reference)
+
   const verified = await verifyPaystackTransaction(eventData.reference)
 
-  if (verified.status !== "success") return
+  if (verified.status !== "success") {
+    console.log(
+      "[handle-charge-success] aborting — verification status is not success:",
+      verified.status,
+      "reference:",
+      verified.reference
+    )
+    return
+  }
 
   const isTestPayment = verified.domain !== "live"
-  if (env.NODE_ENV === "production" && isTestPayment) return
+  if (env.NODE_ENV === "production" && isTestPayment) {
+    console.log(
+      "[handle-charge-success] aborting — test payment in production, reference:",
+      verified.reference
+    )
+    return
+  }
 
   const order = await resolveOrderForPayment(verified.reference)
-  if (!order) return
+  if (!order) {
+    console.log(
+      "[handle-charge-success] aborting — no unpaid order found, reference:",
+      verified.reference
+    )
+    return
+  }
 
   const payload = await getPayload({ config })
 
@@ -26,13 +48,22 @@ export async function handleChargeSuccess(eventData: { reference: string }) {
       amount: Math.round(verified.amount / 100),
       provider: "paystack",
       isTest: isTestPayment,
-      paidAt: verified.paid_at.toISOString(),
+      paidAt: new Date(verified.paid_at).toISOString(),
       snapshot: verified as unknown as Record<string, unknown>,
     },
     overrideAccess: true,
   })
 
+  console.log(
+    "[handle-charge-success] transaction created, order:",
+    order.id,
+    "reference:",
+    verified.reference
+  )
+
   const userId = typeof order.user === "string" ? order.user : order.user.id
 
   await clearUserCart(userId)
+
+  console.log("[handle-charge-success] done, cart cleared for user:", userId)
 }

@@ -18,5 +18,9 @@ export async function clearUserCart(userId: string) {
       id: carts[0].id,
       overrideAccess: true,
     })
+    console.log("[clear-cart] deleted cart for user:", userId)
+    return
   }
+
+  console.log("[clear-cart] no cart found for user:", userId)
 }
