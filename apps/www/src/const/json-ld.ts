@@ -61,7 +61,7 @@ export const localBusiness: WithContext<LocalBusiness> = {
     "Physical and online store for sports nutrition, supplements, and vitamins. Wholesale and retail orders available and acceptable.",
   address: {
     "@type": "PostalAddress",
-    streetAddress: site.address.fullAddress,
+    streetAddress: `${site.address.line1}, ${site.address.line2}`,
     postOfficeBoxNumber: site.address.postalAddress,
     addressLocality: site.address.city,
     addressRegion: site.address.county,
@@ -70,8 +70,8 @@ export const localBusiness: WithContext<LocalBusiness> = {
   },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: -1.274672,
-    longitude: 36.8437572,
+    latitude: -1.2747326,
+    longitude: 36.8504742,
   },
   openingHoursSpecification: [
     {
@@ -97,7 +97,7 @@ export const localBusiness: WithContext<LocalBusiness> = {
   sameAs: site.socialLinks.map((s) => s.href),
   paymentAccepted: ["Cash", "M-Pesa", "Bank Transfer"],
   currenciesAccepted: "KES",
-  hasMap: "https://maps.app.goo.gl/GBruweVx6PBugsuB6",
+  hasMap: "https://maps.app.goo.gl/3t3NuyRUker97fSN6",
   priceRange: "$$",
   image: `${site.url}/logo.png`,
   logo: `${site.url}/logo.png`,
