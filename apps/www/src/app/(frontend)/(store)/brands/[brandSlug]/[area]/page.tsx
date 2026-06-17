@@ -2,6 +2,7 @@ import { getBrand } from "@/actions/brands/get-brand"
 import { getBrandFilters } from "@/actions/brands/get-brand-filters"
 import { getTotalBrandProductVariants } from "@/actions/products/get-products-by-brand"
 import { getServiceArea } from "@/actions/service-areas/get-service-area"
+import { AreaDeliveryInfo } from "@/components/brands/area-delivery-info"
 import {
   BrandBreadcrumbs,
   BrandBreadcrumbsSkeleton,
@@ -113,6 +114,9 @@ export default function BrandAreaPage({
         <main className="grow space-y-10">
           <React.Suspense fallback={<BrandHeaderSkeleton />}>
             <BrandHeader slug={brandSlug} area={area} />
+          </React.Suspense>
+          <React.Suspense fallback={null}>
+            <AreaDeliveryInfo slug={brandSlug} area={area} />
           </React.Suspense>
           <React.Suspense fallback={<ProductCardSkeleton />}>
             <BrandProducts

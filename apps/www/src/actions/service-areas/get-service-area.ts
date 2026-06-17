@@ -1,12 +1,41 @@
 import "server-only"
 
-import { ServiceAreaDetail } from "@/types/service-area"
+import {
+  ServiceAreaDetail,
+  ServiceAreaShippingRate,
+} from "@/types/service-area"
 import config from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 
 type GetServiceAreaArgs = {
   slug: string
+}
+
+type RawShippingRate = {
+  package?: string | { title?: string | null } | null
+  price?: number | null
+}
+
+/** Maps populated shipping rates to display-ready pairs, sorted cheapest first. */
+function resolveShippingRates(
+  rates: RawShippingRate[] | null | undefined
+): ServiceAreaShippingRate[] {
+  return (rates ?? [])
+    .filter(
+      (rate): rate is RawShippingRate & { price: number } =>
+        typeof rate.price === "number"
+    )
+    .map((rate) => {
+      const populatedPackage =
+        rate.package && typeof rate.package === "object" ? rate.package : null
+
+      return {
+        packageTitle: populatedPackage?.title ?? "Standard",
+        price: rate.price,
+      }
+    })
+    .sort((a, b) => a.price - b.price)
 }
 
 export async function getServiceArea({
@@ -28,6 +57,10 @@ export async function getServiceArea({
       title: true,
       slug: true,
       deliveryTime: true,
+      shippingRates: true,
+    },
+    populate: {
+      packages: { title: true },
     },
     limit: 1,
     pagination: false,
@@ -39,6 +72,9 @@ export async function getServiceArea({
 
   cacheTag(`service-areas:${serviceArea.id}`)
 
+  const shippingRates = resolveShippingRates(serviceArea.shippingRates)
+  const lowestShippingRate = shippingRates[0]?.price ?? null
+
   return {
     title: serviceArea.title,
     slug: serviceArea.slug ?? "",
@@ -46,5 +82,7 @@ export async function getServiceArea({
       minDays: serviceArea.deliveryTime.minDays,
       maxDays: serviceArea.deliveryTime.maxDays,
     },
+    lowestShippingRate,
+    shippingRates,
   }
 }
