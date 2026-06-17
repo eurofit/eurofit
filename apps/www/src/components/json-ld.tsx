@@ -6,13 +6,11 @@ type JsonLdProps = {
 
 function schemaToId(item: WithContext<Thing>): string {
   const schema = item as { "@id"?: string; "@type": string | string[] }
-  const fragment = schema["@id"]?.split("#").pop()
   const type = Array.isArray(schema["@type"])
     ? schema["@type"][0]
     : schema["@type"]
-  const slug = (fragment ?? type ?? "schema")
-    .replace(/[^a-z0-9]/gi, "-")
-    .toLowerCase()
+  const source = schema["@id"]?.replace(/^https?:\/\//, "") ?? type ?? "schema"
+  const slug = source.replace(/[^a-z0-9]/gi, "-").toLowerCase()
   return `json-ld-${slug}`
 }
 
