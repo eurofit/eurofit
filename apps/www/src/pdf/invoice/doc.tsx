@@ -1,6 +1,8 @@
 import { site } from "@/const/site"
+import { APP_TIME_ZONE } from "@/const/time"
 import { Invoice } from "@/lib/schemas/invoice"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { tz } from "@date-fns/tz"
 import { Document, Image, Page, Text, View } from "@react-pdf/renderer"
 import { format, formatDate } from "date-fns"
 import truncate from "lodash-es/truncate"
@@ -22,7 +24,7 @@ export function InvoiceDoc({
 }: InvoiceDocProps) {
   return (
     <Document
-      title={`Eurofit - Invoice #${invoice.id} at ${formatDate(invoice.date, "dd/MM/yyyy")}`}
+      title={`Eurofit - Invoice #${invoice.id} at ${formatDate(invoice.date, "dd/MM/yyyy", { in: tz(APP_TIME_ZONE) })}`}
       author={site.name}
       subject={`Invoice #${invoice.id}`}
       keywords="invoice, eurofit, fitness, gym, supplements"
@@ -175,7 +177,11 @@ export function InvoiceDoc({
                     paddingVertical: 2,
                   }}
                 >
-                  <Text>{formatDate(invoice.date, "dd/MM/yyyy")}</Text>
+                  <Text>
+                    {formatDate(invoice.date, "dd/MM/yyyy", {
+                      in: tz(APP_TIME_ZONE),
+                    })}
+                  </Text>
                 </View>
               </View>
               <View
@@ -631,7 +637,10 @@ export function InvoiceDoc({
             >
               <PageNumber />
               <Text>
-                Printed on: {format(new Date(), "dd/MM/yyyy HH:mm:ss")}
+                Printed on:{" "}
+                {format(new Date(), "dd/MM/yyyy HH:mm:ss", {
+                  in: tz(APP_TIME_ZONE),
+                })}
               </Text>
             </View>
           </View>

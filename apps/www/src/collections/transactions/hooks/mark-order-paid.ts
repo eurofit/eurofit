@@ -34,4 +34,9 @@ export const markOrderPaid: CollectionAfterChangeHook<Transaction> = async ({
   if (order.total == null || doc.amount < order.total) return
 
   await markOrderAsPaid(orderId, req)
+
+  // Reflect the paid status on the shared order so the confirmation email hook
+  // (which runs next and reads context.order) stamps the invoice as paid.
+  order.paymentStatus = "paid"
+  context.order = order
 }

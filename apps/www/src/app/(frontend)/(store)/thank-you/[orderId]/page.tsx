@@ -1,10 +1,12 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { OrderCard } from "@/components/orders/card"
+import { APP_TIME_ZONE } from "@/const/time"
 import { addressSchema } from "@/lib/schemas/addresses/address"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { tz } from "@date-fns/tz"
 import {
   Alert,
   AlertDescription,
@@ -78,15 +80,10 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
         snapshot: true,
       },
       snapshot: true,
-      transactions: true,
       subtotal: true,
       deliveryFee: true,
       total: true,
-    },
-    populate: {
-      transactions: {
-        paidAt: true,
-      },
+      createdAt: true,
     },
     overrideAccess: false,
     user: user,
@@ -116,10 +113,6 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
   const formattedItems = z.array(itemSchema).parse(items)
 
   const shippingAddress = addressSchema.parse((order.snapshot as any)?.address)
-
-  const transaction = order.transactions?.docs?.filter(
-    (t) => typeof t !== "string"
-  )?.[0]
 
   return (
     <>
@@ -327,10 +320,11 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                     <div className="text-sm">
                       <p>Order Placed</p>
                       <p className="text-muted-foreground">
-                        {transaction?.paidAt
+                        {order.createdAt
                           ? formatDate(
-                              new Date(transaction.paidAt),
-                              "MMMM dd, yyyy 'at' h:mm aa"
+                              new Date(order.createdAt),
+                              "MMMM dd, yyyy 'at' h:mm aa",
+                              { in: tz(APP_TIME_ZONE) }
                             )
                           : "N/A"}
                       </p>
