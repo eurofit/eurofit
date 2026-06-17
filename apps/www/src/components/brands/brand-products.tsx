@@ -10,6 +10,7 @@ import { ProductsToolbar } from "@/components/products/products-toolbar"
 import { BRAND_PRODUCTS_PER_PAGE } from "@/const/brand-filters"
 import { site } from "@/const/site"
 import { BrandSearchParams } from "@/lib/utils/brands/brand-search-params"
+import { buildAreaFaqs } from "@/lib/utils/brands/build-area-copy"
 import { getBrandJsonLd } from "@/lib/utils/brands/get-brand-jsonld"
 import { ServiceAreaDetail } from "@/types/service-area"
 import pluralize from "pluralize-esm"
@@ -61,6 +62,7 @@ export async function BrandProducts({
         page,
         pagingCounter,
         area,
+        areaFaqs: area ? buildAreaFaqs(brand.title, area) : [],
       })
     : null
 

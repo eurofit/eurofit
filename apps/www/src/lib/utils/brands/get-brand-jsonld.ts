@@ -1,4 +1,5 @@
 import { site } from "@/const/site"
+import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
 import { ServiceAreaDetail } from "@/types/service-area"
 import {
   Brand,
@@ -6,9 +7,20 @@ import {
   CollectionPage,
   ItemList,
   ListItem,
+  OfferShippingDetails,
   Thing,
   WithContext,
 } from "schema-dts"
+
+type AreaJsonLd = Pick<
+  ServiceAreaDetail,
+  "title" | "slug" | "deliveryTime" | "lowestShippingRate"
+>
+
+type AreaFaq = {
+  question: string
+  answer: string
+}
 
 type BrandJsonLdProduct = {
   slug: string
@@ -26,7 +38,8 @@ type BrandJsonLdOptions = {
   totalProducts: number
   page?: number
   pagingCounter: number
-  area?: Pick<ServiceAreaDetail, "title" | "slug"> | null
+  area?: AreaJsonLd | null
+  areaFaqs?: AreaFaq[]
 }
 
 export function getBrandJsonLd({
@@ -36,6 +49,7 @@ export function getBrandJsonLd({
   page = 1,
   pagingCounter,
   area = null,
+  areaFaqs = [],
 }: BrandJsonLdOptions): WithContext<Thing>[] {
   const brandsUrl = `${site.url}/brands`
   const brandUrl = `${brandsUrl}/${brand.slug}`
@@ -144,5 +158,49 @@ export function getBrandJsonLd({
     mainEntity: { "@id": productListId },
   }
 
-  return [breadcrumb, brandSchema, webpage, productItemList]
+  const schemas: WithContext<Thing>[] = [
+    breadcrumb,
+    brandSchema,
+    webpage,
+    productItemList,
+  ]
+
+  if (!area) return schemas
+
+  // Area-specific delivery data makes each brand × area page genuinely unique:
+  // real per-area shipping price and delivery window, machine-readable.
+  const shippingDetails: WithContext<OfferShippingDetails> = {
+    "@context": "https://schema.org",
+    "@type": "OfferShippingDetails",
+    "@id": `${pageUrl}#delivery`,
+    shippingDestination: {
+      "@type": "DefinedRegion",
+      addressRegion: area.title,
+      addressCountry: "KE",
+    },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      transitTime: {
+        "@type": "QuantitativeValue",
+        minValue: area.deliveryTime.minDays,
+        maxValue: area.deliveryTime.maxDays,
+        unitCode: "DAY",
+      },
+    },
+    ...(area.lowestShippingRate !== null && {
+      shippingRate: {
+        "@type": "MonetaryAmount",
+        currency: "KES",
+        value: area.lowestShippingRate,
+      },
+    }),
+  }
+
+  schemas.push(shippingDetails)
+
+  if (areaFaqs.length > 0) {
+    schemas.push(getFaqJsonLd(areaFaqs))
+  }
+
+  return schemas
 }
