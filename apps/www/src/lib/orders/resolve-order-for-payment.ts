@@ -17,5 +17,13 @@ export async function resolveOrderForPayment(reference: string) {
     overrideAccess: true,
   })
 
-  return docs[0] ?? null
+  const order = docs[0] ?? null
+
+  console.log(
+    "[resolve-order]",
+    order ? "found unpaid order:" : "no unpaid order for reference:",
+    order ? order.id : reference
+  )
+
+  return order
 }
