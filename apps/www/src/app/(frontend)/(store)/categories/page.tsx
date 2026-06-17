@@ -1,8 +1,6 @@
 import { Categories } from "@/components/categories/categories"
-import { CategoriesSkeleton } from "@/components/categories/category-card"
 import { site } from "@/const/site"
 import { Metadata } from "next"
-import * as React from "react"
 
 export const metadata: Metadata = {
   title: "Shop Supplements & Sports Nutrition by Category in Kenya",
@@ -13,13 +11,7 @@ export const metadata: Metadata = {
   },
 }
 
-type CategoriesPageProps = {
-  searchParams: Promise<{
-    page?: string
-  }>
-}
-
-export default function CategoriesPage({ searchParams }: CategoriesPageProps) {
+export default function CategoriesPage() {
   return (
     <main className="space-y-8 md:space-y-14">
       <hgroup className="mx-auto mb-8 max-w-xl space-y-2 text-center text-pretty">
@@ -39,9 +31,7 @@ export default function CategoriesPage({ searchParams }: CategoriesPageProps) {
         </p>
       </hgroup>
 
-      <React.Suspense fallback={<CategoriesSkeleton />}>
-        <Categories searchParams={searchParams} />
-      </React.Suspense>
+      <Categories />
     </main>
   )
 }
