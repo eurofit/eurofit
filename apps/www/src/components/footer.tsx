@@ -1,6 +1,7 @@
 import { site } from "@/const/site"
 import { slugify } from "@/lib/utils/slugify"
 import config from "@payload-config"
+import { cacheLife, cacheTag } from "next/cache"
 import Link from "next/link"
 import { getPayload } from "payload"
 import CurrentYear from "./current-year"
@@ -13,7 +14,11 @@ const LEGAL = [
   "Returns Policy",
 ]
 
-export async function Footer() {
+async function getFooter() {
+  "use cache"
+  cacheLife("days")
+  cacheTag("footer")
+
   const payload = await getPayload({
     config,
   })
@@ -21,6 +26,12 @@ export async function Footer() {
   const footer = await payload.findGlobal({
     slug: "footer",
   })
+
+  return footer
+}
+
+export async function Footer() {
+  const footer = await getFooter()
 
   return (
     <footer
