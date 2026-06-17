@@ -1,4 +1,3 @@
-import { env } from "@/env.mjs"
 import { clearUserCart } from "@/lib/cart/clear-user-cart"
 import { resolveOrderForPayment } from "@/lib/orders/resolve-order-for-payment"
 import { verifyPaystackTransaction } from "@/lib/payment/verify-paystack-transaction"
@@ -21,13 +20,6 @@ export async function handleChargeSuccess(eventData: { reference: string }) {
   }
 
   const isTestPayment = verified.domain !== "live"
-  if (env.NODE_ENV === "production" && isTestPayment) {
-    console.log(
-      "[handle-charge-success] aborting — test payment in production, reference:",
-      verified.reference
-    )
-    return
-  }
 
   const order = await resolveOrderForPayment(verified.reference)
   if (!order) {
