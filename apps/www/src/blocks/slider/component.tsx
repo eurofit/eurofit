@@ -4,6 +4,7 @@ import { ImageWithRetry } from "@/components/image-with-retry"
 import { CarouselDots } from "@/components/ui/carousel"
 import { useInView } from "@/hooks/use-in-view"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { usePageVisible } from "@/hooks/use-page-visible"
 import { type SliderBlock } from "@/payload-types"
 import {
   Carousel,
@@ -14,6 +15,7 @@ import {
 } from "@eurofit/ui/components/carousel"
 import Autoplay from "embla-carousel-autoplay"
 import Link from "next/link"
+import { useIdle } from "react-use"
 
 export function Slider({
   slides,
@@ -24,8 +26,11 @@ export function Slider({
 }: SliderBlock) {
   const isMobile = useIsMobile()
   const { ref, isInView } = useInView()
+  const isIdle = useIdle(60_000)
+  const isPageVisible = usePageVisible()
 
-  const isActive = active && isInView && slides.length > 1
+  const isActive =
+    active && isInView && slides.length > 1 && !isIdle && isPageVisible
   const hasSlides = slides.length > 0
   const sizes = getSlideSizes(snaps)
 
