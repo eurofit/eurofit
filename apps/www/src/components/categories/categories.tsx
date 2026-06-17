@@ -1,40 +1,66 @@
-import { getCategories } from "@/actions/categories/get-categories"
+import {
+  getCategories,
+  GetCategoriesData,
+} from "@/actions/categories/get-categories"
 import { JsonLd } from "@/components/json-ld"
 import { getCategoriesJsonLd } from "@/lib/utils/categories/get-categories-json-ld"
+import { getQueryClient } from "@/providers/get-query-client"
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
 } from "@eurofit/ui/components/empty"
+import {
+  dehydrate,
+  HydrationBoundary,
+  type InfiniteData,
+} from "@tanstack/react-query"
 import { CategoryList } from "./categories-list"
-
-type CategoriesProps = {
-  searchParams: Promise<{ page?: string }>
-}
 
 const CATEGORIES_LIMIT = 24
 
-export async function Categories({ searchParams }: CategoriesProps) {
-  const { page: pageParam } = await searchParams
-  const page = Number(pageParam) || 1
+/**
+ * Prefetches the first page of categories into a server `QueryClient` and
+ * streams it to the client via `HydrationBoundary`. `CategoryList` reads the
+ * hydrated `["categories"]` infinite query from cache, so the grid renders in
+ * the static shell with no loading skeleton — pagination is then driven
+ * client-side by infinite scroll. Mirrors the cart's `CartHydrator` pattern.
+ *
+ * The prefetch is awaited (not `void`) so the grid is part of the prerendered
+ * output rather than a streamed-in fallback. The DB read is cached
+ * (`"use cache"` in `getCategories`), keeping this component static.
+ */
+export async function Categories() {
+  const queryClient = getQueryClient()
 
-  const result = await getCategories({ page, limit: CATEGORIES_LIMIT })
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const result = await getCategories({ page: 1, limit: CATEGORIES_LIMIT })
+      if (!result.success) throw new Error(result.message)
+      return result.data
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: GetCategoriesData) =>
+      lastPage.nextPage ?? undefined,
+  })
 
-  if (!result.success || !result.data.totalCategories) {
+  const firstPage = queryClient.getQueryData<
+    InfiniteData<GetCategoriesData, number>
+  >(["categories"])?.pages[0]
+
+  if (!firstPage || !firstPage.totalCategories) {
     return <EmptyCategories />
   }
 
-  const jsonLds = getCategoriesJsonLd(result.data)
+  const jsonLds = getCategoriesJsonLd(firstPage)
 
   return (
-    <>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <JsonLd jsonLd={jsonLds} />
-      <CategoryList
-        initialData={result.data}
-        totalCategories={result.data.totalCategories}
-      />
-    </>
+      <CategoryList totalCategories={firstPage.totalCategories} />
+    </HydrationBoundary>
   )
 }
 

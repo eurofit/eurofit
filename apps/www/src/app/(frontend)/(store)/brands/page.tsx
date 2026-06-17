@@ -1,6 +1,5 @@
 import { getTotalBrands } from "@/actions/brands/get-total-brands"
 import heroImage from "@/assets/images/brands/hero.png"
-import { BrandsSkeleton } from "@/components/brands/brand-card"
 import { BrandSearchDynamic } from "@/components/brands/brand-search-dynamic"
 import { Brands } from "@/components/brands/brands"
 import { TotalBrands } from "@/components/brands/total-brands"
@@ -21,13 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-type BrandsPageProps = {
-  searchParams: Promise<{
-    page?: string
-  }>
-}
-
-export default function BrandsPage({ searchParams }: BrandsPageProps) {
+export default function BrandsPage() {
   return (
     <main className="space-y-8 md:space-y-14">
       {/* hero  */}
@@ -69,9 +62,7 @@ export default function BrandsPage({ searchParams }: BrandsPageProps) {
         </div>
       </div>
 
-      <React.Suspense fallback={<BrandsSkeleton />}>
-        <Brands searchParams={searchParams} />
-      </React.Suspense>
+      <Brands />
     </main>
   )
 }

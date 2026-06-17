@@ -6,49 +6,26 @@ import {
 } from "@/components/categories/category-card"
 import { useInView } from "@/hooks/use-in-view"
 import { useIsMobile } from "@/hooks/use-mobile"
-import {
-  fetchCategories,
-  FetchCategoriesResult,
-} from "@/lib/api/categories/get-categories"
+import { fetchCategories } from "@/lib/api/categories/get-categories"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { CheckCircle, CircleX } from "lucide-react"
-import { useSearchParams } from "next/navigation"
 import * as React from "react"
 
 type CategoryListProps = {
-  initialData: FetchCategoriesResult
   totalCategories: number
 } & React.ComponentProps<"section">
 
 const CATEGORIES_LIMIT = 24
 
-export function CategoryList({
-  initialData,
-  totalCategories,
-  ...props
-}: CategoryListProps) {
-  const searchParams = useSearchParams()
-
-  const page = Math.max(1, Number(searchParams.get("page")) || 1)
-
-  const {
-    data,
-    hasNextPage,
-    fetchNextPage,
-    isError,
-    isFetchingNextPage,
-    hasPreviousPage,
-  } = useInfiniteQuery({
-    queryKey: ["categories"],
-    queryFn: ({ pageParam = page }) =>
-      fetchCategories({ page: pageParam, limit: CATEGORIES_LIMIT }),
-    initialPageParam: page,
-    getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-    initialData: {
-      pages: [initialData],
-      pageParams: [page],
-    },
-  })
+export function CategoryList({ totalCategories, ...props }: CategoryListProps) {
+  const { data, hasNextPage, fetchNextPage, isError, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["categories"],
+      queryFn: ({ pageParam }) =>
+        fetchCategories({ page: pageParam, limit: CATEGORIES_LIMIT }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+    })
 
   const categories = React.useMemo(
     () => data?.pages.flatMap((page) => page.categories) ?? [],
@@ -120,23 +97,6 @@ export function CategoryList({
           </div>
         </div>
       )}
-
-      {/* --- SEO NAV (hidden but crawlable) --- */}
-      <nav
-        className="h-px overflow-hidden text-[1px] opacity-5"
-        aria-label="Pagination navigation for categories"
-      >
-        {hasPreviousPage && (
-          <a href={`?page=${page - 1}`} rel="prev">
-            Previous
-          </a>
-        )}
-        {hasNextPage && (
-          <a href={`?page=${page + 1}`} rel="next">
-            Next
-          </a>
-        )}
-      </nav>
     </section>
   )
 }

@@ -3,46 +3,26 @@
 import { BrandCard, BrandsSkeleton } from "@/components/brands/brand-card"
 import { useInView } from "@/hooks/use-in-view"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { fetchBrands, FetchBrandsResult } from "@/lib/api/brands/get-brands"
+import { fetchBrands } from "@/lib/api/brands/get-brands"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { CheckCircle, CircleX } from "lucide-react"
-import { useSearchParams } from "next/navigation"
 import * as React from "react"
 
 type BrandListProps = {
-  initialData: FetchBrandsResult
   totalBrands: number
 } & React.ComponentProps<"section">
 
 const BRANDS_LIMIT = 35
 
-export function BrandList({
-  initialData,
-  totalBrands,
-  ...props
-}: BrandListProps) {
-  const searchParams = useSearchParams()
-
-  const page = Math.max(1, Number(searchParams.get("page")) || 1)
-
-  const {
-    data,
-    hasNextPage,
-    fetchNextPage,
-    isError,
-    isFetchingNextPage,
-    hasPreviousPage,
-  } = useInfiniteQuery({
-    queryKey: ["brands"],
-    queryFn: ({ pageParam = page }) =>
-      fetchBrands({ page: pageParam, limit: BRANDS_LIMIT }),
-    initialPageParam: page,
-    getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-    initialData: {
-      pages: [initialData],
-      pageParams: [page],
-    },
-  })
+export function BrandList({ totalBrands, ...props }: BrandListProps) {
+  const { data, hasNextPage, fetchNextPage, isError, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["brands"],
+      queryFn: ({ pageParam }) =>
+        fetchBrands({ page: pageParam, limit: BRANDS_LIMIT }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+    })
 
   const brands = React.useMemo(
     () => data?.pages.flatMap((page) => page.brands) ?? [],
@@ -112,23 +92,6 @@ export function BrandList({
           </div>
         </div>
       )}
-
-      {/* --- SEO NAV (hidden but crawlable) --- */}
-      <nav
-        className="h-px overflow-hidden text-[1px] opacity-5"
-        aria-label="Pagination navigation for brands"
-      >
-        {hasPreviousPage && (
-          <a href={`?page=${page - 1}`} rel="prev">
-            Previous
-          </a>
-        )}
-        {hasNextPage && (
-          <a href={`?page=${page + 1}`} rel="next">
-            Next
-          </a>
-        )}
-      </nav>
     </section>
   )
 }
