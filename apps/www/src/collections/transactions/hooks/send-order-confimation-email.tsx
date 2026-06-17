@@ -97,7 +97,8 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
 
   try {
     await req.payload.sendEmail({
-      from: env.SMTP_NO_REPLY_USERNAME,
+      // Omit `from` so the Resend adapter applies defaultFromName + defaultFromAddress
+      // ("Eurofit <no-reply@…>") instead of a bare address shown as just the mailbox.
       to: orderUser.email,
       subject: "Order Placed",
       text: await getOrderConfirmationEmailText(emailProps),
