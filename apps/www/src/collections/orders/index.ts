@@ -5,7 +5,7 @@ import { userOwned } from "@/access/user-owned"
 import { orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
-import { getOrderTotal } from "./hooks/get-order-total"
+import { setOrderTotals } from "./hooks/set-order-totals"
 import { getOrderStatus } from "./hooks/status"
 import { validateOrderItems } from "./hooks/validate-order-items"
 
@@ -89,15 +89,39 @@ export const orders: CollectionConfig = {
       ],
     },
     {
-      name: "total",
+      name: "subtotal",
       type: "number",
       defaultValue: 0,
-      virtual: true,
       admin: {
         readOnly: true,
       },
-      hooks: {
-        afterRead: [getOrderTotal],
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: "deliveryFee",
+      type: "number",
+      defaultValue: 0,
+      admin: {
+        readOnly: true,
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: "total",
+      type: "number",
+      defaultValue: 0,
+      admin: {
+        readOnly: true,
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
       },
     },
     {
@@ -166,6 +190,7 @@ export const orders: CollectionConfig = {
   hooks: {
     beforeChange: [
       validateOrderItems,
+      setOrderTotals,
       autoincrement({ field: "id", startFrom: 31032025, step: 46 }),
     ],
   },

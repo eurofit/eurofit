@@ -816,6 +816,8 @@ export interface Order {
       | null;
     id?: string | null;
   }[];
+  subtotal?: number | null;
+  deliveryFee?: number | null;
   total?: number | null;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentStatus: 'unpaid' | 'paid' | 'refunded';
@@ -1495,6 +1497,8 @@ export interface OrdersSelect<T extends boolean = true> {
         snapshot?: T;
         id?: T;
       };
+  subtotal?: T;
+  deliveryFee?: T;
   total?: T;
   status?: T;
   paymentStatus?: T;

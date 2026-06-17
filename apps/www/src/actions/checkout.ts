@@ -1,7 +1,6 @@
 "use server"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
-import { DELIVERY_FEE } from "@/const/delivery"
 import { site } from "@/const/site"
 import { env } from "@/env.mjs"
 import { paystack } from "@/lib/paystack"
@@ -116,7 +115,7 @@ export async function checkout(
       }
     }
 
-    const amount = (order.total + DELIVERY_FEE) * 100
+    const amount = order.total * 100
 
     const res = await paystack.transaction.initialize({
       reference: order.id.toString(),

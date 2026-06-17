@@ -43,6 +43,9 @@ export async function handleChargeSuccess(eventData: { reference: string }) {
       paidAt: new Date(verified.paid_at).toISOString(),
       snapshot: verified as unknown as Record<string, unknown>,
     },
+    // Reuse the order already loaded by resolveOrderForPayment so the transaction
+    // hooks don't refetch it.
+    context: { order },
     overrideAccess: true,
   })
 

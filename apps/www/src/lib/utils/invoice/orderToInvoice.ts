@@ -25,8 +25,8 @@ export function orderToInvoice(order: Order): Invoice | null {
       ...(typeof snapshot === "object" && snapshot !== null ? snapshot : {}),
     })),
     total: order.total,
-    subtotal: order.total,
-    deliveryFee: 0.0,
+    subtotal: order.subtotal,
+    deliveryFee: order.deliveryFee,
     tax: 0.0,
   }
 

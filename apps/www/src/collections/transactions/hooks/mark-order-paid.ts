@@ -30,7 +30,8 @@ export const markOrderPaid: CollectionAfterChangeHook<Transaction> = async ({
   }
 
   if (checkIfOrderIsPaid(order)) return
-  if (order.total !== doc.amount) return
+  // Only block on underpayment; paying the exact total or more marks the order paid.
+  if (order.total == null || doc.amount < order.total) return
 
   await markOrderAsPaid(orderId, req)
 }
