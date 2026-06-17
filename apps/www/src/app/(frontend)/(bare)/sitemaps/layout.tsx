@@ -4,7 +4,7 @@ import React from "react"
 export const metadata: Metadata = {
   title: {
     default: "Sitemaps",
-    template: `%s | Sitemaps`,
+    template: "%s | Sitemaps",
   },
 }
 
