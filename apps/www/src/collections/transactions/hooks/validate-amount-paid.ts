@@ -18,6 +18,8 @@ export const validatePaidAmount: CollectionBeforeChangeHook<
 
   if (isOrderPopulated) {
     order = transaction.order as Order
+  } else if (context.order) {
+    order = context.order as Order
   } else {
     order = await req.payload.findByID({
       id: orderId,

@@ -10,9 +10,10 @@ export function validateTransactionAmount(amount: number, orderTotal: number) {
       true
     )
   }
-  if (amount !== orderTotal) {
+  // Underpayment is rejected; paying the exact total or more is accepted.
+  if (amount < orderTotal) {
     throw new APIError(
-      "Transaction amount does not match order total",
+      "Transaction amount is less than order total",
       400,
       null,
       true
