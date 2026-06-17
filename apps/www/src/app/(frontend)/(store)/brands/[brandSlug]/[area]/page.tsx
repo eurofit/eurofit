@@ -115,9 +115,6 @@ export default function BrandAreaPage({
           <React.Suspense fallback={<BrandHeaderSkeleton />}>
             <BrandHeader slug={brandSlug} area={area} />
           </React.Suspense>
-          <React.Suspense fallback={null}>
-            <AreaDeliveryInfo slug={brandSlug} area={area} />
-          </React.Suspense>
           <React.Suspense fallback={<ProductCardSkeleton />}>
             <BrandProducts
               slug={brandSlug}
@@ -134,6 +131,9 @@ export default function BrandAreaPage({
                 </React.Suspense>
               }
             />
+          </React.Suspense>
+          <React.Suspense fallback={null}>
+            <AreaDeliveryInfo slug={brandSlug} area={area} />
           </React.Suspense>
         </main>
       </div>

@@ -90,7 +90,14 @@ export async function AreaDeliveryInfo({
               <TableBody>
                 {area.shippingRates.map((rate) => (
                   <TableRow key={`${rate.packageTitle}-${rate.price}`}>
-                    <TableCell>{rate.packageTitle}</TableCell>
+                    <TableCell>
+                      <span>{rate.packageTitle}</span>
+                      {rate.maxWeight !== null && (
+                        <span className="block text-sm text-muted-foreground">
+                          Maximum weight: {rate.maxWeight} kg
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       {formatDeliveryPrice(rate.price)}
                     </TableCell>

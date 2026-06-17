@@ -1,5 +1,7 @@
 export type ServiceAreaShippingRate = {
   packageTitle: string
+  /** Package tier max weight in kg, or null when not populated. */
+  maxWeight: number | null
   price: number
 }
 
