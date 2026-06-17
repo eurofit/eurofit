@@ -37,7 +37,7 @@ export function ProductVariantCard({
       <div className="w-full min-w-0 grow">
         <div className="mb-1 flex items-center gap-2">
           {variant.variant && (
-            <Link href={`/product-variations/${variant.slug}`}>
+            <Link href={`/product-variants/${variant.slug}`}>
               <h3
                 id={variant.slug}
                 className="max-w-xs scroll-m-20 font-medium text-pretty capitalize"
