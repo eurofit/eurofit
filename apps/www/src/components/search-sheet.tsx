@@ -239,14 +239,13 @@ export function SearchSheet() {
 export function SearchSheetSkeleton() {
   return (
     <Button
-      variant="outline"
-      size="icon"
-      className="animate-pulse md:hidden"
-      aria-label="Loading search"
-      disabled
+      variant="secondary"
+      size="lg"
+      aria-label="Search products"
+      className="-mx-1 h-10 w-[calc(100%+8px)] justify-start bg-muted text-muted-foreground"
     >
-      <Search aria-hidden="true" />
-      <span className="sr-only">Loading search</span>
+      <Search aria-hidden="true" className="size-5.5" />
+      Search products, brands and categories
     </Button>
   )
 }
