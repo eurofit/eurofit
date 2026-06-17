@@ -16,6 +16,7 @@
     "generate:schema": "payload generate:db-schema"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.5.0",
     "@eurofit/transactional": "workspace:*",
     "@eurofit/ui": "workspace:*",
     "@hookform/resolvers": "^5.4.0",
