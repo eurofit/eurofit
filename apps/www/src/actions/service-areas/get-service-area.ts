@@ -13,7 +13,7 @@ type GetServiceAreaArgs = {
 }
 
 type RawShippingRate = {
-  package?: string | { title?: string | null } | null
+  package?: string | { title?: string | null; maxWeight?: number | null } | null
   price?: number | null
 }
 
@@ -32,6 +32,7 @@ function resolveShippingRates(
 
       return {
         packageTitle: populatedPackage?.title ?? "Standard",
+        maxWeight: populatedPackage?.maxWeight ?? null,
         price: rate.price,
       }
     })
@@ -60,7 +61,7 @@ export async function getServiceArea({
       shippingRates: true,
     },
     populate: {
-      packages: { title: true },
+      packages: { title: true, maxWeight: true },
     },
     limit: 1,
     pagination: false,
