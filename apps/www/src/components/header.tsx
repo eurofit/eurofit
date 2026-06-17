@@ -5,7 +5,7 @@ import { MobileMenu, MobileMenuSkeleton } from "@/components/mobile-menu"
 import { Nav, NavSkeleton } from "@/components/nav"
 import { SearchBar, SearchBarSkeleton } from "@/components/searchbar"
 import * as React from "react"
-import { SearchSheetDynamic } from "./search-sheet-dynamic"
+import { SearchSheet, SearchSheetSkeleton } from "./search-sheet"
 
 export function Header() {
   return (
@@ -32,7 +32,9 @@ export function Header() {
           </React.Suspense>
         </div>
       </div>
-      <SearchSheetDynamic />
+      <React.Suspense fallback={<SearchSheetSkeleton />}>
+        <SearchSheet />
+      </React.Suspense>
     </header>
   )
 }
