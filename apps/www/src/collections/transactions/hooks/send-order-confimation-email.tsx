@@ -1,14 +1,17 @@
 import { site } from "@/const/site"
+import { APP_TIME_ZONE } from "@/const/time"
 import { env } from "@/env.mjs"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
 import { getInvoiceBuffer } from "@/lib/utils/invoice/getInvoiceBuffer"
 import { orderToInvoice } from "@/lib/utils/invoice/orderToInvoice"
 import { Order, Transaction, User } from "@/payload-types"
+import { tz } from "@date-fns/tz"
 import {
   getOrderConfirmationEmailHTML,
   getOrderConfirmationEmailText,
 } from "@eurofit/transactional/order-confirmation"
+import { formatDate } from "date-fns"
 import { CollectionAfterChangeHook } from "payload"
 import * as z from "zod"
 
@@ -97,8 +100,6 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
 
   try {
     await req.payload.sendEmail({
-      // Omit `from` so the Resend adapter applies defaultFromName + defaultFromAddress
-      // ("Eurofit <no-reply@…>") instead of a bare address shown as just the mailbox.
       to: orderUser.email,
       subject: "Order Placed",
       text: await getOrderConfirmationEmailText(emailProps),
@@ -107,7 +108,13 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
       attachments: [
         invoiceBuffer
           ? {
-              filename: `invoice-${order.id}.pdf`,
+              filename: `eurofit-invoice-${order.id}_${formatDate(
+                order.createdAt,
+                "dd-MM-yyyy",
+                {
+                  in: tz(APP_TIME_ZONE),
+                }
+              )}.pdf`,
               content: invoiceBuffer,
               contentType: "application/pdf",
             }
