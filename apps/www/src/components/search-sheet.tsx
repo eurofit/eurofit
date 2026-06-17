@@ -242,7 +242,7 @@ export function SearchSheetSkeleton() {
       variant="secondary"
       size="lg"
       aria-label="Search products"
-      className="-mx-1 h-10 w-[calc(100%+8px)] justify-start bg-muted text-muted-foreground"
+      className="-mx-1 h-10 w-[calc(100%+8px)] justify-start bg-muted text-muted-foreground md:hidden"
     >
       <Search aria-hidden="true" className="size-5.5" />
       Search products, brands and categories
