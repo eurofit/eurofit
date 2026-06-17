@@ -32,7 +32,7 @@ export const website: WithContext<WebSite> = {
   "@type": "WebSite",
   "@id": `${site.url}/#website`,
   url: site.url,
-  name: site.name,
+  name: "EUROFIT - Supplements & Sports Nutrition",
   alternateName: [
     site.legalName,
     "Eurofit Supplements Shop",

@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
+  openGraph: {
+    siteName: "EUROFIT - Supplements & Sports Nutrition",
+  },
   other: {
     "apple-mobile-web-app-title": site.name,
   },
