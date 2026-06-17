@@ -20,7 +20,7 @@ export async function generateMetadata({
       : `${site.url}/sitemaps/brand-areas?page=${page}`
 
   return {
-    title: "Brand Areas Directory",
+    title: "Brand Areas Sitemap",
     alternates: { canonical: canonicalUrl },
   }
 }
