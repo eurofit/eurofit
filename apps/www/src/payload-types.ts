@@ -82,6 +82,7 @@ export interface Config {
     categories: Category;
     products: Product;
     'product-variants': ProductVariant;
+    'product-reviews': ProductReview;
     'stock-alerts': StockAlert;
     wishlists: Wishlist;
     carts: Cart;
@@ -120,6 +121,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
+    'product-reviews': ProductReviewsSelect<false> | ProductReviewsSelect<true>;
     'stock-alerts': StockAlertsSelect<false> | StockAlertsSelect<true>;
     wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
@@ -739,6 +741,20 @@ export interface ServiceArea {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews".
+ */
+export interface ProductReview {
+  id: string;
+  user: string | User;
+  productVariant: string | ProductVariant;
+  rating: number;
+  message?: string | null;
+  isActive: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "stock-alerts".
  */
 export interface StockAlert {
@@ -1141,6 +1157,10 @@ export interface PayloadLockedDocument {
         value: string | ProductVariant;
       } | null)
     | ({
+        relationTo: 'product-reviews';
+        value: string | ProductReview;
+      } | null)
+    | ({
         relationTo: 'stock-alerts';
         value: string | StockAlert;
       } | null)
@@ -1432,6 +1452,19 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   isLowStock?: T;
   isOutOfStock?: T;
   isPreorder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews_select".
+ */
+export interface ProductReviewsSelect<T extends boolean = true> {
+  user?: T;
+  productVariant?: T;
+  rating?: T;
+  message?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }

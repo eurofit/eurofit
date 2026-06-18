@@ -2,6 +2,7 @@ import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Flame, Star } from "lucide-react"
 import Link from "next/link"
+import pluralize from "pluralize-esm"
 import { ProductDetailCartActions } from "./product-detail-cart-actions"
 import { WishlistButton } from "./wishlist-button"
 
@@ -20,6 +21,8 @@ interface ProductInfoProps {
   stock: number
   variant?: string | null
   isWishlisted: boolean
+  averageRating: number
+  totalRatings: number
 }
 
 export function ProductInfo({
@@ -34,6 +37,8 @@ export function ProductInfo({
   stock,
   variant,
   isWishlisted,
+  averageRating,
+  totalRatings,
 }: ProductInfoProps) {
   return (
     <div className="flex flex-col justify-start gap-6">
@@ -79,7 +84,7 @@ export function ProductInfo({
               <Star
                 key={i}
                 className={`h-4 w-4 ${
-                  i < Math.floor(4.5)
+                  i < Math.round(averageRating)
                     ? "fill-orange-400 text-orange-400"
                     : "text-muted-foreground"
                 }`}
@@ -87,7 +92,9 @@ export function ProductInfo({
             ))}
           </div>
           <span className="text-xs text-muted-foreground">
-            ({32} verified ratings)
+            {totalRatings > 0
+              ? `${averageRating.toFixed(1)} (${totalRatings} verified ${pluralize("rating", totalRatings)})`
+              : "No ratings yet"}
           </span>
         </div>
 
