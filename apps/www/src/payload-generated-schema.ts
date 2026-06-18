@@ -399,6 +399,11 @@ export const pages = pgTable(
     title: varchar("title").notNull(),
     generateSlug: boolean("generate_slug").default(true),
     slug: varchar("slug").notNull(),
+    meta_title: varchar("meta_title"),
+    meta_description: varchar("meta_description"),
+    meta_image: uuid("meta_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
@@ -416,6 +421,7 @@ export const pages = pgTable(
   },
   (columns) => [
     uniqueIndex("pages_slug_idx").on(columns.slug),
+    index("pages_meta_meta_image_idx").on(columns.meta_image),
     index("pages_updated_at_idx").on(columns.updatedAt),
     index("pages_created_at_idx").on(columns.createdAt),
   ]
@@ -727,6 +733,11 @@ export const product_variants = pgTable(
     supplierProductCode: varchar("supplier_product_code"),
     barcode: varchar("barcode"),
     exportCommodityCode: varchar("export_commodity_code"),
+    meta_title: varchar("meta_title"),
+    meta_description: varchar("meta_description"),
+    meta_image: uuid("meta_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
@@ -749,6 +760,7 @@ export const product_variants = pgTable(
     index("product_variants_detail_title_idx").on(columns.detailTitle),
     index("product_variants_product_idx").on(columns.product),
     index("product_variants_barcode_idx").on(columns.barcode),
+    index("product_variants_meta_meta_image_idx").on(columns.meta_image),
     index("product_variants_updated_at_idx").on(columns.updatedAt),
     index("product_variants_created_at_idx").on(columns.createdAt),
   ]
@@ -2042,7 +2054,7 @@ export const relations_pages_blocks_rich_text = relations(
     }),
   })
 )
-export const relations_pages = relations(pages, ({ many }) => ({
+export const relations_pages = relations(pages, ({ one, many }) => ({
   _blocks_slider: many(pages_blocks_slider, {
     relationName: "_blocks_slider",
   }),
@@ -2051,6 +2063,11 @@ export const relations_pages = relations(pages, ({ many }) => ({
   }),
   _blocks_richText: many(pages_blocks_rich_text, {
     relationName: "_blocks_richText",
+  }),
+  meta_image: one(media, {
+    fields: [pages.meta_image],
+    references: [media.id],
+    relationName: "meta_image",
   }),
 }))
 export const relations_packages = relations(packages, () => ({}))
@@ -2145,6 +2162,11 @@ export const relations_product_variants = relations(
       fields: [product_variants.product],
       references: [products.id],
       relationName: "product",
+    }),
+    meta_image: one(media, {
+      fields: [product_variants.meta_image],
+      references: [media.id],
+      relationName: "meta_image",
     }),
     _rels: many(product_variants_rels, {
       relationName: "_rels",

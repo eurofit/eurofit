@@ -496,6 +496,14 @@ export interface ProductVariant {
    * Indicates if the product is back-orderable. Managed programmatically.
    */
   isPreorder: boolean;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -673,6 +681,14 @@ export interface Page {
   generateSlug?: boolean | null;
   slug: string;
   layout: (SliderBlock | FAQBlock | RichTextBlock)[];
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1319,6 +1335,13 @@ export interface PagesSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   layout?: T | {};
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1452,6 +1475,13 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   isLowStock?: T;
   isOutOfStock?: T;
   isPreorder?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

@@ -42,6 +42,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
       isOutOfStock: true,
       isWishlisted: true,
       isNotifyRequested: true,
+      meta: true,
     },
     populate: {
       products: {
@@ -61,17 +62,33 @@ export async function getProductVariantBySlug({ slug }: Args) {
     user,
   })
 
-  let pv = productVariants?.[0]
+  const pv = productVariants?.[0]
 
   if (!pv) {
     return null
   }
 
-  const { stock, supplierStock, ...productVariant } = pv
+  const { stock, supplierStock, meta, ...productVariant } = pv
 
   const { averageRating, totalRatings } = await getVariantReviewStats(
     productVariant.id
   )
+
+  const product =
+    typeof productVariant.product === "object" ? productVariant.product : null
+
+  const variantImages = (
+    productVariant.images?.filter((i) => typeof i === "object") ?? []
+  )
+    .map((i) => i.url)
+    .filter((url): url is string => typeof url === "string")
+
+  const images =
+    variantImages.length > 0
+      ? variantImages
+      : [product?.supplierImageUrl].filter(
+          (url): url is string => typeof url === "string"
+        )
 
   const formattedProductLine = productVariant
     ? {
@@ -79,21 +96,23 @@ export async function getProductVariantBySlug({ slug }: Args) {
         averageRating,
         totalRatings,
         stock: resolveAvailableStock(stock, supplierStock),
-        images: (
-          productVariant.images?.filter((i) => typeof i === "object") ?? []
-        )
-          .map((i) => i.url)
-          .filter((url): url is string => typeof url === "string"),
-        product:
-          typeof productVariant.product === "object"
-            ? {
-                ...productVariant.product,
-                brand:
-                  typeof productVariant.product.brand === "object"
-                    ? productVariant.product.brand
-                    : null,
-              }
-            : null,
+        images,
+        meta: meta
+          ? {
+              title: meta.title ?? null,
+              description: meta.description ?? null,
+              image:
+                typeof meta.image === "object"
+                  ? (meta.image?.url ?? null)
+                  : null,
+            }
+          : null,
+        product: product
+          ? {
+              ...product,
+              brand: typeof product.brand === "object" ? product.brand : null,
+            }
+          : null,
       }
     : null
 

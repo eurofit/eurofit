@@ -4,6 +4,7 @@ import { env, publicUrl } from "@/env.mjs"
 import { postgresAdapter } from "@payloadcms/db-postgres"
 import { resendAdapter } from "@payloadcms/email-resend"
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder"
+import { seoPlugin } from "@payloadcms/plugin-seo"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import { s3Storage } from "@payloadcms/storage-s3"
 import path from "path"
@@ -76,6 +77,18 @@ export default buildConfig({
       },
     }),
     formBuilderPlugin({}),
+    seoPlugin({
+      collections: ["pages", "product-variants"],
+      uploadsCollection: "media",
+      generateURL: ({ doc, collectionSlug }) => {
+        switch (collectionSlug) {
+          case "product-variants":
+            return publicUrl + "/product-variants/" + doc.slug
+          default:
+            return publicUrl + "/" + doc.slug
+        }
+      },
+    }),
   ],
   sharp,
 })
