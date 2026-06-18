@@ -1766,6 +1766,11 @@ export interface Footer {
       | null;
     id?: string | null;
   }[];
+  legalLinks: {
+    label: string;
+    url: string;
+    id?: string | null;
+  }[];
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1812,6 +1817,13 @@ export interface FooterSelect<T extends boolean = true> {
               url?: T;
               id?: T;
             };
+        id?: T;
+      };
+  legalLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
         id?: T;
       };
   updatedAt?: T;

@@ -7,13 +7,6 @@ import { getPayload } from "payload"
 import CurrentYear from "./current-year"
 import { Logo } from "./logo"
 
-const LEGAL = [
-  "Terms of Service",
-  "Privacy Policy",
-  "Cookie Policy",
-  "Returns Policy",
-]
-
 async function getFooter() {
   "use cache"
   cacheLife("days")
@@ -111,14 +104,14 @@ export async function Footer() {
           className="flex flex-wrap justify-center gap-x-4 gap-y-2"
           aria-label="Legal"
         >
-          {LEGAL.map((item) => (
+          {footer.legalLinks.map(({ url, label }) => (
             <Link
-              key={item}
+              key={url}
               href="#"
               className="transition-colors hover:text-primary"
               prefetch={false}
             >
-              {item}
+              {label}
             </Link>
           ))}
         </nav>
