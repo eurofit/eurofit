@@ -188,6 +188,7 @@ Cart is identified by **either** `userId` (authenticated) or the `guestSessionId
 
 **Local API**:
 
+- Never pass the `payload` instance as a function argument — `getPayload({ config })` is cached, so call it again inside the function.
 - When using `limit: 1`, always set `pagination: false`.
 - All DB IDs are UUIDs (`idType: "uuid"`, `allowIDOnCreate: true`). Treat all IDs as strings.
 

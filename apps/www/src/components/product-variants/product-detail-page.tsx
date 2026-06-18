@@ -3,9 +3,9 @@
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
+import { ProductReviews } from "@/components/product-reviews/product-reviews"
 import { ProductImageGallery } from "@/components/product-variants/product-image-gallery"
 import { ProductInfo } from "@/components/product-variants/product-info"
-import { ProductReviews } from "@/components/product-variants/product-reviews"
 import { getPayloadImageUrl } from "@/lib/utils/payload-image"
 import { ProductDetail } from "@/lib/utils/product-variants/get-product-variant-by-slug"
 import {
@@ -115,6 +115,8 @@ export function ProductDetailPage({
               stock={product.stock}
               variant={product.variant}
               isWishlisted={product.isWishlisted}
+              averageRating={product.averageRating}
+              totalRatings={product.totalRatings}
             />
           </div>
         </div>
@@ -162,7 +164,15 @@ export function ProductDetailPage({
           </div>
         </section>
         {/* PRODUCT REVIEWS  */}
-        <ProductReviews />
+        <ProductReviews
+          productVariantId={product.id}
+          variant={{
+            title: product.detailTitle ?? product.title,
+            variant: product.variant,
+            sku: product.sku,
+          }}
+          currentUserId={currentUserId}
+        />
       </div>
     </main>
   )

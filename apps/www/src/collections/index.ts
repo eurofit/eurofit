@@ -7,6 +7,7 @@ import { orders } from "./orders"
 import { orderStatus } from "./orders/order-status"
 import { packages } from "./packages"
 import { pages } from "./pages"
+import { productReviews } from "./product-reviews"
 import { productVariants } from "./product-variants"
 import { products } from "./products"
 import { serviceAreas } from "./service-areas"
@@ -26,6 +27,7 @@ export const collections = [
   categories,
   products,
   productVariants,
+  productReviews,
   stockAlerts,
   wishlists,
   carts,

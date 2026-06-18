@@ -781,6 +781,51 @@ export const product_variants_rels = pgTable(
   ]
 )
 
+export const product_reviews = pgTable(
+  "product_reviews",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    user: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    productVariant: uuid("product_variant_id")
+      .notNull()
+      .references(() => product_variants.id, {
+        onDelete: "set null",
+      }),
+    rating: numeric("rating", { mode: "number" }).notNull(),
+    message: varchar("message"),
+    isActive: boolean("is_active").notNull().default(true),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("product_reviews_user_idx").on(columns.user),
+    index("product_reviews_product_variant_idx").on(columns.productVariant),
+    index("product_reviews_updated_at_idx").on(columns.updatedAt),
+    index("product_reviews_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_productVariant_idx").on(
+      columns.user,
+      columns.productVariant
+    ),
+    index("productVariant_idx").on(columns.productVariant),
+  ]
+)
+
 export const stock_alerts = pgTable(
   "stock_alerts",
   {
@@ -815,7 +860,7 @@ export const stock_alerts = pgTable(
     index("stock_alerts_product_variant_idx").on(columns.productVariant),
     index("stock_alerts_updated_at_idx").on(columns.updatedAt),
     index("stock_alerts_created_at_idx").on(columns.createdAt),
-    uniqueIndex("user_productVariant_idx").on(
+    uniqueIndex("user_productVariant_1_idx").on(
       columns.user,
       columns.productVariant
     ),
@@ -856,7 +901,7 @@ export const wishlists = pgTable(
     index("wishlists_product_variant_idx").on(columns.productVariant),
     index("wishlists_updated_at_idx").on(columns.updatedAt),
     index("wishlists_created_at_idx").on(columns.createdAt),
-    uniqueIndex("user_productVariant_1_idx").on(
+    uniqueIndex("user_productVariant_2_idx").on(
       columns.user,
       columns.productVariant
     ),
@@ -1496,6 +1541,7 @@ export const payload_locked_documents_rels = pgTable(
     categoriesID: uuid("categories_id"),
     productsID: uuid("products_id"),
     "product-variantsID": uuid("product_variants_id"),
+    "product-reviewsID": uuid("product_reviews_id"),
     "stock-alertsID": uuid("stock_alerts_id"),
     wishlistsID: uuid("wishlists_id"),
     cartsID: uuid("carts_id"),
@@ -1530,6 +1576,9 @@ export const payload_locked_documents_rels = pgTable(
     ),
     index("payload_locked_documents_rels_product_variants_id_idx").on(
       columns["product-variantsID"]
+    ),
+    index("payload_locked_documents_rels_product_reviews_id_idx").on(
+      columns["product-reviewsID"]
     ),
     index("payload_locked_documents_rels_stock_alerts_id_idx").on(
       columns["stock-alertsID"]
@@ -1603,6 +1652,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["product-variantsID"]],
       foreignColumns: [product_variants.id],
       name: "payload_locked_documents_rels_product_variants_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["product-reviewsID"]],
+      foreignColumns: [product_reviews.id],
+      name: "payload_locked_documents_rels_product_reviews_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["stock-alertsID"]],
@@ -2097,6 +2151,21 @@ export const relations_product_variants = relations(
     }),
   })
 )
+export const relations_product_reviews = relations(
+  product_reviews,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [product_reviews.user],
+      references: [users.id],
+      relationName: "user",
+    }),
+    productVariant: one(product_variants, {
+      fields: [product_reviews.productVariant],
+      references: [product_variants.id],
+      relationName: "productVariant",
+    }),
+  })
+)
 export const relations_stock_alerts = relations(stock_alerts, ({ one }) => ({
   user: one(users, {
     fields: [stock_alerts.user],
@@ -2416,6 +2485,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [product_variants.id],
       relationName: "product-variants",
     }),
+    "product-reviewsID": one(product_reviews, {
+      fields: [payload_locked_documents_rels["product-reviewsID"]],
+      references: [product_reviews.id],
+      relationName: "product-reviews",
+    }),
     "stock-alertsID": one(stock_alerts, {
       fields: [payload_locked_documents_rels["stock-alertsID"]],
       references: [stock_alerts.id],
@@ -2591,6 +2665,7 @@ type DatabaseSchema = {
   products_rels: typeof products_rels
   product_variants: typeof product_variants
   product_variants_rels: typeof product_variants_rels
+  product_reviews: typeof product_reviews
   stock_alerts: typeof stock_alerts
   wishlists: typeof wishlists
   carts_items: typeof carts_items
@@ -2650,6 +2725,7 @@ type DatabaseSchema = {
   relations_products: typeof relations_products
   relations_product_variants_rels: typeof relations_product_variants_rels
   relations_product_variants: typeof relations_product_variants
+  relations_product_reviews: typeof relations_product_reviews
   relations_stock_alerts: typeof relations_stock_alerts
   relations_wishlists: typeof relations_wishlists
   relations_carts_items: typeof relations_carts_items

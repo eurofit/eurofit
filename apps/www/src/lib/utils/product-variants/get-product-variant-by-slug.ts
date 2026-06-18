@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { getVariantReviewStats } from "@/lib/utils/reviews/get-variant-review-stats"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import config from "@payload-config"
 import { getPayload } from "payload"
@@ -67,9 +68,15 @@ export async function getProductVariantBySlug({ slug }: Args) {
 
   const { stock, supplierStock, ...productVariant } = pv
 
+  const { averageRating, totalRatings } = await getVariantReviewStats(
+    productVariant.id
+  )
+
   const formattedProductLine = productVariant
     ? {
         ...productVariant,
+        averageRating,
+        totalRatings,
         stock: resolveAvailableStock(stock, supplierStock),
         images: (
           productVariant.images?.filter((i) => typeof i === "object") ?? []
