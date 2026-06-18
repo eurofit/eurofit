@@ -27,7 +27,7 @@ export const products: CollectionConfig = {
   },
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "brand", "origin", "srcImage"],
+    defaultColumns: ["title", "brand", "origin", "supplierImageUrl"],
   },
   defaultSort: "title",
   fields: [
