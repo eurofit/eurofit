@@ -1,6 +1,8 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { JsonLd } from "@/components/json-ld"
 import { ProductDetailPage } from "@/components/product-variants/product-detail-page"
 import { getProductVariantBySlug } from "@/lib/utils/product-variants/get-product-variant-by-slug"
+import { getProductVariantJsonLd } from "@/lib/utils/product-variants/get-product-variant-json-ld"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
@@ -47,10 +49,13 @@ export default async function ProductLinePage({ params }: ProductPageProps) {
   }
 
   return (
-    <ProductDetailPage
-      product={productVariant}
-      currentUserId={currentUser?.id}
-    />
+    <>
+      <JsonLd jsonLd={getProductVariantJsonLd(productVariant)} />
+      <ProductDetailPage
+        product={productVariant}
+        currentUserId={currentUser?.id}
+      />
+    </>
   )
 }
 
