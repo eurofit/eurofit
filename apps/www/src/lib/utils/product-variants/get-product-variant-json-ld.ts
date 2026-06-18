@@ -1,19 +1,9 @@
 import { DELIVERY_FEE } from "@/const/delivery"
 import { site } from "@/const/site"
-import { getPayloadImageUrl } from "@/lib/utils/payload-image"
 import { ProductDetail } from "@/lib/utils/product-variants/get-product-variant-by-slug"
 import { AggregateRating, Offer, Product, WithContext } from "schema-dts"
 
 const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000
-
-function resolveImages(variant: ProductDetail) {
-  if (variant.images.length > 0) return variant.images
-
-  return (variant.product?.images ?? [])
-    .map(getPayloadImageUrl)
-    .concat(variant.product?.supplierImageUrl ?? null)
-    .filter((url): url is string => typeof url === "string")
-}
 
 function resolveAvailability(variant: ProductDetail) {
   if (variant.isOutOfStock) return "https://schema.org/OutOfStock"
@@ -95,7 +85,7 @@ export function getProductVariantJsonLd(
     name: variant.detailTitle ?? variant.title,
     sku: variant.sku,
     gtin: variant.barcode ?? undefined,
-    image: resolveImages(variant),
+    image: variant.images,
     brand: {
       "@type": "Brand",
       name: product?.brand?.title || undefined,

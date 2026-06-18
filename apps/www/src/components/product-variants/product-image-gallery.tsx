@@ -7,13 +7,11 @@ import { useState } from "react"
 
 interface ProductImageGalleryProps {
   images: string[]
-  defaultImages?: string[]
   productTitle: string
 }
 
 export function ProductImageGallery({
   images,
-  defaultImages,
   productTitle,
 }: ProductImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)

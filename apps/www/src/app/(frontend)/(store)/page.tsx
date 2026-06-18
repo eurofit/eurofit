@@ -1,9 +1,33 @@
 import { getPage } from "@/actions/pages/get-page"
 import { RenderBlocks } from "@/blocks/render-blocks"
 import { JsonLd } from "@/components/json-ld"
+import { site } from "@/const/site"
 import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext"
+import { Metadata } from "next"
 import { notFound } from "next/navigation"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("home")
+  const meta = page?.meta
+
+  if (!meta) return {}
+
+  const image = typeof meta.image === "object" ? meta.image?.url : undefined
+
+  return {
+    title: meta.title ? { absolute: meta.title } : undefined,
+    description: meta.description || undefined,
+    openGraph: {
+      type: "website",
+      url: site.url,
+      siteName: site.name,
+      title: meta.title || undefined,
+      description: meta.description || undefined,
+      images: image ? [{ url: image }] : undefined,
+    },
+  }
+}
 
 export default async function Home() {
   const page = await getPage("home")
