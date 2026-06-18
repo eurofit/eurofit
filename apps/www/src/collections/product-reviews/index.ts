@@ -2,7 +2,7 @@ import { adminOnly } from "@/access/admin"
 import { adminOrSelf } from "@/access/admin-or-self"
 import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
-import { userOwned } from "@/access/user-owned"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { activeField } from "@/fields/active"
 import { CollectionConfig } from "payload"
 import { validateCanReview } from "./hooks/validate-can-review"
@@ -20,7 +20,7 @@ export const productReviews: CollectionConfig = {
     create: adminOrSelf,
     read: everyone,
     update: adminOnly,
-    delete: userOwned,
+    delete: ownerOrAdmin,
     admin: isAdmin,
   },
   admin: {

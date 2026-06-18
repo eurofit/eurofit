@@ -1,7 +1,7 @@
 import { adminOnly } from "@/access/admin"
 import { adminOnlyFieldAccess } from "@/access/admin-field"
 import { isAdmin } from "@/access/is-admin"
-import { userOwned } from "@/access/user-owned"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
@@ -19,8 +19,8 @@ export const orders: CollectionConfig = {
     interface: "Order",
   },
   access: {
-    create: userOwned,
-    read: userOwned,
+    create: ownerOrAdmin,
+    read: ownerOrAdmin,
     update: adminOnly,
     delete: adminOnly,
     admin: isAdmin,

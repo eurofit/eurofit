@@ -1,5 +1,5 @@
 import { isAdmin } from "@/access/is-admin"
-import { userOwned } from "@/access/user-owned"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { CollectionConfig } from "payload"
 import { computeTotal } from "./hooks/compute-total"
 import { ensureSnapshots } from "./hooks/ensure-snapshots"
@@ -13,10 +13,10 @@ export const carts: CollectionConfig = {
     interface: "Cart",
   },
   access: {
-    create: userOwned,
-    read: userOwned,
-    update: userOwned,
-    delete: userOwned,
+    create: ownerOrAdmin,
+    read: ownerOrAdmin,
+    update: ownerOrAdmin,
+    delete: ownerOrAdmin,
     admin: isAdmin,
   },
   labels: {
