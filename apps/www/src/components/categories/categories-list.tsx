@@ -75,7 +75,7 @@ export function CategoryList({ totalCategories, ...props }: CategoryListProps) {
         </div>
       )}
 
-      {categories.length == totalCategories && (
+      {categories.length === totalCategories && (
         <div
           aria-live="polite"
           className="mx-auto mt-8 flex max-w-md flex-col items-center justify-center gap-2 text-center"
