@@ -28,6 +28,9 @@ export const env = createEnv({
     CLOUDFLARE_TURNSTILE_SECRET_KEY: z.string().min(1),
     CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
+    CRON_SECRET: z
+      .string()
+      .min(16, "CRON_SECRET must be at least 16 characters"),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().min(1),
@@ -53,6 +56,7 @@ export const env = createEnv({
     SUPABASE_S3_REGION: process.env.SUPABASE_S3_REGION,
     SUPABASE_S3_ENDPOINT: process.env.SUPABASE_S3_ENDPOINT,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
     CLOUDFLARE_TURNSTILE_SECRET_KEY:
       process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
     NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY:
