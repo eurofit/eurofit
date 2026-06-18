@@ -1,8 +1,5 @@
 "use client"
 
-import { Facebook } from "@/components/icons/facebook"
-import { Twitter } from "@/components/icons/twitter"
-import { Whatsapp } from "@/components/icons/whatsapp"
 import { ProductReviews } from "@/components/product-reviews/product-reviews"
 import { ProductImageGallery } from "@/components/product-variants/product-image-gallery"
 import { ProductInfo } from "@/components/product-variants/product-info"
@@ -15,7 +12,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@eurofit/ui/components/breadcrumb"
-import { Button } from "@eurofit/ui/components/button"
 import { Separator } from "@eurofit/ui/components/separator"
 
 interface ProductDetailPageProps {
@@ -30,99 +26,57 @@ export function ProductDetailPage({
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>Product Variations</BreadcrumbItem>
-            <BreadcrumbSeparator />
+        <div className="py-4 md:py-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>Product Variations</BreadcrumbItem>
+              <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-              <BreadcrumbPage>{product.title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
-          {/* Left Column - Images */}
-          <div className="flex flex-col">
-            <ProductImageGallery
-              images={product.images}
-              productTitle={product.title}
-            />
-            <Separator className="my-6" />
-            <section className="space-y-2">
-              <h2 className="text-sm font-medium uppercase">
-                Share this product
-              </h2>
-              <ul className="flex items-center gap-2">
-                <li>
-                  <Button
-                    variant="outline"
-                    size="icon-lg"
-                    className="rounded-full"
-                  >
-                    <Facebook />
-                    <span className="sr-only">Share on Facebook</span>
-                  </Button>
-                </li>
-                <li>
-                  <Button
-                    variant="outline"
-                    size="icon-lg"
-                    className="rounded-full"
-                  >
-                    <Twitter />
-                    <span className="sr-only">Share on Twitter</span>
-                  </Button>
-                </li>
-                <li>
-                  <Button
-                    variant="outline"
-                    size="icon-lg"
-                    className="rounded-full"
-                  >
-                    <Whatsapp />
-                    <span className="sr-only">Share on Whatsapp</span>
-                  </Button>
-                </li>
-              </ul>
-            </section>
-          </div>
-
-          {/* Right Column - Info */}
-          <div className="flex flex-col">
-            <ProductInfo
-              currentUserId={currentUserId}
-              id={product.id}
-              sku={product.sku}
-              title={product.detailTitle ?? product.title}
-              brand={product.product?.brand || null}
-              price={product.retailPrice}
-              inStock={!product.isOutOfStock}
-              isPreorder={product.isPreorder}
-              stock={product.stock}
-              variant={product.variant}
-              isWishlisted={product.isWishlisted}
-              averageRating={product.averageRating}
-              totalRatings={product.totalRatings}
-            />
-          </div>
+              <BreadcrumbItem>
+                <BreadcrumbPage>{product.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
 
-        <Separator className="my-8 md:my-12" />
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 gap-8 pt-2 md:grid-cols-2 md:gap-12">
+          {/* Left Column - Images */}
+          <ProductImageGallery
+            images={product.images}
+            productTitle={product.title}
+          />
+
+          {/* Right Column - Info */}
+          <ProductInfo
+            currentUserId={currentUserId}
+            id={product.id}
+            sku={product.sku}
+            title={product.detailTitle ?? product.title}
+            brand={product.product?.brand || null}
+            price={product.retailPrice}
+            inStock={!product.isOutOfStock}
+            isPreorder={product.isPreorder}
+            stock={product.stock}
+            variant={product.variant}
+            isWishlisted={product.isWishlisted}
+            averageRating={product.averageRating}
+            totalRatings={product.totalRatings}
+          />
+        </div>
+
+        <Separator className="my-10 md:my-14" />
+
         {/* PRODUCT DESCRIPTION  */}
-        <section className="space-y-4 py-4">
-          <div className="">
-            <h2 className="text-base leading-snug font-medium capitalize">
-              Product Description
-            </h2>
-          </div>
-          <div className="space-y-4">
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold md:text-2xl">
+            Product Description
+          </h2>
+          <div className="max-w-prose space-y-4 leading-relaxed text-muted-foreground">
             <p>
               Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Accusantium aliquam eaque, labore fugiat ea voluptatibus assumenda
@@ -156,6 +110,7 @@ export function ProductDetailPage({
             </p>
           </div>
         </section>
+
         {/* PRODUCT REVIEWS  */}
         <ProductReviews
           productVariantId={product.id}

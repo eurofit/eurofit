@@ -1,6 +1,11 @@
+import { Facebook } from "@/components/icons/facebook"
+import { Twitter } from "@/components/icons/twitter"
+import { Whatsapp } from "@/components/icons/whatsapp"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Badge } from "@eurofit/ui/components/badge"
-import { Flame, Star } from "lucide-react"
+import { Button } from "@eurofit/ui/components/button"
+import { Separator } from "@eurofit/ui/components/separator"
+import { Flame, ShieldCheck, Star } from "lucide-react"
 import Link from "next/link"
 import pluralize from "pluralize-esm"
 import { ProductDetailCartActions } from "./product-detail-cart-actions"
@@ -43,47 +48,43 @@ export function ProductInfo({
   return (
     <div className="flex flex-col justify-start gap-6">
       {/* Header with Wishlist */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-red-700 text-white uppercase">
-                <Flame className="fill-white" />
-                trending
-              </Badge>
-              <Badge className="bg-green-50 text-green-700 uppercase">
-                best seller
-              </Badge>
-            </div>
-            <WishlistButton
-              currentUserId={currentUserId}
-              variantId={id}
-              isWishlisted={isWishlisted}
-            />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>
+              <Flame className="fill-current" />
+              Trending
+            </Badge>
+            <Badge variant="secondary">Best seller</Badge>
           </div>
-          <h1 className="text-lg font-bold text-pretty text-foreground md:text-2xl md:leading-8 md:text-balance">
-            {title}
-          </h1>
-          {/* Brand */}
-          {brand && (
-            <Link
-              href={`/brands/${brand?.slug}`}
-              className="text-blue-900 hover:underline hover:underline-offset-4"
-            >
-              Visit the {brand.title} store
-            </Link>
-          )}
+          <WishlistButton
+            currentUserId={currentUserId}
+            variantId={id}
+            isWishlisted={isWishlisted}
+          />
         </div>
+        <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
+          {title}
+        </h1>
+        {/* Brand */}
+        {brand && (
+          <Link
+            href={`/brands/${brand?.slug}`}
+            className="inline-block text-sm text-primary underline-offset-4 hover:underline"
+          >
+            Visit the {brand.title} store
+          </Link>
+        )}
       </div>
 
       {/* Rating and Stock */}
-      <div className="flex flex-wrap items-center gap-6">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`h-4 w-4 ${
+                className={`size-4 ${
                   i < Math.round(averageRating)
                     ? "fill-orange-400 text-orange-400"
                     : "text-muted-foreground"
@@ -98,14 +99,14 @@ export function ProductInfo({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-sm font-medium">
           {inStock ? (
             <>
-              <div className="size-2 rounded-full bg-green-500" />
-              <span className="text-sm font-medium text-green-700">
-                {formatWithCommas(stock)} In stock{" "}
+              <span className="size-2 rounded-full bg-green-600" />
+              <span className="text-green-700 dark:text-green-500">
+                {formatWithCommas(stock)} in stock
                 {isPreorder && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="font-normal text-muted-foreground">
                     &nbsp;(preorder)
                   </span>
                 )}
@@ -113,10 +114,8 @@ export function ProductInfo({
             </>
           ) : (
             <>
-              <div className="size-2 rounded-full bg-red-500" />
-              <span className="text-sm font-medium text-red-700">
-                Out of stock
-              </span>
+              <span className="size-2 rounded-full bg-destructive" />
+              <span className="text-destructive">Out of stock</span>
             </>
           )}
         </div>
@@ -124,33 +123,59 @@ export function ProductInfo({
 
       {/* Pricing Section */}
       {price != null && (
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold text-foreground tabular-nums">
-                Ksh {formatWithCommas(price)}
-              </span>
-            </div>
-          </div>
-        </div>
+        <p className="text-3xl font-bold text-foreground tabular-nums">
+          Ksh {formatWithCommas(price)}
+        </p>
       )}
 
       {/* Variation Selector */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-foreground">
-          VARIATION AVAILABLE
-        </label>
+        <span className="text-sm font-medium text-muted-foreground">
+          Variation
+        </span>
         <Badge variant="secondary">{variant}</Badge>
       </div>
+
       {/* Add to Cart Button */}
       <ProductDetailCartActions
         variant={{ id, stock, sku, title, variant, price: price ?? null }}
         inStock={inStock}
       />
 
-      {/* Promotions */}
+      {/* Trust */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <ShieldCheck className="size-4" aria-hidden="true" />
+        Fast &amp; secure payments
+      </div>
 
-      <p className="text-sm text-blue-900">Fast & Secure Payments</p>
+      <Separator />
+
+      {/* Share */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-medium text-muted-foreground">
+          Share this product
+        </h2>
+        <ul className="flex items-center gap-2">
+          <li>
+            <Button variant="outline" size="icon-lg" className="rounded-full">
+              <Facebook />
+              <span className="sr-only">Share on Facebook</span>
+            </Button>
+          </li>
+          <li>
+            <Button variant="outline" size="icon-lg" className="rounded-full">
+              <Twitter />
+              <span className="sr-only">Share on Twitter</span>
+            </Button>
+          </li>
+          <li>
+            <Button variant="outline" size="icon-lg" className="rounded-full">
+              <Whatsapp />
+              <span className="sr-only">Share on Whatsapp</span>
+            </Button>
+          </li>
+        </ul>
+      </section>
     </div>
   )
 }

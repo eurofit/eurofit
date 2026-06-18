@@ -51,17 +51,17 @@ export function ProductImageGallery({
           <>
             <button
               onClick={scrollPrev}
-              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/90 p-2 transition-colors hover:bg-white"
+              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-full border bg-background/90 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-background"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-5 w-5 text-primary" />
+              <ChevronLeft className="size-5" />
             </button>
             <button
               onClick={scrollNext}
-              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/90 p-2 transition-colors hover:bg-white"
+              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full border bg-background/90 p-2 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-background"
               aria-label="Next image"
             >
-              <ChevronRight className="h-5 w-5 text-primary" />
+              <ChevronRight className="size-5" />
             </button>
           </>
         )}
