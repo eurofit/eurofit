@@ -4,8 +4,10 @@ import { usePreventScroll } from "@/hooks/use-prevent-scroll"
 import { useToggle } from "@/hooks/use-toggle"
 import { Nav } from "@/payload-types"
 import { Button } from "@eurofit/ui/components/button"
+import { cn } from "@eurofit/ui/lib/utils"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 type MobileMenuClientProps = {
   items: Nav["items"]
@@ -13,6 +15,7 @@ type MobileMenuClientProps = {
 
 export function MobileMenuClient({ items }: MobileMenuClientProps) {
   const { value: isOpen, toggle } = useToggle()
+  const pathname = usePathname()
 
   usePreventScroll({ isDisabled: isOpen === false })
 
@@ -21,43 +24,52 @@ export function MobileMenuClient({ items }: MobileMenuClientProps) {
       <Button
         variant="ghost"
         size="icon-lg"
-        className="-mt-px md:hidden"
+        className="md:hidden"
         onClick={toggle}
-        aria-label="Toggle menu"
+        aria-expanded={isOpen}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        {isOpen && (
-          <>
-            <span className="sr-only">Close Mobile menu</span>
-            <X className="size-5.5" aria-hidden="true" />
-          </>
-        )}
-        {!isOpen && (
-          <>
-            <span className="sr-only">Open Mobile menu</span>
-            <Menu className="size-5.5" aria-hidden="true" />
-          </>
+        {isOpen ? (
+          <X className="size-5.5" aria-hidden="true" />
+        ) : (
+          <Menu className="size-5.5" aria-hidden="true" />
         )}
       </Button>
 
       {isOpen && (
         <div
-          className="absolute top-26 z-999 -mx-4 h-[calc(100vh-6.5rem)] w-[calc(100%+2rem)] bg-black/50 transition-colors duration-150 supports-backdrop-filter:backdrop-blur-xs md:hidden"
+          className="absolute inset-x-0 top-28 z-50 h-[calc(100vh-7rem)] bg-black/50 supports-backdrop-filter:backdrop-blur-xs motion-safe:animate-in motion-safe:duration-150 motion-safe:fade-in md:hidden"
           onClick={toggle}
         >
-          <div className="border bg-popover p-4 text-popover-foreground">
-            <ul>
-              {items.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={item.url}
-                    className="block rounded px-4 py-2 hover:bg-gray-100"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+          <nav
+            className="border-b bg-popover p-2 text-popover-foreground shadow-md motion-safe:animate-in motion-safe:duration-200 motion-safe:ease-out motion-safe:slide-in-from-top-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ul className="flex flex-col gap-0.5">
+              {items.map((item) => {
+                const isActive =
+                  pathname === item.url ||
+                  (item.url !== "/" && pathname.startsWith(item.url))
+
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={item.url}
+                      onClick={toggle}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "flex min-h-11 items-center rounded-md px-4 py-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive &&
+                          "bg-accent font-medium text-accent-foreground"
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
-          </div>
+          </nav>
         </div>
       )}
     </>

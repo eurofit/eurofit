@@ -9,18 +9,21 @@ import { SearchSheet, SearchSheetSkeleton } from "./search-sheet"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 h-30 space-y-2 gap-x-6 border-b bg-background p-4 pb-3 md:h-16 md:px-6">
-      <div className="relative flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-50 border-b bg-background">
+      {/* Top row: brand · nav · actions */}
+      <div className="flex h-14 items-center gap-3 px-4 md:h-16 md:px-6">
+        <div className="flex items-center gap-1.5">
           <React.Suspense fallback={<MobileMenuSkeleton />}>
             <MobileMenu />
           </React.Suspense>
           <Logo />
         </div>
+
         <React.Suspense fallback={<NavSkeleton />}>
           <Nav />
         </React.Suspense>
-        <div className="ml-auto flex flex-1 items-center justify-end gap-x-3">
+
+        <div className="ml-auto flex flex-1 items-center justify-end gap-2 md:gap-3">
           <React.Suspense fallback={<SearchBarSkeleton />}>
             <SearchBar />
           </React.Suspense>
@@ -32,9 +35,13 @@ export function Header() {
           </React.Suspense>
         </div>
       </div>
-      <React.Suspense fallback={<SearchSheetSkeleton />}>
-        <SearchSheet />
-      </React.Suspense>
+
+      {/* Mobile-only search row */}
+      <div className="flex h-14 items-center px-4 md:hidden">
+        <React.Suspense fallback={<SearchSheetSkeleton />}>
+          <SearchSheet />
+        </React.Suspense>
+      </div>
     </header>
   )
 }

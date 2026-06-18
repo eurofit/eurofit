@@ -15,7 +15,7 @@ export default function StoreLayout({ children }: StoreLayoutProps) {
       </React.Suspense>
       <div className="container mx-auto">
         <Header />
-        <div className="relative min-h-[calc(100vh-5rem)] p-4 md:min-h-[calc(100vh-4rem)] md:p-6">
+        <div className="relative min-h-[calc(100vh-7rem)] p-4 md:min-h-[calc(100vh-4rem)] md:p-6">
           {children}
         </div>
         <React.Suspense fallback={<div>Loading footer...</div>}>
