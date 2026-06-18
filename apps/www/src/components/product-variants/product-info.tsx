@@ -8,6 +8,7 @@ import { WishlistButton } from "./wishlist-button"
 interface ProductInfoProps {
   currentUserId: string | undefined
   id: string
+  sku: string
   title: string
   brand: {
     title: string
@@ -24,6 +25,7 @@ interface ProductInfoProps {
 export function ProductInfo({
   currentUserId,
   id,
+  sku,
   title,
   brand,
   price,
@@ -114,15 +116,17 @@ export function ProductInfo({
       </div>
 
       {/* Pricing Section */}
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-baseline gap-3">
-            <span className="text-2xl font-bold text-foreground tabular-nums">
-              Ksh {price != null ? formatWithCommas(price) : "—"}
-            </span>
+      {price != null && (
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-baseline gap-3">
+              <span className="text-2xl font-bold text-foreground tabular-nums">
+                Ksh {formatWithCommas(price)}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Variation Selector */}
       <div className="flex flex-col gap-2">
@@ -132,7 +136,10 @@ export function ProductInfo({
         <Badge variant="secondary">{variant}</Badge>
       </div>
       {/* Add to Cart Button */}
-      <ProductDetailCartActions variant={{ id, stock }} inStock={inStock} />
+      <ProductDetailCartActions
+        variant={{ id, stock, sku, title, variant, price: price ?? null }}
+        inStock={inStock}
+      />
 
       {/* Promotions */}
 

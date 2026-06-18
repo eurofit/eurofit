@@ -106,6 +106,7 @@ export function ProductDetailPage({
             <ProductInfo
               currentUserId={currentUserId}
               id={product.id}
+              sku={product.sku}
               title={product.detailTitle ?? product.title}
               brand={product.product?.brand || null}
               price={product.retailPrice}
