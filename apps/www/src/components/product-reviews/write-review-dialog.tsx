@@ -61,12 +61,10 @@ function StarRatingInput({
           className="rounded-sm transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <Star
-            className={cn(
-              "size-7",
-              star <= active
-                ? "fill-orange-400 text-orange-400"
-                : "text-muted-foreground/40"
-            )}
+            className={cn("size-7", {
+              "fill-orange-400 text-orange-400": star < active,
+              "text-muted-foreground/40": star > active,
+            })}
           />
         </button>
       ))}
