@@ -10,25 +10,31 @@ import {
 } from "@eurofit/ui/components/empty"
 import {
   dehydrate,
+  type DehydratedState,
   HydrationBoundary,
   type InfiniteData,
 } from "@tanstack/react-query"
+import { cacheLife, cacheTag } from "next/cache"
 import { BrandList } from "./brands-list"
 
 const BRANDS_LIMIT = 35
 
 /**
- * Prefetches the first page of brands into a server `QueryClient` and streams it
- * to the client via `HydrationBoundary`. `BrandList` reads the hydrated
- * `["brands"]` infinite query from cache, so the grid renders in the static
- * shell with no loading skeleton — pagination is then driven client-side by
- * infinite scroll. Mirrors the cart's `CartHydrator` pattern.
+ * Prefetches the first page of brands into a server `QueryClient` and returns
+ * its dehydrated state alongside the first page (for the empty check + JSON-LD).
  *
- * The prefetch is awaited (not `void`) so the grid is part of the prerendered
- * output rather than a streamed-in fallback. The DB read is cached
- * (`"use cache"` in `getBrands`), keeping this component static.
+ * Wrapped in `"use cache"` because `prefetchInfiniteQuery` stamps `Date.now()`
+ * on the query — under `cacheComponents` that current-time read is only allowed
+ * inside a Cache Component, and caching here keeps the page in the static shell.
  */
-export async function Brands() {
+async function getBrandsHydration(): Promise<{
+  state: DehydratedState
+  firstPage: GetBrandsData | null
+}> {
+  "use cache"
+  cacheTag("brands")
+  cacheLife("hours")
+
   const queryClient = getQueryClient()
 
   await queryClient.prefetchInfiniteQuery({
@@ -43,9 +49,21 @@ export async function Brands() {
       lastPage.nextPage ?? undefined,
   })
 
-  const firstPage = queryClient.getQueryData<
-    InfiniteData<GetBrandsData, number>
-  >(["brands"])?.pages[0]
+  const firstPage =
+    queryClient.getQueryData<InfiniteData<GetBrandsData, number>>(["brands"])
+      ?.pages[0] ?? null
+
+  return { state: dehydrate(queryClient), firstPage }
+}
+
+/**
+ * Streams the prefetched brands to the client via `HydrationBoundary`.
+ * `BrandList` reads the hydrated `["brands"]` infinite query from cache, so the
+ * grid renders in the static shell with no loading skeleton — pagination is then
+ * driven client-side by infinite scroll. Mirrors the cart's `CartHydrator`.
+ */
+export async function Brands() {
+  const { state, firstPage } = await getBrandsHydration()
 
   if (!firstPage || !firstPage.totalBrands) {
     return <EmptyBrands />
@@ -54,7 +72,7 @@ export async function Brands() {
   const jsonLds = getBrandListJsonLd(firstPage)
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <HydrationBoundary state={state}>
       <JsonLd jsonLd={jsonLds} />
       <BrandList totalBrands={firstPage.totalBrands} />
     </HydrationBoundary>
