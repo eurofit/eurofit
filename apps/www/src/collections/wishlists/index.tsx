@@ -1,4 +1,5 @@
 import { isAdmin } from "@/access/is-admin"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { CollectionConfig } from "payload"
 
 export const wishlists: CollectionConfig = {

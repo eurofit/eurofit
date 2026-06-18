@@ -1,4 +1,5 @@
 import { isAdmin } from "@/access/is-admin"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { CollectionConfig } from "payload"
 import { computeTotal } from "./hooks/compute-total"
 import { ensureSnapshots } from "./hooks/ensure-snapshots"
@@ -115,7 +116,7 @@ export const carts: CollectionConfig = {
       admin: {
         readOnly: true,
         description:
-          "Timestamp of the last activity on this cart by its ownerOrAdmin.",
+          "Timestamp of the last activity on this cart by its owner.",
       },
       required: true,
     },

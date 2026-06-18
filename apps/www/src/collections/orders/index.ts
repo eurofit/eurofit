@@ -1,6 +1,7 @@
 import { adminOnly } from "@/access/admin"
 import { adminOnlyFieldAccess } from "@/access/admin-field"
 import { isAdmin } from "@/access/is-admin"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
