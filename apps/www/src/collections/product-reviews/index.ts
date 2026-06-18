@@ -1,5 +1,4 @@
 import { adminOnly } from "@/access/admin"
-import { adminOrSelf } from "@/access/admin-or-self"
 import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
 import { ownerOrAdmin } from "@/access/owner-or-admin"
@@ -17,7 +16,7 @@ export const productReviews: CollectionConfig = {
     interface: "ProductReview",
   },
   access: {
-    create: adminOrSelf,
+    create: ownerOrAdmin,
     read: everyone,
     update: adminOnly,
     delete: ownerOrAdmin,

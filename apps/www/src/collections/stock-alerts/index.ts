@@ -1,6 +1,6 @@
 import { adminOnly } from "@/access/admin"
-import { adminOrSelf } from "@/access/admin-or-self"
 import { isAdmin } from "@/access/is-admin"
+import { ownerOrAdmin } from "@/access/owner-or-admin"
 import { CollectionConfig } from "payload"
 import { validateOutOfStock } from "./hooks/validate-out-of-stock"
 
@@ -14,10 +14,10 @@ export const stockAlerts: CollectionConfig = {
     interface: "StockAlert",
   },
   access: {
-    create: adminOrSelf,
-    read: adminOrSelf,
+    create: ownerOrAdmin,
+    read: ownerOrAdmin,
     update: adminOnly,
-    delete: adminOrSelf,
+    delete: ownerOrAdmin,
     admin: isAdmin,
   },
   admin: {
