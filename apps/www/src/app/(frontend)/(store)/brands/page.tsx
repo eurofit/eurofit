@@ -44,7 +44,7 @@ export default function BrandsPage() {
               </span>
               <h1
                 id="brand-list-heading"
-                className="scroll-m-20 text-2xl font-bold tracking-tight text-pretty lg:text-3xl"
+                className="scroll-m-20 text-2xl font-bold tracking-tight text-balance lg:text-3xl"
               >
                 Browse{" "}
                 <React.Suspense fallback={<span>...</span>}>
@@ -52,7 +52,7 @@ export default function BrandsPage() {
                 </React.Suspense>
                 {"+ Authentic Supplement & Sports Nutrition Brands in Kenya"}
               </h1>
-              <p className="text-pretty text-muted-foreground capitalize">
+              <p className="text-balance text-muted-foreground">
                 Sourced from authorized European manufacturers — delivered to
                 Nairobi, Mombasa, Kisumu, and everywhere in between.
               </p>

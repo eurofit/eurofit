@@ -42,7 +42,7 @@ export function BrandList({ totalBrands, ...props }: BrandListProps) {
     <section {...props}>
       {/* --- LIST ---  */}
       <ul
-        className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10 lg:grid-cols-4 xl:grid-cols-5"
+        className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6"
         role="list"
         aria-label="Brands available for purchase"
       >
@@ -55,7 +55,7 @@ export function BrandList({ totalBrands, ...props }: BrandListProps) {
 
       {hasNextPage && (
         <div ref={ref}>
-          <BrandsSkeleton length={isMobile ? 1 : 5} className="mt-10" />
+          <BrandsSkeleton length={isMobile ? 2 : 6} className="mt-8" />
         </div>
       )}
 
