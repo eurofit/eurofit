@@ -18,6 +18,7 @@
         "SUPABASE_*",
         "CLOUDFLARE_*",
         "RESEND_*",
+        "CRON_SECRET",
         "NEXT_PUBLIC_*"
       ]
     },
