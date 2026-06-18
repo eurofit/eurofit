@@ -107,7 +107,7 @@ export async function Footer() {
           {footer.legalLinks.map(({ url, label }) => (
             <Link
               key={url}
-              href="#"
+              href={url}
               className="transition-colors hover:text-primary"
               prefetch={false}
             >
