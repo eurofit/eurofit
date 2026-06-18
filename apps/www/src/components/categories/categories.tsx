@@ -13,25 +13,32 @@ import {
 } from "@eurofit/ui/components/empty"
 import {
   dehydrate,
+  type DehydratedState,
   HydrationBoundary,
   type InfiniteData,
 } from "@tanstack/react-query"
+import { cacheLife, cacheTag } from "next/cache"
 import { CategoryList } from "./categories-list"
 
 const CATEGORIES_LIMIT = 24
 
 /**
  * Prefetches the first page of categories into a server `QueryClient` and
- * streams it to the client via `HydrationBoundary`. `CategoryList` reads the
- * hydrated `["categories"]` infinite query from cache, so the grid renders in
- * the static shell with no loading skeleton — pagination is then driven
- * client-side by infinite scroll. Mirrors the cart's `CartHydrator` pattern.
+ * returns its dehydrated state alongside the first page (for the empty check +
+ * JSON-LD).
  *
- * The prefetch is awaited (not `void`) so the grid is part of the prerendered
- * output rather than a streamed-in fallback. The DB read is cached
- * (`"use cache"` in `getCategories`), keeping this component static.
+ * Wrapped in `"use cache"` because `prefetchInfiniteQuery` stamps `Date.now()`
+ * on the query — under `cacheComponents` that current-time read is only allowed
+ * inside a Cache Component, and caching here keeps the page in the static shell.
  */
-export async function Categories() {
+async function getCategoriesHydration(): Promise<{
+  state: DehydratedState
+  firstPage: GetCategoriesData | null
+}> {
+  "use cache"
+  cacheTag("categories")
+  cacheLife("hours")
+
   const queryClient = getQueryClient()
 
   await queryClient.prefetchInfiniteQuery({
@@ -46,9 +53,23 @@ export async function Categories() {
       lastPage.nextPage ?? undefined,
   })
 
-  const firstPage = queryClient.getQueryData<
-    InfiniteData<GetCategoriesData, number>
-  >(["categories"])?.pages[0]
+  const firstPage =
+    queryClient.getQueryData<InfiniteData<GetCategoriesData, number>>([
+      "categories",
+    ])?.pages[0] ?? null
+
+  return { state: dehydrate(queryClient), firstPage }
+}
+
+/**
+ * Streams the prefetched categories to the client via `HydrationBoundary`.
+ * `CategoryList` reads the hydrated `["categories"]` infinite query from cache,
+ * so the grid renders in the static shell with no loading skeleton — pagination
+ * is then driven client-side by infinite scroll. Mirrors the cart's
+ * `CartHydrator` pattern.
+ */
+export async function Categories() {
+  const { state, firstPage } = await getCategoriesHydration()
 
   if (!firstPage || !firstPage.totalCategories) {
     return <EmptyCategories />
@@ -57,7 +78,7 @@ export async function Categories() {
   const jsonLds = getCategoriesJsonLd(firstPage)
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <HydrationBoundary state={state}>
       <JsonLd jsonLd={jsonLds} />
       <CategoryList totalCategories={firstPage.totalCategories} />
     </HydrationBoundary>
