@@ -1,33 +1,10 @@
 import { getNav } from "@/actions/get-nav"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@eurofit/ui/components/navigation-menu"
 import { Skeleton } from "@eurofit/ui/components/skeleton"
+import { NavLinks } from "./nav.client"
 
 export async function Nav() {
   const navItems = await getNav()
-  return (
-    <NavigationMenu className="hidden md:block">
-      {navItems.length > 0 && (
-        <NavigationMenuList>
-          {navItems.map(({ label, url, id }) => (
-            <NavigationMenuItem key={id}>
-              <NavigationMenuLink
-                className={navigationMenuTriggerStyle()}
-                href={url}
-              >
-                {label}
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          ))}
-        </NavigationMenuList>
-      )}
-    </NavigationMenu>
-  )
+  return <NavLinks items={navItems} />
 }
 
 export function NavSkeleton() {
