@@ -10,7 +10,7 @@ import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { ProductReview } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
-import { getPayload } from "payload"
+import { APIError, getPayload } from "payload"
 
 export async function createReview(
   unsafeReview: CreateReview,
@@ -57,18 +57,20 @@ export async function createReview(
         // Field-level access strips this for non-admins; the default (true) applies.
         isActive: true,
       },
-      user: user.id,
+      user: user,
       overrideAccess: false,
       draft: false,
     })
 
     return { success: true, data: review }
-  } catch {
+  } catch (err) {
+    if (err instanceof APIError && err.isPublic) {
+      return { success: false, code: err.status, message: err.message }
+    }
     return {
       success: false,
       code: 400,
-      message:
-        "We couldn't submit your review. You can only review a product you've purchased, and only once.",
+      message: "We couldn't submit your review. Please try again.",
     }
   }
 }

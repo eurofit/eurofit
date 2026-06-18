@@ -25,6 +25,7 @@ export async function hasPurchasedVariant({
       paymentStatus: { equals: "paid" },
       "items.productVariant": { equals: productVariantId },
     },
+    overrideAccess: true,
     req,
   })
 
