@@ -1,6 +1,10 @@
 "use client"
 
+import { Whatsapp } from "@/components/icons/whatsapp"
+import { site } from "@/const/site"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
+import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
+import { buildWhatsAppLink } from "@/lib/utils/build-wa-link"
 import { ProductVariant } from "@/types/product-variant"
 import { Button } from "@eurofit/ui/components/button"
 import { ButtonGroup } from "@eurofit/ui/components/button-group"
@@ -8,9 +12,13 @@ import { Input } from "@eurofit/ui/components/input"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { cn } from "@eurofit/ui/lib/utils"
 import { Minus, Plus, ShoppingCart } from "lucide-react"
+import Link from "next/link"
 
 type ProductDetailCartActionsProps = {
-  variant: Pick<ProductVariant, "id" | "stock">
+  variant: Pick<
+    ProductVariant,
+    "id" | "stock" | "sku" | "title" | "variant" | "price"
+  >
   inStock: boolean
 }
 
@@ -18,6 +26,37 @@ export function ProductDetailCartActions({
   variant,
   inStock,
 }: ProductDetailCartActionsProps) {
+  const shouldInquirePrice = variant.price == null
+
+  if (shouldInquirePrice) {
+    return (
+      <div className="relative flex w-full items-stretch gap-2 max-md:fixed max-md:right-0 max-md:bottom-0 max-md:left-0 max-md:z-50 max-md:bg-background max-md:p-4">
+        <Button
+          size="lg"
+          variant="outline"
+          className="text-whatsapp h-12 flex-1 rounded-md px-6 text-base font-semibold"
+          asChild
+        >
+          <Link
+            href={buildWhatsAppLink({
+              phone: site.contact.whatsapp,
+              message: buildPriceInquiryMessage(variant),
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Whatsapp aria-hidden="true" />
+            Inquire Price
+          </Link>
+        </Button>
+      </div>
+    )
+  }
+
+  return <PurchaseActions variant={variant} inStock={inStock} />
+}
+
+function PurchaseActions({ variant, inStock }: ProductDetailCartActionsProps) {
   const {
     quantity,
     isInCart,
