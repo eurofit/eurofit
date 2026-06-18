@@ -56,6 +56,10 @@ export const enum_order_statuses_status = pgEnum("enum_order_statuses_status", [
   "delivered",
   "cancelled",
 ])
+export const enum_forms_confirmation_type = pgEnum(
+  "enum_forms_confirmation_type",
+  ["message", "redirect"]
+)
 
 export const users_roles = pgTable(
   "users_roles",
@@ -967,6 +971,9 @@ export const orders = pgTable(
       .references(() => addresses.id, {
         onDelete: "set null",
       }),
+    subtotal: numeric("subtotal", { mode: "number" }).default(0),
+    deliveryFee: numeric("delivery_fee", { mode: "number" }).default(0),
+    total: numeric("total", { mode: "number" }).default(0),
     paymentStatus: enum_orders_payment_status("payment_status")
       .notNull()
       .default("unpaid"),
@@ -1076,6 +1083,365 @@ export const transactions = pgTable(
   ]
 )
 
+export const forms_blocks_checkbox = pgTable(
+  "forms_blocks_checkbox",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    required: boolean("required"),
+    defaultValue: boolean("default_value"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_checkbox_order_idx").on(columns._order),
+    index("forms_blocks_checkbox_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_checkbox_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_checkbox_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_country = pgTable(
+  "forms_blocks_country",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_country_order_idx").on(columns._order),
+    index("forms_blocks_country_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_country_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_country_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_email = pgTable(
+  "forms_blocks_email",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_email_order_idx").on(columns._order),
+    index("forms_blocks_email_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_email_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_email_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_message = pgTable(
+  "forms_blocks_message",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    message: jsonb("message"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_message_order_idx").on(columns._order),
+    index("forms_blocks_message_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_message_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_message_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_number = pgTable(
+  "forms_blocks_number",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: numeric("default_value", { mode: "number" }),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_number_order_idx").on(columns._order),
+    index("forms_blocks_number_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_number_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_number_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_select_options = pgTable(
+  "forms_blocks_select_options",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    value: varchar("value").notNull(),
+  },
+  (columns) => [
+    index("forms_blocks_select_options_order_idx").on(columns._order),
+    index("forms_blocks_select_options_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms_blocks_select.id],
+      name: "forms_blocks_select_options_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_select = pgTable(
+  "forms_blocks_select",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: varchar("default_value"),
+    placeholder: varchar("placeholder"),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_select_order_idx").on(columns._order),
+    index("forms_blocks_select_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_select_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_select_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_state = pgTable(
+  "forms_blocks_state",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_state_order_idx").on(columns._order),
+    index("forms_blocks_state_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_state_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_state_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_text = pgTable(
+  "forms_blocks_text",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: varchar("default_value"),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_text_order_idx").on(columns._order),
+    index("forms_blocks_text_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_text_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_text_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_blocks_textarea = pgTable(
+  "forms_blocks_textarea",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+    label: varchar("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: varchar("default_value"),
+    required: boolean("required"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_textarea_order_idx").on(columns._order),
+    index("forms_blocks_textarea_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_textarea_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_textarea_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms_emails = pgTable(
+  "forms_emails",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    emailTo: varchar("email_to"),
+    cc: varchar("cc"),
+    bcc: varchar("bcc"),
+    replyTo: varchar("reply_to"),
+    emailFrom: varchar("email_from"),
+    subject: varchar("subject")
+      .notNull()
+      .default("You've received a new message."),
+    message: jsonb("message"),
+  },
+  (columns) => [
+    index("forms_emails_order_idx").on(columns._order),
+    index("forms_emails_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_emails_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const forms = pgTable(
+  "forms",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title").notNull(),
+    submitButtonLabel: varchar("submit_button_label"),
+    confirmationType:
+      enum_forms_confirmation_type("confirmation_type").default("message"),
+    confirmationMessage: jsonb("confirmation_message"),
+    redirect_url: varchar("redirect_url"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("forms_updated_at_idx").on(columns.updatedAt),
+    index("forms_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const form_submissions_submission_data = pgTable(
+  "form_submissions_submission_data",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    field: varchar("field").notNull(),
+    value: varchar("value").notNull(),
+  },
+  (columns) => [
+    index("form_submissions_submission_data_order_idx").on(columns._order),
+    index("form_submissions_submission_data_parent_id_idx").on(
+      columns._parentID
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [form_submissions.id],
+      name: "form_submissions_submission_data_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const form_submissions = pgTable(
+  "form_submissions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    form: uuid("form_id")
+      .notNull()
+      .references(() => forms.id, {
+        onDelete: "set null",
+      }),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("form_submissions_form_idx").on(columns.form),
+    index("form_submissions_updated_at_idx").on(columns.updatedAt),
+    index("form_submissions_created_at_idx").on(columns.createdAt),
+  ]
+)
+
 export const payload_kv = pgTable(
   "payload_kv",
   {
@@ -1136,6 +1502,8 @@ export const payload_locked_documents_rels = pgTable(
     ordersID: numeric("orders_id", { mode: "number" }),
     "order-statusesID": uuid("order_statuses_id"),
     transactionsID: uuid("transactions_id"),
+    formsID: uuid("forms_id"),
+    "form-submissionsID": uuid("form_submissions_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -1176,6 +1544,10 @@ export const payload_locked_documents_rels = pgTable(
     ),
     index("payload_locked_documents_rels_transactions_id_idx").on(
       columns.transactionsID
+    ),
+    index("payload_locked_documents_rels_forms_id_idx").on(columns.formsID),
+    index("payload_locked_documents_rels_form_submissions_id_idx").on(
+      columns["form-submissionsID"]
     ),
     foreignKey({
       columns: [columns["parent"]],
@@ -1261,6 +1633,16 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["transactionsID"]],
       foreignColumns: [transactions.id],
       name: "payload_locked_documents_rels_transactions_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["formsID"]],
+      foreignColumns: [forms.id],
+      name: "payload_locked_documents_rels_forms_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["form-submissionsID"]],
+      foreignColumns: [form_submissions.id],
+      name: "payload_locked_documents_rels_form_submissions_fk",
     }).onDelete("cascade"),
   ]
 )
@@ -1449,6 +1831,26 @@ export const footer_nav = pgTable(
       columns: [columns["_parentID"]],
       foreignColumns: [footer.id],
       name: "footer_nav_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const footer_legal_links = pgTable(
+  "footer_legal_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    url: varchar("url").notNull(),
+  },
+  (columns) => [
+    index("footer_legal_links_order_idx").on(columns._order),
+    index("footer_legal_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer.id],
+      name: "footer_legal_links_parent_id_fk",
     }).onDelete("cascade"),
   ]
 )
@@ -1790,6 +2192,171 @@ export const relations_transactions = relations(transactions, ({ one }) => ({
     relationName: "order",
   }),
 }))
+export const relations_forms_blocks_checkbox = relations(
+  forms_blocks_checkbox,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_checkbox._parentID],
+      references: [forms.id],
+      relationName: "_blocks_checkbox",
+    }),
+  })
+)
+export const relations_forms_blocks_country = relations(
+  forms_blocks_country,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_country._parentID],
+      references: [forms.id],
+      relationName: "_blocks_country",
+    }),
+  })
+)
+export const relations_forms_blocks_email = relations(
+  forms_blocks_email,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_email._parentID],
+      references: [forms.id],
+      relationName: "_blocks_email",
+    }),
+  })
+)
+export const relations_forms_blocks_message = relations(
+  forms_blocks_message,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_message._parentID],
+      references: [forms.id],
+      relationName: "_blocks_message",
+    }),
+  })
+)
+export const relations_forms_blocks_number = relations(
+  forms_blocks_number,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_number._parentID],
+      references: [forms.id],
+      relationName: "_blocks_number",
+    }),
+  })
+)
+export const relations_forms_blocks_select_options = relations(
+  forms_blocks_select_options,
+  ({ one }) => ({
+    _parentID: one(forms_blocks_select, {
+      fields: [forms_blocks_select_options._parentID],
+      references: [forms_blocks_select.id],
+      relationName: "options",
+    }),
+  })
+)
+export const relations_forms_blocks_select = relations(
+  forms_blocks_select,
+  ({ one, many }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_select._parentID],
+      references: [forms.id],
+      relationName: "_blocks_select",
+    }),
+    options: many(forms_blocks_select_options, {
+      relationName: "options",
+    }),
+  })
+)
+export const relations_forms_blocks_state = relations(
+  forms_blocks_state,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_state._parentID],
+      references: [forms.id],
+      relationName: "_blocks_state",
+    }),
+  })
+)
+export const relations_forms_blocks_text = relations(
+  forms_blocks_text,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_text._parentID],
+      references: [forms.id],
+      relationName: "_blocks_text",
+    }),
+  })
+)
+export const relations_forms_blocks_textarea = relations(
+  forms_blocks_textarea,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_textarea._parentID],
+      references: [forms.id],
+      relationName: "_blocks_textarea",
+    }),
+  })
+)
+export const relations_forms_emails = relations(forms_emails, ({ one }) => ({
+  _parentID: one(forms, {
+    fields: [forms_emails._parentID],
+    references: [forms.id],
+    relationName: "emails",
+  }),
+}))
+export const relations_forms = relations(forms, ({ many }) => ({
+  _blocks_checkbox: many(forms_blocks_checkbox, {
+    relationName: "_blocks_checkbox",
+  }),
+  _blocks_country: many(forms_blocks_country, {
+    relationName: "_blocks_country",
+  }),
+  _blocks_email: many(forms_blocks_email, {
+    relationName: "_blocks_email",
+  }),
+  _blocks_message: many(forms_blocks_message, {
+    relationName: "_blocks_message",
+  }),
+  _blocks_number: many(forms_blocks_number, {
+    relationName: "_blocks_number",
+  }),
+  _blocks_select: many(forms_blocks_select, {
+    relationName: "_blocks_select",
+  }),
+  _blocks_state: many(forms_blocks_state, {
+    relationName: "_blocks_state",
+  }),
+  _blocks_text: many(forms_blocks_text, {
+    relationName: "_blocks_text",
+  }),
+  _blocks_textarea: many(forms_blocks_textarea, {
+    relationName: "_blocks_textarea",
+  }),
+  emails: many(forms_emails, {
+    relationName: "emails",
+  }),
+}))
+export const relations_form_submissions_submission_data = relations(
+  form_submissions_submission_data,
+  ({ one }) => ({
+    _parentID: one(form_submissions, {
+      fields: [form_submissions_submission_data._parentID],
+      references: [form_submissions.id],
+      relationName: "submissionData",
+    }),
+  })
+)
+export const relations_form_submissions = relations(
+  form_submissions,
+  ({ one, many }) => ({
+    form: one(forms, {
+      fields: [form_submissions.form],
+      references: [forms.id],
+      relationName: "form",
+    }),
+    submissionData: many(form_submissions_submission_data, {
+      relationName: "submissionData",
+    }),
+  })
+)
 export const relations_payload_kv = relations(payload_kv, () => ({}))
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -1879,6 +2446,16 @@ export const relations_payload_locked_documents_rels = relations(
       references: [transactions.id],
       relationName: "transactions",
     }),
+    formsID: one(forms, {
+      fields: [payload_locked_documents_rels.formsID],
+      references: [forms.id],
+      relationName: "forms",
+    }),
+    "form-submissionsID": one(form_submissions, {
+      fields: [payload_locked_documents_rels["form-submissionsID"]],
+      references: [form_submissions.id],
+      relationName: "form-submissions",
+    }),
   })
 )
 export const relations_payload_locked_documents = relations(
@@ -1963,9 +2540,22 @@ export const relations_footer_nav = relations(footer_nav, ({ one, many }) => ({
     relationName: "links",
   }),
 }))
+export const relations_footer_legal_links = relations(
+  footer_legal_links,
+  ({ one }) => ({
+    _parentID: one(footer, {
+      fields: [footer_legal_links._parentID],
+      references: [footer.id],
+      relationName: "legalLinks",
+    }),
+  })
+)
 export const relations_footer = relations(footer, ({ many }) => ({
   nav: many(footer_nav, {
     relationName: "nav",
+  }),
+  legalLinks: many(footer_legal_links, {
+    relationName: "legalLinks",
   }),
 }))
 
@@ -1977,6 +2567,7 @@ type DatabaseSchema = {
   enum_categories_type: typeof enum_categories_type
   enum_orders_payment_status: typeof enum_orders_payment_status
   enum_order_statuses_status: typeof enum_order_statuses_status
+  enum_forms_confirmation_type: typeof enum_forms_confirmation_type
   users_roles: typeof users_roles
   users_sessions: typeof users_sessions
   users: typeof users
@@ -2008,6 +2599,20 @@ type DatabaseSchema = {
   orders: typeof orders
   order_statuses: typeof order_statuses
   transactions: typeof transactions
+  forms_blocks_checkbox: typeof forms_blocks_checkbox
+  forms_blocks_country: typeof forms_blocks_country
+  forms_blocks_email: typeof forms_blocks_email
+  forms_blocks_message: typeof forms_blocks_message
+  forms_blocks_number: typeof forms_blocks_number
+  forms_blocks_select_options: typeof forms_blocks_select_options
+  forms_blocks_select: typeof forms_blocks_select
+  forms_blocks_state: typeof forms_blocks_state
+  forms_blocks_text: typeof forms_blocks_text
+  forms_blocks_textarea: typeof forms_blocks_textarea
+  forms_emails: typeof forms_emails
+  forms: typeof forms
+  form_submissions_submission_data: typeof form_submissions_submission_data
+  form_submissions: typeof form_submissions
   payload_kv: typeof payload_kv
   payload_locked_documents: typeof payload_locked_documents
   payload_locked_documents_rels: typeof payload_locked_documents_rels
@@ -2020,6 +2625,7 @@ type DatabaseSchema = {
   nav: typeof nav
   footer_nav_links: typeof footer_nav_links
   footer_nav: typeof footer_nav
+  footer_legal_links: typeof footer_legal_links
   footer: typeof footer
   relations_users_roles: typeof relations_users_roles
   relations_users_sessions: typeof relations_users_sessions
@@ -2052,6 +2658,20 @@ type DatabaseSchema = {
   relations_orders: typeof relations_orders
   relations_order_statuses: typeof relations_order_statuses
   relations_transactions: typeof relations_transactions
+  relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox
+  relations_forms_blocks_country: typeof relations_forms_blocks_country
+  relations_forms_blocks_email: typeof relations_forms_blocks_email
+  relations_forms_blocks_message: typeof relations_forms_blocks_message
+  relations_forms_blocks_number: typeof relations_forms_blocks_number
+  relations_forms_blocks_select_options: typeof relations_forms_blocks_select_options
+  relations_forms_blocks_select: typeof relations_forms_blocks_select
+  relations_forms_blocks_state: typeof relations_forms_blocks_state
+  relations_forms_blocks_text: typeof relations_forms_blocks_text
+  relations_forms_blocks_textarea: typeof relations_forms_blocks_textarea
+  relations_forms_emails: typeof relations_forms_emails
+  relations_forms: typeof relations_forms
+  relations_form_submissions_submission_data: typeof relations_form_submissions_submission_data
+  relations_form_submissions: typeof relations_form_submissions
   relations_payload_kv: typeof relations_payload_kv
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels
   relations_payload_locked_documents: typeof relations_payload_locked_documents
@@ -2064,6 +2684,7 @@ type DatabaseSchema = {
   relations_nav: typeof relations_nav
   relations_footer_nav_links: typeof relations_footer_nav_links
   relations_footer_nav: typeof relations_footer_nav
+  relations_footer_legal_links: typeof relations_footer_legal_links
   relations_footer: typeof relations_footer
 }
 

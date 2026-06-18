@@ -56,6 +56,25 @@ export const footer: GlobalConfig = {
         update: adminOnlyFieldAccess,
       },
     },
+    {
+      name: "legalLinks",
+      label: "Legal Links",
+      type: "array",
+      fields: [
+        {
+          name: "label",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "url",
+          type: "text",
+          required: true,
+        },
+      ],
+      required: true,
+      minRows: 1,
+    },
   ],
   hooks: {
     afterChange: [revalidateFooterTag],
