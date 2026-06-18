@@ -33,7 +33,7 @@ export async function toggleWishlist({
         productVariant: {
           equals: variantId,
         },
-        customer: {
+        user: {
           equals: currentUserId,
         },
       },
