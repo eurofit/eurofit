@@ -43,7 +43,7 @@ export function MobileProductFiltersDrawer({
         <Button
           variant="outline"
           size="sm"
-          className="gap-1.5 md:hidden"
+          className="flex-1 gap-1.5 md:hidden"
           aria-label="Open product filters"
         >
           <SlidersHorizontal aria-hidden="true" />
@@ -87,7 +87,12 @@ export function MobileProductFiltersDrawer({
 
 export function MobileProductFiltersTriggerSkeleton() {
   return (
-    <Button variant="outline" size="sm" className="gap-1.5 md:hidden" disabled>
+    <Button
+      variant="outline"
+      size="sm"
+      className="flex-1 gap-1.5 md:hidden"
+      disabled
+    >
       <SlidersHorizontal aria-hidden="true" />
       Filters
     </Button>

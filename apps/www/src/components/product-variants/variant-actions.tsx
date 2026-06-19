@@ -26,9 +26,9 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
   const shouldInquirePrice = !variant.isOutOfStock && variant.price === null
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex w-full flex-row items-center justify-between gap-3 md:w-auto md:flex-col md:items-end md:gap-2">
       {variant.price && (
-        <span className="ml-auto text-right text-lg font-bold tabular-nums">
+        <span className="text-lg font-bold tabular-nums">
           <span className="text-muted-foreground">Ksh</span>
           {formatWithCommas(variant.price)}
         </span>

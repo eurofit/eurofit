@@ -50,7 +50,10 @@ export async function SearchProducts({
     <div className="flex flex-col space-y-6">
       <hgroup className="space-y-1">
         <p className="text-sm text-muted-foreground">
-          Showing <span className="text-destructive">{totalProducts}</span>{" "}
+          Showing{" "}
+          <span className="font-medium text-foreground tabular-nums">
+            {totalProducts}
+          </span>{" "}
           {pluralize("result", totalProducts)} for
         </p>
         <h1 className="scroll-m-20 text-2xl font-bold tracking-tight text-balance">
