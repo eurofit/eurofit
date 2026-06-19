@@ -30,7 +30,7 @@ export function QuantityInput({ variant }: QuantityInputProps) {
   } = useCartQuantity({ variant })
 
   return (
-    <div className="relative flex w-full items-center gap-0.5">
+    <div className="relative flex w-fit items-center gap-0.5">
       {isInCart && (
         <Button
           size="icon"

@@ -51,8 +51,8 @@ export function ProductSort({
 
   return (
     <Select defaultValue={defaultValue} onValueChange={handleChange}>
-      <SelectTrigger size="sm" className={cn("w-45", className)}>
-        <SelectValue placeholder="Select a fruit" />
+      <SelectTrigger size="sm" className={cn("w-full md:w-45", className)}>
+        <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
@@ -70,8 +70,9 @@ export function ProductSort({
 
 export function ProductSortFallback({ className }: { className?: string }) {
   return (
-    <div className={className}>
-      <div className="h-9 w-45 animate-pulse rounded-md bg-muted" />
-    </div>
+    <div
+      className={cn("h-9 animate-pulse rounded-md bg-muted", className)}
+      aria-hidden="true"
+    />
   )
 }

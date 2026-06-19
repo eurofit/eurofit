@@ -75,14 +75,10 @@ export async function CategoryProducts({
       <ProductsToolbar
         sortDirection={sortDirection}
         mobileFiltersSlot={mobileFiltersSlot}
+        count={totalProducts}
       />
 
       <div className="space-y-10">
-        <p className="mb-2 flex-1 text-sm text-muted-foreground">
-          <span className="text-destructive">{totalProducts}</span>{" "}
-          {pluralize("Product", totalProducts)} found
-        </p>
-
         <section id="category-products-list" className="grid gap-8 md:gap-10">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} userId={user?.id} />
