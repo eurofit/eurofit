@@ -198,7 +198,6 @@ export const users: CollectionConfig = {
       type: "join",
       collection: "tags",
       on: "users",
-      required: true,
     },
   ],
 }

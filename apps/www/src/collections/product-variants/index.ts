@@ -434,7 +434,6 @@ export const productVariants: CollectionConfig = {
       type: "join",
       collection: "tags",
       on: "productVariants",
-      required: true,
     },
   ],
   hooks: {
