@@ -36,15 +36,16 @@ export function FilterItem({
   }
 
   return (
-    <div className={cn("group flex items-start gap-2", className)} {...props}>
+    <div className={cn("group flex items-start gap-2.5", className)} {...props}>
       <Checkbox
         id={slugify(key + "-" + title)}
         checked={isChecked}
         onCheckedChange={handleCheckedChange}
+        className="mt-0.5"
       />
       <Link
         href={toggleUrl}
-        className="text-sm hover:underline hover:underline-offset-4"
+        className="text-sm leading-snug hover:underline hover:underline-offset-4"
         prefetch={false}
         shallow
         replace

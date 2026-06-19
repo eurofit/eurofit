@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@eurofit/ui/components/button"
+import { XIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 
@@ -28,8 +29,14 @@ export function FilterGroupClearButton({
   }
 
   return (
-    <Button variant="secondary" size="xs" asChild>
+    <Button
+      variant="ghost"
+      size="xs"
+      className="text-muted-foreground hover:text-foreground"
+      asChild
+    >
       <Link href={newUrl} replace shallow>
+        <XIcon aria-hidden="true" />
         Clear
       </Link>
     </Button>
@@ -58,7 +65,12 @@ export function FilterClearButton({ keys }: FilterClearButtonProps) {
   const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`
 
   return (
-    <Button variant="destructive" size="sm" asChild>
+    <Button
+      variant="ghost"
+      size="sm"
+      className="text-muted-foreground hover:text-foreground"
+      asChild
+    >
       <Link href={newUrl} replace shallow>
         Clear all
       </Link>

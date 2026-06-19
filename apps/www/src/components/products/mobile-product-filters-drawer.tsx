@@ -69,7 +69,7 @@ export function MobileProductFiltersDrawer({
           </div>
         </DrawerHeader>
 
-        <ScrollArea className="overflow-y-auto px-4 pb-2">
+        <ScrollArea className="min-h-0 grow overflow-y-auto px-4 pb-2">
           <FilterAccordion filters={filters} />
         </ScrollArea>
 
