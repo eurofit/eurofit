@@ -44,6 +44,11 @@ export const enum_categories_type = pgEnum("enum_categories_type", [
   "product",
   "post",
 ])
+export const enum_tags_type = pgEnum("enum_tags_type", [
+  "product",
+  "product-variant",
+  "user",
+])
 export const enum_orders_payment_status = pgEnum("enum_orders_payment_status", [
   "unpaid",
   "paid",
@@ -879,6 +884,78 @@ export const stock_alerts = pgTable(
   ]
 )
 
+export const tags = pgTable(
+  "tags",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    isActive: boolean("is_active").notNull().default(true),
+    title: varchar("title").notNull(),
+    description: varchar("description"),
+    type: enum_tags_type("type").notNull().default("product"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("tags_updated_at_idx").on(columns.updatedAt),
+    index("tags_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const tags_rels = pgTable(
+  "tags_rels",
+  {
+    id: serial("id").primaryKey(),
+    order: integer("order"),
+    parent: uuid("parent_id").notNull(),
+    path: varchar("path").notNull(),
+    productsID: uuid("products_id"),
+    "product-variantsID": uuid("product_variants_id"),
+    usersID: uuid("users_id"),
+  },
+  (columns) => [
+    index("tags_rels_order_idx").on(columns.order),
+    index("tags_rels_parent_idx").on(columns.parent),
+    index("tags_rels_path_idx").on(columns.path),
+    index("tags_rels_products_id_idx").on(columns.productsID),
+    index("tags_rels_product_variants_id_idx").on(
+      columns["product-variantsID"]
+    ),
+    index("tags_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [tags.id],
+      name: "tags_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["productsID"]],
+      foreignColumns: [products.id],
+      name: "tags_rels_products_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["product-variantsID"]],
+      foreignColumns: [product_variants.id],
+      name: "tags_rels_product_variants_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "tags_rels_users_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
 export const wishlists = pgTable(
   "wishlists",
   {
@@ -1555,6 +1632,7 @@ export const payload_locked_documents_rels = pgTable(
     "product-variantsID": uuid("product_variants_id"),
     "product-reviewsID": uuid("product_reviews_id"),
     "stock-alertsID": uuid("stock_alerts_id"),
+    tagsID: uuid("tags_id"),
     wishlistsID: uuid("wishlists_id"),
     cartsID: uuid("carts_id"),
     ordersID: numeric("orders_id", { mode: "number" }),
@@ -1595,6 +1673,7 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_stock_alerts_id_idx").on(
       columns["stock-alertsID"]
     ),
+    index("payload_locked_documents_rels_tags_id_idx").on(columns.tagsID),
     index("payload_locked_documents_rels_wishlists_id_idx").on(
       columns.wishlistsID
     ),
@@ -1674,6 +1753,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["stock-alertsID"]],
       foreignColumns: [stock_alerts.id],
       name: "payload_locked_documents_rels_stock_alerts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["tagsID"]],
+      foreignColumns: [tags.id],
+      name: "payload_locked_documents_rels_tags_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["wishlistsID"]],
@@ -2200,6 +2284,33 @@ export const relations_stock_alerts = relations(stock_alerts, ({ one }) => ({
     relationName: "productVariant",
   }),
 }))
+export const relations_tags_rels = relations(tags_rels, ({ one }) => ({
+  parent: one(tags, {
+    fields: [tags_rels.parent],
+    references: [tags.id],
+    relationName: "_rels",
+  }),
+  productsID: one(products, {
+    fields: [tags_rels.productsID],
+    references: [products.id],
+    relationName: "products",
+  }),
+  "product-variantsID": one(product_variants, {
+    fields: [tags_rels["product-variantsID"]],
+    references: [product_variants.id],
+    relationName: "product-variants",
+  }),
+  usersID: one(users, {
+    fields: [tags_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
+}))
+export const relations_tags = relations(tags, ({ many }) => ({
+  _rels: many(tags_rels, {
+    relationName: "_rels",
+  }),
+}))
 export const relations_wishlists = relations(wishlists, ({ one }) => ({
   user: one(users, {
     fields: [wishlists.user],
@@ -2517,6 +2628,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [stock_alerts.id],
       relationName: "stock-alerts",
     }),
+    tagsID: one(tags, {
+      fields: [payload_locked_documents_rels.tagsID],
+      references: [tags.id],
+      relationName: "tags",
+    }),
     wishlistsID: one(wishlists, {
       fields: [payload_locked_documents_rels.wishlistsID],
       references: [wishlists.id],
@@ -2661,6 +2777,7 @@ type DatabaseSchema = {
   enum_addresses_title: typeof enum_addresses_title
   enum_pages_blocks_slider_snaps: typeof enum_pages_blocks_slider_snaps
   enum_categories_type: typeof enum_categories_type
+  enum_tags_type: typeof enum_tags_type
   enum_orders_payment_status: typeof enum_orders_payment_status
   enum_order_statuses_status: typeof enum_order_statuses_status
   enum_forms_confirmation_type: typeof enum_forms_confirmation_type
@@ -2689,6 +2806,8 @@ type DatabaseSchema = {
   product_variants_rels: typeof product_variants_rels
   product_reviews: typeof product_reviews
   stock_alerts: typeof stock_alerts
+  tags: typeof tags
+  tags_rels: typeof tags_rels
   wishlists: typeof wishlists
   carts_items: typeof carts_items
   carts: typeof carts
@@ -2749,6 +2868,8 @@ type DatabaseSchema = {
   relations_product_variants: typeof relations_product_variants
   relations_product_reviews: typeof relations_product_reviews
   relations_stock_alerts: typeof relations_stock_alerts
+  relations_tags_rels: typeof relations_tags_rels
+  relations_tags: typeof relations_tags
   relations_wishlists: typeof relations_wishlists
   relations_carts_items: typeof relations_carts_items
   relations_carts: typeof relations_carts

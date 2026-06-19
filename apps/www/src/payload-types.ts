@@ -84,6 +84,7 @@ export interface Config {
     'product-variants': ProductVariant;
     'product-reviews': ProductReview;
     'stock-alerts': StockAlert;
+    tags: Tag;
     wishlists: Wishlist;
     carts: Cart;
     orders: Order;
@@ -99,12 +100,17 @@ export interface Config {
   collectionsJoins: {
     users: {
       addresses: 'addresses';
+      tags: 'tags';
     };
     brands: {
       products: 'products';
     };
     products: {
       productVariants: 'product-variants';
+      tags: 'tags';
+    };
+    'product-variants': {
+      tags: 'tags';
     };
     orders: {
       transactions: 'transactions';
@@ -123,6 +129,7 @@ export interface Config {
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     'product-reviews': ProductReviewsSelect<false> | ProductReviewsSelect<true>;
     'stock-alerts': StockAlertsSelect<false> | StockAlertsSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
     wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -296,6 +303,11 @@ export interface Product {
   categories?: (string | Category)[] | null;
   productVariants: {
     docs?: (string | ProductVariant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  tags: {
+    docs?: (string | Tag)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -496,6 +508,11 @@ export interface ProductVariant {
    * Indicates if the product is back-orderable. Managed programmatically.
    */
   isPreorder: boolean;
+  tags: {
+    docs?: (string | Tag)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -509,56 +526,19 @@ export interface ProductVariant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FAQBlock".
+ * via the `definition` "tags".
  */
-export interface FAQBlock {
-  faqs: {
-    question: string;
-    answer: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    id?: string | null;
-  }[];
-  center: boolean;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "RichTextBlock".
- */
-export interface RichTextBlock {
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'richText';
+export interface Tag {
+  id: string;
+  isActive: boolean;
+  title: string;
+  description?: string | null;
+  type: 'product' | 'product-variant' | 'user';
+  products?: (string | Product)[] | null;
+  productVariants?: (string | ProductVariant)[] | null;
+  users?: (string | User)[] | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -581,6 +561,11 @@ export interface User {
   fullName?: string | null;
   addresses?: {
     docs?: (string | Address)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  tags: {
+    docs?: (string | Tag)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -667,6 +652,59 @@ export interface Address {
   isDefault: boolean;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  faqs: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    id?: string | null;
+  }[];
+  center: boolean;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richText';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1181,6 +1219,10 @@ export interface PayloadLockedDocument {
         value: string | StockAlert;
       } | null)
     | ({
+        relationTo: 'tags';
+        value: string | Tag;
+      } | null)
+    | ({
         relationTo: 'wishlists';
         value: string | Wishlist;
       } | null)
@@ -1263,6 +1305,7 @@ export interface UsersSelect<T extends boolean = true> {
   paystackCustomerCode?: T;
   fullName?: T;
   addresses?: T;
+  tags?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1434,6 +1477,7 @@ export interface ProductsSelect<T extends boolean = true> {
   supplierUrl?: T;
   categories?: T;
   productVariants?: T;
+  tags?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1475,6 +1519,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   isLowStock?: T;
   isOutOfStock?: T;
   isPreorder?: T;
+  tags?: T;
   meta?:
     | T
     | {
@@ -1505,6 +1550,21 @@ export interface ProductReviewsSelect<T extends boolean = true> {
 export interface StockAlertsSelect<T extends boolean = true> {
   user?: T;
   productVariant?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  isActive?: T;
+  title?: T;
+  description?: T;
+  type?: T;
+  products?: T;
+  productVariants?: T;
+  users?: T;
   updatedAt?: T;
   createdAt?: T;
 }

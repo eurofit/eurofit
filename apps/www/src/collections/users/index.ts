@@ -193,5 +193,12 @@ export const users: CollectionConfig = {
       },
       saveToJWT: true,
     },
+    {
+      name: "tags",
+      type: "join",
+      collection: "tags",
+      on: "users",
+      required: true,
+    },
   ],
 }

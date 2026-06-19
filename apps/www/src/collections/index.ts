@@ -12,6 +12,7 @@ import { productVariants } from "./product-variants"
 import { products } from "./products"
 import { serviceAreas } from "./service-areas"
 import { stockAlerts } from "./stock-alerts"
+import { tags } from "./tags"
 import { transactions } from "./transactions"
 import { users } from "./users"
 import { wishlists } from "./wishlists"
@@ -29,6 +30,7 @@ export const collections = [
   productVariants,
   productReviews,
   stockAlerts,
+  tags,
   wishlists,
   carts,
   orders,
