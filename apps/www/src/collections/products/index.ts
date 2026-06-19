@@ -147,7 +147,6 @@ export const products: CollectionConfig = {
       type: "join",
       collection: "tags",
       on: "products",
-      required: true,
     },
   ],
   hooks: {

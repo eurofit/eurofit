@@ -306,7 +306,7 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  tags: {
+  tags?: {
     docs?: (string | Tag)[];
     hasNextPage?: boolean;
     totalDocs?: number;
@@ -508,7 +508,7 @@ export interface ProductVariant {
    * Indicates if the product is back-orderable. Managed programmatically.
    */
   isPreorder: boolean;
-  tags: {
+  tags?: {
     docs?: (string | Tag)[];
     hasNextPage?: boolean;
     totalDocs?: number;
@@ -564,7 +564,7 @@ export interface User {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  tags: {
+  tags?: {
     docs?: (string | Tag)[];
     hasNextPage?: boolean;
     totalDocs?: number;
