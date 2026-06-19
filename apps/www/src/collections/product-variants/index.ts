@@ -429,6 +429,13 @@ export const productVariants: CollectionConfig = {
         afterRead: [checkIfPreorder],
       },
     },
+    {
+      name: "tags",
+      type: "join",
+      collection: "tags",
+      on: "productVariants",
+      required: true,
+    },
   ],
   hooks: {
     afterChange: [revalidateProductVariantTag],

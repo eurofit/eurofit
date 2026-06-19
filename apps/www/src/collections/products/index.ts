@@ -142,6 +142,13 @@ export const products: CollectionConfig = {
       },
       required: true,
     },
+    {
+      name: "tags",
+      type: "join",
+      collection: "tags",
+      on: "products",
+      required: true,
+    },
   ],
   hooks: {
     afterChange: [revalidateProductTag],
