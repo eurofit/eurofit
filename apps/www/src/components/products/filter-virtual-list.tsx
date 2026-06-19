@@ -18,13 +18,13 @@ export function FilterVirtualList({ items, queryKey }: FilterVirtualListProps) {
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 28,
+    estimateSize: () => 32,
     overscan: 5,
   })
 
   if (items.length <= VIRTUALIZE_THRESHOLD) {
     return (
-      <div className="space-y-2 pr-2">
+      <div className="space-y-2.5 pr-1">
         {items.map((item) => (
           <FilterItem key={item.slug} queryKey={queryKey} item={item} />
         ))}
@@ -33,7 +33,7 @@ export function FilterVirtualList({ items, queryKey }: FilterVirtualListProps) {
   }
 
   return (
-    <div ref={scrollRef} className="h-72 overflow-auto overscroll-contain pr-2">
+    <div ref={scrollRef} className="h-72 overflow-auto overscroll-contain pr-1">
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,

@@ -17,21 +17,20 @@ export function FilterAccordion({ filters }: FilterAccordionProps) {
     <Accordion
       type="multiple"
       defaultValue={filters[0] ? [filters[0].key] : []}
-      className="md:gap-1.5"
     >
       {filters.map(({ key, title, items }) => {
         return (
-          <AccordionItem key={key} value={key} className="md:border-b-0">
-            <AccordionTrigger className="md:rounded-lg md:bg-muted md:px-3 md:hover:bg-muted/80 md:hover:no-underline">
+          <AccordionItem key={key} value={key}>
+            <AccordionTrigger className="hover:no-underline">
               <span className="flex items-center gap-2">
                 <span className="capitalize">{title}</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground tabular-nums">
                   ({items.length})
                 </span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pr-4 [&_a]:no-underline">
-              <div className="mb-3 flex justify-end">
+            <AccordionContent className="[&_a]:no-underline">
+              <div className="-mt-1 mb-1.5 flex justify-end empty:hidden">
                 <FilterGroupClearButton queryKey={key} />
               </div>
               <FilterVirtualList items={items} queryKey={key} />
