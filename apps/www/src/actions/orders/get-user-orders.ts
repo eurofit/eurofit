@@ -22,7 +22,7 @@ export async function getUserOrders(args: Args): Promise<Order[]> {
     const { docs } = await payload.find({
       collection: "orders",
       where: {
-        customer: { equals: parsed.data.userId },
+        user: { equals: parsed.data.userId },
       },
       select: {
         items: true,
