@@ -1,7 +1,9 @@
+import { CountdownTimer } from "@/components/countdown-timer/countdown-timer"
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
 import { Separator } from "@eurofit/ui/components/separator"
@@ -9,6 +11,7 @@ import { Flame, ShieldCheck, Star } from "lucide-react"
 import Link from "next/link"
 import pluralize from "pluralize-esm"
 import { ProductDetailCartActions } from "./product-detail-cart-actions"
+import { VariantPrice } from "./variant-price"
 import { WishlistButton } from "./wishlist-button"
 
 interface ProductInfoProps {
@@ -21,6 +24,7 @@ interface ProductInfoProps {
     slug: string
   } | null
   price?: number | null
+  discount: VariantDiscount | null
   inStock: boolean
   isPreorder: boolean
   stock: number
@@ -37,6 +41,7 @@ export function ProductInfo({
   title,
   brand,
   price,
+  discount,
   inStock,
   isPreorder,
   stock,
@@ -123,9 +128,12 @@ export function ProductInfo({
 
       {/* Pricing Section */}
       {price != null && (
-        <p className="text-3xl font-bold text-foreground tabular-nums">
-          Ksh {formatWithCommas(price)}
-        </p>
+        <div className="space-y-3">
+          <VariantPrice price={price} discount={discount} size="lg" />
+          {discount?.endDate && (
+            <CountdownTimer endDate={discount.endDate} variant="boxed" />
+          )}
+        </div>
       )}
 
       {/* Variation Selector */}

@@ -24,6 +24,7 @@ export const invoiceSchema = z.object({
       .extend({ quantity: z.number() })
   ),
   subtotal: z.number(),
+  discountTotal: z.number().nullable().optional(),
   deliveryFee: z.number().nullable().optional(),
   tax: z.number().nullable().optional(),
   total: z.number().nullable().optional(),

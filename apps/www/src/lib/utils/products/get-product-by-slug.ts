@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import { Media } from "@/payload-types"
 import config from "@payload-config"
@@ -57,6 +58,7 @@ export async function getProductBySlug(slug: string) {
         stock: true,
         supplierStock: true,
         retailPrice: true,
+        discount: true,
         isPreorder: true,
         isLowStock: true,
         isOutOfStock: true,
@@ -94,12 +96,14 @@ export async function getProductBySlug(slug: string) {
     productVariants: (product.productVariants.docs ?? [])
       .filter((variant) => typeof variant === "object")
       .map((variant) => {
-        const { supplierStock, retailPrice, stock, ...variantRest } = variant
+        const { supplierStock, retailPrice, stock, discount, ...variantRest } =
+          variant
 
         return {
           ...variantRest,
           stock: resolveAvailableStock(stock, supplierStock),
           price: retailPrice ?? null,
+          discount: normalizeVariantDiscount(discount),
         }
       }),
   }

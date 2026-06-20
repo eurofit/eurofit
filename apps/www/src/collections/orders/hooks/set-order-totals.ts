@@ -32,15 +32,23 @@ export const setOrderTotals: CollectionBeforeChangeHook<Order> = async ({
 
   const items = z.array(orderItem).parse(formattedItems)
 
+  // subtotal is the pre-discount sum; the discount total is the savings across all
+  // lines. The effective unit price falls back to the original when no discount applies.
   const subtotal = items.reduce(
     (acc, item) => acc + item.snapshot.price * item.quantity,
     0
   )
 
+  const discountTotal = items.reduce((acc, item) => {
+    const effectivePrice = item.snapshot.discount?.price ?? item.snapshot.price
+    return acc + (item.snapshot.price - effectivePrice) * item.quantity
+  }, 0)
+
   return {
     ...data,
     subtotal,
+    discountTotal,
     deliveryFee: DELIVERY_FEE,
-    total: subtotal + DELIVERY_FEE,
+    total: subtotal - discountTotal + DELIVERY_FEE,
   }
 }

@@ -31,6 +31,7 @@ export type OrderConfirmationProps = {
     items: Item[]
     total: number
     subtotal: number
+    discountTotal: number
     deliveryFee: number
   }
   orderUrl: string
@@ -243,6 +244,19 @@ export default function OrderConfirmation({
                     </Text>
                   </Column>
                 </Row>
+
+                {order.discountTotal > 0 && (
+                  <Row className="mt-1">
+                    <Column>
+                      <Text className="mt-0 py-0">Discount</Text>
+                    </Column>
+                    <Column align="right">
+                      <Text className="mt-0 py-0 text-green-600">
+                        − Ksh {order.discountTotal.toLocaleString()}
+                      </Text>
+                    </Column>
+                  </Row>
+                )}
 
                 <Row className="mt-1">
                   <Column>
@@ -512,8 +526,9 @@ OrderConfirmation.PreviewProps = {
         variant: "10x68g / White Chocolate Salted Caramel & Peanut",
       },
     ],
-    total: 52412,
+    total: 49412,
     subtotal: 52012,
+    discountTotal: 3000,
     deliveryFee: 400,
   },
 }

@@ -497,6 +497,44 @@ export function InvoiceDoc({
                 </Text>
               </View>
             </View>
+            {invoice.discountTotal ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  borderBottom: "1px solid black",
+                }}
+              >
+                <View
+                  style={{
+                    padding: 4,
+                    textAlign: "right",
+                    textTransform: "uppercase",
+                    justifyContent: "flex-end",
+                    width: "50%",
+                    borderRight: "1px solid black",
+                  }}
+                >
+                  <Text>Discount</Text>
+                </View>
+                <View
+                  style={{
+                    alignItems: "flex-end",
+                    justifyContent: "center",
+                    padding: 4,
+                    textAlign: "right",
+                    width: "50%",
+                  }}
+                >
+                  <Text>
+                    <Text style={{ fontSize: 9, textTransform: "none" }}>
+                      KSh
+                    </Text>
+                    &nbsp;−{formatWithCommas(invoice.discountTotal)}
+                  </Text>
+                </View>
+              </View>
+            ) : null}
             <View
               style={{
                 flexDirection: "row",

@@ -90,6 +90,7 @@ export interface Config {
     orders: Order;
     'order-statuses': OrderStatus;
     transactions: Transaction;
+    discounts: Discount;
     forms: Form;
     'form-submissions': FormSubmission;
     'payload-kv': PayloadKv;
@@ -135,6 +136,7 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     'order-statuses': OrderStatusesSelect<false> | OrderStatusesSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    discounts: DiscountsSelect<false> | DiscountsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -508,6 +510,15 @@ export interface ProductVariant {
    * Indicates if the product is back-orderable. Managed programmatically.
    */
   isPreorder: boolean;
+  /**
+   * Best active automatic discount for this variant. Computed on read.
+   */
+  discount?: {
+    price?: number | null;
+    type?: ('percentage' | 'fixed') | null;
+    amount?: number | null;
+    endDate?: string | null;
+  };
   tags?: {
     docs?: (string | Tag)[];
     hasNextPage?: boolean;
@@ -887,6 +898,10 @@ export interface Order {
     id?: string | null;
   }[];
   subtotal?: number | null;
+  /**
+   * Total savings applied across all line items.
+   */
+  discountTotal?: number | null;
   deliveryFee?: number | null;
   total?: number | null;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
@@ -952,6 +967,73 @@ export interface OrderStatus {
   staff: string | User;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   visibleToCustomer: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discounts".
+ */
+export interface Discount {
+  id: string;
+  isActive: boolean;
+  /**
+   * Internal name for this discount.
+   */
+  title: string;
+  /**
+   * Internal notes.
+   */
+  description?: string | null;
+  /**
+   * What this discount applies to.
+   */
+  discountTarget: 'product' | 'free_shipping';
+  discountMethod: 'code' | 'automatic';
+  /**
+   * Customers must enter this code at checkout.
+   */
+  code?: string | null;
+  /**
+   * Customers will see this in their cart and at checkout.
+   */
+  label?: string | null;
+  /**
+   * Discount specific products or collections of products.
+   */
+  productDiscountType?: ('amount_off' | 'buy_x_get_y') | null;
+  valueType?: ('percentage' | 'fixed') | null;
+  discountAmount?: number | null;
+  appliesTo?: 'products' | null;
+  eligibleVariants?: (string | ProductVariant)[] | null;
+  buyQuantity?: number | null;
+  buyVariants?: (string | ProductVariant)[] | null;
+  getQuantity?: number | null;
+  /**
+   * Customers must add the quantity of items specified below to their cart.
+   */
+  getVariants?: (string | ProductVariant)[] | null;
+  getDiscountType?: ('percentage' | 'amount_off_each' | 'free') | null;
+  getDiscountAmount?: number | null;
+  /**
+   * Leave empty to apply to all service areas.
+   */
+  applicableAreas?: (string | ServiceArea)[] | null;
+  hasShippingRateLimit?: boolean | null;
+  maxShippingRate?: number | null;
+  eligibility: 'all' | 'tags' | 'customers';
+  eligibleTags?: (string | Tag)[] | null;
+  eligibleCustomers?: (string | User)[] | null;
+  startDate: string;
+  shouldSetEndDate?: boolean | null;
+  /**
+   * When absent, the discount runs indefinitely.
+   */
+  endDate?: string | null;
+  /**
+   * The admin who created this discount.
+   */
+  staff: string | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1243,6 +1325,10 @@ export interface PayloadLockedDocument {
         value: string | Transaction;
       } | null)
     | ({
+        relationTo: 'discounts';
+        value: string | Discount;
+      } | null)
+    | ({
         relationTo: 'forms';
         value: string | Form;
       } | null)
@@ -1519,6 +1605,14 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   isLowStock?: T;
   isOutOfStock?: T;
   isPreorder?: T;
+  discount?:
+    | T
+    | {
+        price?: T;
+        type?: T;
+        amount?: T;
+        endDate?: T;
+      };
   tags?: T;
   meta?:
     | T
@@ -1621,6 +1715,7 @@ export interface OrdersSelect<T extends boolean = true> {
         id?: T;
       };
   subtotal?: T;
+  discountTotal?: T;
   deliveryFee?: T;
   total?: T;
   status?: T;
@@ -1655,6 +1750,42 @@ export interface TransactionsSelect<T extends boolean = true> {
   isTest?: T;
   paidAt?: T;
   snapshot?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discounts_select".
+ */
+export interface DiscountsSelect<T extends boolean = true> {
+  isActive?: T;
+  title?: T;
+  description?: T;
+  discountTarget?: T;
+  discountMethod?: T;
+  code?: T;
+  label?: T;
+  productDiscountType?: T;
+  valueType?: T;
+  discountAmount?: T;
+  appliesTo?: T;
+  eligibleVariants?: T;
+  buyQuantity?: T;
+  buyVariants?: T;
+  getQuantity?: T;
+  getVariants?: T;
+  getDiscountType?: T;
+  getDiscountAmount?: T;
+  applicableAreas?: T;
+  hasShippingRateLimit?: T;
+  maxShippingRate?: T;
+  eligibility?: T;
+  eligibleTags?: T;
+  eligibleCustomers?: T;
+  startDate?: T;
+  shouldSetEndDate?: T;
+  endDate?: T;
+  staff?: T;
   updatedAt?: T;
   createdAt?: T;
 }

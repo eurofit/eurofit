@@ -94,6 +94,7 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
       })),
       total: order.total!,
       subtotal: order.subtotal!,
+      discountTotal: order.discountTotal ?? 0,
       deliveryFee: order.deliveryFee!,
     },
   }

@@ -1,5 +1,6 @@
 "use client"
 
+import { CountdownTimer } from "@/components/countdown-timer/countdown-timer"
 import { VariantActions } from "@/components/product-variants/variant-actions"
 import { VariantStockStatus } from "@/components/product-variants/variant-stock-status"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
@@ -55,8 +56,14 @@ export function ProductVariantCard({
           )}
         </div>
 
-        <div className="!mt-2 flex items-center">
+        <div className="!mt-2 flex flex-wrap items-center gap-2">
           <VariantStockStatus variant={variant} />
+          {variant.discount?.endDate && (
+            <CountdownTimer
+              endDate={variant.discount.endDate}
+              variant="inline"
+            />
+          )}
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { site } from "@/const/site"
 import { env } from "@/env.mjs"
+import type { OrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
 import { paystack } from "@/lib/paystack"
 import { addressWithIdSchema } from "@/lib/schemas/addresses/address"
 import { orderSchema } from "@/lib/schemas/orders/order"
@@ -117,6 +118,21 @@ export async function checkout(
 
     const amount = order.total * 100
 
+    // Build the gateway snapshot from the server-priced order items so the metadata
+    // records exactly what was charged (original + discounted unit price).
+    const metadataItems = order.items.map((item) => {
+      const snapshot = item.snapshot as OrderItemSnapshot
+      return {
+        id:
+          typeof item.productVariant === "string"
+            ? item.productVariant
+            : item.productVariant.id,
+        quantity: item.quantity,
+        price: snapshot.price,
+        discountedPrice: snapshot.discount?.price ?? snapshot.price,
+      }
+    })
+
     const res = await paystack.transaction.initialize({
       reference: order.id.toString(),
       email: user.email,
@@ -126,8 +142,30 @@ export async function checkout(
       metadata: {
         cancel_action: site.url + "/checkout",
         order_id: order.id.toString(),
+        custom_fields: [
+          {
+            display_name: "Subtotal",
+            variable_name: "subtotal",
+            value: `KES ${order.subtotal ?? 0}`,
+          },
+          {
+            display_name: "Discount",
+            variable_name: "discount",
+            value: `KES ${order.discountTotal ?? 0}`,
+          },
+          {
+            display_name: "Delivery Fee",
+            variable_name: "delivery_fee",
+            value: `KES ${order.deliveryFee ?? 0}`,
+          },
+          {
+            display_name: "Total",
+            variable_name: "total",
+            value: `KES ${order.total}`,
+          },
+        ],
         snapshot: {
-          items,
+          items: metadataItems,
           user: {
             id: user.id,
             fullName: user.fullName,
