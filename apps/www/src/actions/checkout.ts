@@ -29,15 +29,22 @@ export async function checkout(
   unSafCheckoutData: CheckoutArgs,
   turnstileToken: string
 ): Promise<ActionResult<{ authorization_url: string }>> {
+  console.log("[checkout] start", { turnstileToken: Boolean(turnstileToken) })
+
   const isTurnstileValid = await verifyTurnstile(
     turnstileToken,
     env.CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY
   )
+  console.log("[checkout] turnstile result", { isTurnstileValid })
   if (!isTurnstileValid) {
     return { success: false, code: 400, message: "CAPTCHA validation failed." }
   }
 
   const { items, addressId } = checkoutSchema.parse(unSafCheckoutData)
+  console.log("[checkout] parsed input", {
+    itemsCount: items.length,
+    addressId,
+  })
 
   const orderItems: Order["items"] = items.map(({ id, ...item }) => ({
     productVariant: id,
@@ -48,6 +55,7 @@ export async function checkout(
     getPayload({ config }),
     getCurrentUser(),
   ])
+  console.log("[checkout] resolved user", { userId: user?.id })
 
   if (!user) {
     return {
@@ -71,6 +79,7 @@ export async function checkout(
   })
 
   const address = addresses[0]
+  console.log("[checkout] address lookup", { found: Boolean(address) })
 
   if (!address) {
     return {
@@ -106,6 +115,13 @@ export async function checkout(
       draft: false,
       overrideAccess: true,
     })
+    console.log("[checkout] order created", {
+      id: order.id,
+      subtotal: order.subtotal,
+      discountTotal: order.discountTotal,
+      deliveryFee: order.deliveryFee,
+      total: order.total,
+    })
 
     // check order total amount
     if (!order.total) {
@@ -117,6 +133,7 @@ export async function checkout(
     }
 
     const amount = order.total * 100
+    console.log("[checkout] charge amount", { amount })
 
     // Build the gateway snapshot from the server-priced order items so the metadata
     // records exactly what was charged (original + discounted unit price).
@@ -133,48 +150,75 @@ export async function checkout(
       }
     })
 
-    const res = await paystack.transaction.initialize({
+    console.log("[checkout] initializing paystack", {
       reference: order.id.toString(),
       email: user.email,
       amount: amount.toString(),
       currency: "KES",
       callback_url: `${site.url}/thank-you/${order.id}`,
-      metadata: {
-        cancel_action: site.url + "/checkout",
-        order_id: order.id.toString(),
-        custom_fields: [
-          {
-            display_name: "Subtotal",
-            variable_name: "subtotal",
-            value: `KES ${order.subtotal ?? 0}`,
-          },
-          {
-            display_name: "Discount",
-            variable_name: "discount",
-            value: `KES ${order.discountTotal ?? 0}`,
-          },
-          {
-            display_name: "Delivery Fee",
-            variable_name: "delivery_fee",
-            value: `KES ${order.deliveryFee ?? 0}`,
-          },
-          {
-            display_name: "Total",
-            variable_name: "total",
-            value: `KES ${order.total}`,
-          },
-        ],
-        snapshot: {
-          items: metadataItems,
-          user: {
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-          },
-          address: addressWithIdSchema.parse(address),
-        },
-      },
+      metadataItems,
     })
+
+    let res
+    try {
+      res = await paystack.transaction.initialize({
+        reference: order.id.toString(),
+        email: user.email,
+        amount: amount.toString(),
+        currency: "KES",
+        callback_url: `${site.url}/thank-you/${order.id}`,
+        metadata: {
+          cancel_action: site.url + "/checkout",
+          order_id: order.id.toString(),
+          custom_fields: [
+            {
+              display_name: "Subtotal",
+              variable_name: "subtotal",
+              value: `KES ${order.subtotal ?? 0}`,
+            },
+            {
+              display_name: "Discount",
+              variable_name: "discount",
+              value: `KES ${order.discountTotal ?? 0}`,
+            },
+            {
+              display_name: "Delivery Fee",
+              variable_name: "delivery_fee",
+              value: `KES ${order.deliveryFee ?? 0}`,
+            },
+            {
+              display_name: "Total",
+              variable_name: "total",
+              value: `KES ${order.total}`,
+            },
+          ],
+          snapshot: {
+            items: metadataItems,
+            user: {
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+            },
+            address: addressWithIdSchema.parse(address),
+          },
+        },
+      })
+    } catch (error) {
+      // The Paystack SDK uses axios with default behaviour (throws on any non-2xx)
+      // and no error interceptor, so a rejected request lands here instead of
+      // resolving to a { data: null } response. Surface the real reason to the
+      // server log only and return a clean message to the client.
+      const paystackError =
+        (error as { response?: { data?: unknown } })?.response?.data ?? error
+      console.error("[checkout] Paystack initialize failed:", paystackError)
+      return {
+        success: false,
+        code: 502,
+        message: "Payment gateway is unavailable. Please try again.",
+      }
+    }
+
+    console.log("[checkout] paystack response", res)
 
     if ("data" in res && res.data === null) {
       return {
@@ -197,11 +241,16 @@ export async function checkout(
       })
     })
 
+    console.log("[checkout] success, redirecting", {
+      authorization_url: res.data.authorization_url,
+    })
+
     return {
       success: true,
       data: { authorization_url: res.data.authorization_url },
     }
-  } catch {
+  } catch (error) {
+    console.error("[checkout] Unexpected error:", error)
     return {
       success: false,
       code: 500,
