@@ -1,21 +1,12 @@
 "use client"
 
 import { createAddress as createAddressAction } from "@/actions/addresses/create-address"
-import { CITIES } from "@/const/cities"
 import { titles } from "@/const/titles"
 import { env } from "@/env.mjs"
 import { Address, addressSchema } from "@/lib/schemas/addresses/address"
 import { unwrapActionResult } from "@/lib/utils/unwrap-action-result"
 import { Button } from "@eurofit/ui/components/button"
 import { Checkbox } from "@eurofit/ui/components/checkbox"
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@eurofit/ui/components/combobox"
 import {
   Field,
   FieldDescription,
@@ -43,6 +34,7 @@ import { useMutation } from "@tanstack/react-query"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { CityCommand } from "./city-command"
 import { stepper } from "./stepper/steps"
 
 const { useStepper } = stepper
@@ -364,26 +356,13 @@ export function CreateAddressForm({
                     <FieldLabel htmlFor="create-city-combobox">
                       City / Town
                     </FieldLabel>
-                    <Combobox value={value} onValueChange={onChange}>
-                      <ComboboxInput
-                        id="create-city-combobox"
-                        aria-invalid={fieldState.invalid}
-                        onBlur={onBlur}
-                        showTrigger
-                        showClear
-                        placeholder="Search city or town..."
-                      />
-                      <ComboboxContent>
-                        <ComboboxList>
-                          {CITIES.map((city) => (
-                            <ComboboxItem key={city} value={city}>
-                              {city}
-                            </ComboboxItem>
-                          ))}
-                          <ComboboxEmpty>No city found.</ComboboxEmpty>
-                        </ComboboxList>
-                      </ComboboxContent>
-                    </Combobox>
+                    <CityCommand
+                      id="create-city-combobox"
+                      value={value}
+                      onValueChange={onChange}
+                      onBlur={onBlur}
+                      aria-invalid={fieldState.invalid}
+                    />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
