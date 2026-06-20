@@ -103,7 +103,7 @@ export function CountdownTimer({
               <span className="text-lg font-bold text-foreground tabular-nums">
                 {pad(segment.value)}
               </span>
-              <span className="text-destructive-foreground text-[10px] font-medium tracking-wide uppercase">
+              <span className="text-[10px] font-medium tracking-wide text-white uppercase">
                 {segment.label}
               </span>
             </div>
