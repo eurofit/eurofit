@@ -19,7 +19,7 @@ export function orderToInvoice(order: Order): Invoice | null {
   }))
 
   // Legacy orders predate the stored subtotal/discount fields, so fall back to
-  // recomputing the pre-discount sum from the line snapshots when it's missing.
+  // recomputing both from line snapshots when the stored values are missing.
   const subtotal =
     order.subtotal ??
     order.items.reduce((acc, { snapshot, quantity }) => {
@@ -33,6 +33,29 @@ export function orderToInvoice(order: Order): Invoice | null {
       return acc + price * quantity
     }, 0)
 
+  const discountTotal =
+    order.discountTotal ??
+    order.items.reduce((acc, { snapshot, quantity }) => {
+      if (
+        typeof snapshot !== "object" ||
+        snapshot === null ||
+        Array.isArray(snapshot)
+      )
+        return acc
+      const snap = snapshot as Record<string, unknown>
+      const originalPrice =
+        typeof snap["price"] === "number" ? snap["price"] : 0
+      const discountObj =
+        typeof snap["discount"] === "object" && snap["discount"] !== null
+          ? (snap["discount"] as Record<string, unknown>)
+          : null
+      const effectivePrice =
+        discountObj !== null && typeof discountObj["price"] === "number"
+          ? discountObj["price"]
+          : originalPrice
+      return acc + (originalPrice - effectivePrice) * quantity
+    }, 0)
+
   const formattedOrder = {
     id: order.id.toString(),
     fao: order.user.fullName ?? order.user.firstName,
@@ -43,7 +66,7 @@ export function orderToInvoice(order: Order): Invoice | null {
     items,
     total: order.total,
     subtotal,
-    discountTotal: order.discountTotal,
+    discountTotal,
     deliveryFee: order.deliveryFee,
     tax: 0.0,
   }
