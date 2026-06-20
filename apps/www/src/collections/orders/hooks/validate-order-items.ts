@@ -1,4 +1,5 @@
 import { buildOrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import { Order, Product } from "@/payload-types"
 import { APIError, CollectionBeforeChangeHook } from "payload"
@@ -38,6 +39,7 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
       variant: true,
       expiryDate: true,
       retailPrice: true,
+      discount: true,
       stock: true,
       supplierStock: true,
       isOutOfStock: true,
@@ -105,6 +107,7 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
       variant: productVariant.variant,
       expiryDate: productVariant.expiryDate,
       retailPrice: productVariant.retailPrice,
+      discount: normalizeVariantDiscount(productVariant.discount),
       product: productVariant.product as Product,
     })
 

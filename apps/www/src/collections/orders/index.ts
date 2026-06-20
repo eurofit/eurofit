@@ -101,6 +101,19 @@ export const orders: CollectionConfig = {
       },
     },
     {
+      name: "discountTotal",
+      type: "number",
+      defaultValue: 0,
+      admin: {
+        readOnly: true,
+        description: "Total savings applied across all line items.",
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
       name: "deliveryFee",
       type: "number",
       defaultValue: 0,
