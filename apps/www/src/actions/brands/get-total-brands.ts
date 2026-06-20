@@ -1,3 +1,4 @@
+import { captureError } from "@/lib/observability/capture-error"
 import { ActionResult } from "@/types/action-result"
 import payloadConfig from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
@@ -18,7 +19,8 @@ export async function getTotalBrands(): Promise<
     })
 
     return { success: true, data: { total } }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "brands.total" })
     return { success: false, code: 500, message: "Failed to count brands." }
   }
 }

@@ -1,5 +1,6 @@
 "use server"
 
+import { captureError } from "@/lib/observability/capture-error"
 import { ActionResult } from "@/types/action-result"
 import { Category } from "@/types/categories"
 import payloadConfig from "@payload-config"
@@ -101,7 +102,8 @@ export async function getCategories(
         page: responsePage,
       },
     }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "categories.get" })
     return { success: false, code: 500, message: "Failed to load categories." }
   }
 }

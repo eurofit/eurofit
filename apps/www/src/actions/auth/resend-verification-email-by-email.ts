@@ -2,6 +2,7 @@
 
 import { site } from "@/const/site"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import {
   ResendVerificationData,
   resendVerificationSchema,
@@ -82,7 +83,8 @@ export async function resendVerificationEmailByEmail(
     })
 
     return { success: true, data: { status: "sent" } }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "auth.resend-verification" })
     return {
       success: false,
       code: 500,

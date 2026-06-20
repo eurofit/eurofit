@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
 import { mergeCart } from "@/lib/utils/cart/merge-cart"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
@@ -86,6 +87,9 @@ export async function login(
       } satisfies ActionResult
     }
 
+    // Only unexpected errors reach here — the typed auth failures above are
+    // normal user flows and must not be captured.
+    captureError(error, { scope: "auth.login" })
     return {
       success: false,
       code: 500,

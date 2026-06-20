@@ -1,6 +1,7 @@
 import { site } from "@/const/site"
 import { APP_TIME_ZONE } from "@/const/time"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
 import { getInvoiceBuffer } from "@/lib/utils/invoice/getInvoiceBuffer"
@@ -123,8 +124,13 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
       ].filter(Boolean),
     })
   } catch (error) {
-    // TODO: implement error tracking service (see TODOS.md)
-    console.error("[order-confirmation-email] sendEmail failed:", error)
+    // The order is already paid; a failed confirmation email must not roll it
+    // back, but it has to be visible so it can be resent (TODOS H-03).
+    captureError(error, {
+      scope: "order-confirmation-email",
+      tags: { order_id: order.id },
+      user: { id: orderUser.id, email: orderUser.email },
+    })
   }
 
   return transaction

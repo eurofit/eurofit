@@ -1,3 +1,4 @@
+import { logger } from "@/lib/observability/capture-error"
 import config from "@payload-config"
 import { getPayload } from "payload"
 
@@ -18,9 +19,9 @@ export async function clearUserCart(userId: string) {
       id: carts[0].id,
       overrideAccess: true,
     })
-    console.log("[clear-cart] deleted cart for user:", userId)
+    logger.info(logger.fmt`[clear-cart] deleted cart for user ${userId}`)
     return
   }
 
-  console.log("[clear-cart] no cart found for user:", userId)
+  logger.info(logger.fmt`[clear-cart] no cart found for user ${userId}`)
 }

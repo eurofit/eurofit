@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import { ContactData, contactSchema } from "@/lib/schemas/contact/contact"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { ActionResult } from "@/types/action-result"
@@ -66,7 +67,7 @@ export async function submitContactForm(
 
     return { success: true, data: { ok: true } }
   } catch (e) {
-    console.error(e)
+    captureError(e, { scope: "contact" })
     return {
       success: false,
       code: 500,

@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { site } from "@/const/site"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import type { OrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
 import { paystack } from "@/lib/paystack"
 import { addressWithIdSchema } from "@/lib/schemas/addresses/address"
@@ -11,6 +12,7 @@ import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { Order } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
+import * as Sentry from "@sentry/nextjs"
 import { after } from "next/server"
 import { getPayload } from "payload"
 import * as z from "zod"
@@ -26,6 +28,15 @@ const checkoutSchema = orderSchema
 type CheckoutArgs = z.infer<typeof checkoutSchema>
 
 export async function checkout(
+  unSafCheckoutData: CheckoutArgs,
+  turnstileToken: string
+): Promise<ActionResult<{ authorization_url: string }>> {
+  return Sentry.startSpan({ name: "checkout", op: "function" }, () =>
+    runCheckout(unSafCheckoutData, turnstileToken)
+  )
+}
+
+async function runCheckout(
   unSafCheckoutData: CheckoutArgs,
   turnstileToken: string
 ): Promise<ActionResult<{ authorization_url: string }>> {
@@ -57,6 +68,8 @@ export async function checkout(
     }
   }
 
+  Sentry.setUser({ id: user.id, email: user.email })
+
   // verify address ownership
   const { docs: addresses } = await payload.find({
     collection: "addresses",
@@ -86,26 +99,32 @@ export async function checkout(
     // verify items price
 
     // proceed to create order
-    const order = await payload.create({
-      collection: "orders",
-      data: {
-        user: user.id,
-        deliveryAddress: address.id,
-        items: orderItems,
-        status: "pending",
-        paymentStatus: "unpaid",
-        snapshot: {
-          user: {
-            id: user.id,
-            fullName: `${user.firstName} ${user.lastName}`,
-            email: user.email,
+    const order = await Sentry.startSpan(
+      { name: "order.create", op: "db.create" },
+      () =>
+        payload.create({
+          collection: "orders",
+          data: {
+            user: user.id,
+            deliveryAddress: address.id,
+            items: orderItems,
+            status: "pending",
+            paymentStatus: "unpaid",
+            snapshot: {
+              user: {
+                id: user.id,
+                fullName: `${user.firstName} ${user.lastName}`,
+                email: user.email,
+              },
+              address: addressWithIdSchema.parse(address),
+            },
           },
-          address: addressWithIdSchema.parse(address),
-        },
-      },
-      draft: false,
-      overrideAccess: true,
-    })
+          draft: false,
+          overrideAccess: true,
+        })
+    )
+
+    Sentry.setTag("order.id", order.id)
 
     // check order total amount
     if (!order.total) {
@@ -135,56 +154,65 @@ export async function checkout(
 
     let res
     try {
-      res = await paystack.transaction.initialize({
-        reference: order.id.toString(),
-        email: user.email,
-        amount: amount.toString(),
-        currency: "KES",
-        callback_url: `${site.url}/thank-you/${order.id}`,
-        metadata: {
-          cancel_action: site.url + "/checkout",
-          order_id: order.id.toString(),
-          custom_fields: [
-            {
-              display_name: "Subtotal",
-              variable_name: "subtotal",
-              value: `KES ${order.subtotal ?? 0}`,
+      res = await Sentry.startSpan(
+        { name: "paystack.initialize_transaction", op: "http.client" },
+        () =>
+          paystack.transaction.initialize({
+            reference: order.id.toString(),
+            email: user.email,
+            amount: amount.toString(),
+            currency: "KES",
+            callback_url: `${site.url}/thank-you/${order.id}`,
+            metadata: {
+              cancel_action: site.url + "/checkout",
+              order_id: order.id.toString(),
+              custom_fields: [
+                {
+                  display_name: "Subtotal",
+                  variable_name: "subtotal",
+                  value: `KES ${order.subtotal ?? 0}`,
+                },
+                {
+                  display_name: "Discount",
+                  variable_name: "discount",
+                  value: `KES ${order.discountTotal ?? 0}`,
+                },
+                {
+                  display_name: "Delivery Fee",
+                  variable_name: "delivery_fee",
+                  value: `KES ${order.deliveryFee ?? 0}`,
+                },
+                {
+                  display_name: "Total",
+                  variable_name: "total",
+                  value: `KES ${order.total}`,
+                },
+              ],
+              snapshot: {
+                items: metadataItems,
+                user: {
+                  id: user.id,
+                  fullName: user.fullName,
+                  email: user.email,
+                },
+                address: addressWithIdSchema.parse(address),
+              },
             },
-            {
-              display_name: "Discount",
-              variable_name: "discount",
-              value: `KES ${order.discountTotal ?? 0}`,
-            },
-            {
-              display_name: "Delivery Fee",
-              variable_name: "delivery_fee",
-              value: `KES ${order.deliveryFee ?? 0}`,
-            },
-            {
-              display_name: "Total",
-              variable_name: "total",
-              value: `KES ${order.total}`,
-            },
-          ],
-          snapshot: {
-            items: metadataItems,
-            user: {
-              id: user.id,
-              fullName: user.fullName,
-              email: user.email,
-            },
-            address: addressWithIdSchema.parse(address),
-          },
-        },
-      })
+          })
+      )
     } catch (error) {
       // The Paystack SDK uses axios with default behaviour (throws on any non-2xx)
       // and no error interceptor, so a rejected request lands here instead of
-      // resolving to a { data: null } response. Surface the real reason to the
-      // server log only and return a clean message to the client.
+      // resolving to a { data: null } response. Surface the real reason to
+      // Sentry and return a clean message to the client.
       const paystackError =
         (error as { response?: { data?: unknown } })?.response?.data ?? error
-      console.error("[checkout] Paystack initialize failed:", paystackError)
+      captureError(error, {
+        scope: "checkout",
+        tags: { stage: "paystack-init", order_id: order.id },
+        user: { id: user.id, email: user.email },
+        context: { paystackError },
+      })
       return {
         success: false,
         code: 502,
@@ -203,14 +231,21 @@ export async function checkout(
     after(async () => {
       // update order with paystack access code so we can recharge if the user
       // does not complete the payment after being redirected to paystack
-      await payload.update({
-        collection: "orders",
-        id: order.id,
-        data: {
-          paystackAccessCode: res.data.access_code,
-        },
-        overrideAccess: true,
-      })
+      try {
+        await payload.update({
+          collection: "orders",
+          id: order.id,
+          data: {
+            paystackAccessCode: res.data.access_code,
+          },
+          overrideAccess: true,
+        })
+      } catch (error) {
+        captureError(error, {
+          scope: "checkout",
+          tags: { stage: "access-code-update", order_id: order.id },
+        })
+      }
     })
 
     return {
@@ -218,7 +253,11 @@ export async function checkout(
       data: { authorization_url: res.data.authorization_url },
     }
   } catch (error) {
-    console.error("[checkout] Unexpected error:", error)
+    captureError(error, {
+      scope: "checkout",
+      tags: { stage: "unexpected" },
+      user: { id: user.id, email: user.email },
+    })
     return {
       success: false,
       code: 500,

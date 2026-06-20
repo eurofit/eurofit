@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env.mjs"
+import { logger } from "@/lib/observability/capture-error"
 import {
   ResetPasswordData,
   resetPasswordSchema,
@@ -40,8 +41,10 @@ export async function resetPassword(
       overrideAccess: true,
     })
     return { success: true, data: { ok: true } }
-  } catch (error: unknown) {
-    console.error(error)
+  } catch {
+    // Expired/invalid token is an expected user flow — log as a warning rather
+    // than capturing it as an exception so it doesn't create alert noise.
+    logger.warn("[reset-password] reset rejected — invalid or expired token")
     return {
       success: false,
       code: 410,

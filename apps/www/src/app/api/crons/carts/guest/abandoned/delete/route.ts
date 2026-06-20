@@ -1,4 +1,5 @@
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import config from "@payload-config"
 import type { NextRequest } from "next/server"
 import { getPayload } from "payload"
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     return Response.json({ success: true, deletedCount: deletedCarts.length })
   } catch (error) {
-    console.error("[cron:abandoned-guest-carts] delete failed:", error)
+    captureError(error, { scope: "cron.abandoned-cart" })
     // Never surface internal errors to the caller.
     return Response.json({ success: false }, { status: 500 })
   }

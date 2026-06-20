@@ -1,5 +1,6 @@
 "use server"
 
+import { captureError } from "@/lib/observability/capture-error"
 import { getVariantReviewStats } from "@/lib/utils/reviews/get-variant-review-stats"
 import { ActionResult } from "@/types/action-result"
 import { ReviewStats } from "@/types/review"
@@ -13,7 +14,8 @@ export async function getReviewStats(
     const stats = await getVariantReviewStats(id)
 
     return { success: true, data: stats }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "reviews.stats" })
     return {
       success: false,
       code: 500,

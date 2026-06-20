@@ -1,6 +1,7 @@
 "use server"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { captureError } from "@/lib/observability/capture-error"
 import { hasPurchasedVariant } from "@/lib/utils/reviews/has-purchased-variant"
 import { ActionResult } from "@/types/action-result"
 import { ReviewEligibility } from "@/types/review"
@@ -38,7 +39,8 @@ export async function getReviewEligibility(
       success: true,
       data: { canReview: didPurchaseVariant && !hasReviewed, hasReviewed },
     }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "reviews.eligibility" })
     return {
       success: false,
       code: 500,

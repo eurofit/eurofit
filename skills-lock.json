@@ -79,6 +79,12 @@
       "skillPath": "skills/programmatic-seo/SKILL.md",
       "computedHash": "0bbdcbacfbe46fd78d774041ee49afd313505bb435b775dc246f4b8e6981d797"
     },
+    "sentry-nextjs-sdk": {
+      "source": "getsentry/sentry-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-nextjs-sdk/SKILL.md",
+      "computedHash": "6bbb2bce22fa8fc3e0385dbe06fe5a26770b2f91f66ad8e78d80c1df3d4b2e05"
+    },
     "seo-audit": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",

@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import { SignupData, SignUpSchema } from "@/lib/schemas/auth/signup"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { ActionResult } from "@/types/action-result"
@@ -53,7 +54,7 @@ export async function signUp(
         return { success: false, code: 409, message: "Email already exists" }
       }
     }
-    console.error(e)
+    captureError(e, { scope: "auth.sign-up" })
     return { success: false, code: 500, message: "Something went wrong!" }
   }
 }

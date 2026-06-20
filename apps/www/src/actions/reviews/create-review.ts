@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import {
   CreateReview,
   createReviewSchema,
@@ -67,6 +68,9 @@ export async function createReview(
     if (err instanceof APIError && err.isPublic) {
       return { success: false, code: err.status, message: err.message }
     }
+    // Public APIErrors above are the expected purchase-gate/duplicate failures;
+    // anything else is unexpected and must be captured.
+    captureError(err, { scope: "reviews.create" })
     return {
       success: false,
       code: 400,

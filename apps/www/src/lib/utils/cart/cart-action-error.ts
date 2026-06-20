@@ -1,5 +1,6 @@
 import "server-only"
 
+import { captureError } from "@/lib/observability/capture-error"
 import { ActionResult } from "@/types/action-result"
 import { APIError } from "payload"
 
@@ -34,5 +35,8 @@ export function toCartActionError(error: unknown): ActionFailure {
     return { success: false, code, message }
   }
 
+  // Non-APIError means something unexpected broke — APIErrors are the cart's
+  // own expected validation failures and are translated above.
+  captureError(error, { scope: "cart" })
   return { success: false, code: 500, message: GENERIC_MESSAGE }
 }

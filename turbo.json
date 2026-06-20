@@ -19,6 +19,7 @@
         "CLOUDFLARE_*",
         "RESEND_*",
         "CRON_SECRET",
+        "SENTRY_AUTH_TOKEN",
         "NEXT_PUBLIC_*"
       ]
     },

@@ -1,6 +1,7 @@
 "use server"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { captureError } from "@/lib/observability/capture-error"
 import { AddressId, addressIdSchema } from "@/lib/schemas/addresses/address"
 import { Address as AddressDoc } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
@@ -47,7 +48,8 @@ export async function setDefaultAddress(
     })
 
     return { success: true, data: updated }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "addresses.set-default" })
     return {
       success: false,
       code: 500,
