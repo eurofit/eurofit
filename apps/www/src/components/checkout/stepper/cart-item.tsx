@@ -1,9 +1,10 @@
 "use client"
 
 import { ImageWithRetry } from "@/components/image-with-retry"
+import { VariantPrice } from "@/components/product-variants/variant-price"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
 import { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
-import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { Button } from "@eurofit/ui/components/button"
 import { ButtonGroup } from "@eurofit/ui/components/button-group"
 import { Input } from "@eurofit/ui/components/input"
@@ -56,10 +57,12 @@ export function CartItem({ item }: CartItemProps) {
         </p>
       </div>
       <div className="ml-auto space-y-2">
-        <div className="flex items-center justify-end gap-1 text-right text-sm font-medium">
-          <span className="text-xs text-muted-foreground">Ksh</span>
-          <span>{formatWithCommas(item.retailPrice!)}</span>
-        </div>
+        <VariantPrice
+          price={item.retailPrice ?? 0}
+          discount={normalizeVariantDiscount(item.discount)}
+          size="sm"
+          className="items-end text-right"
+        />
 
         <div className="flex items-center justify-end gap-2">
           <ButtonGroup>

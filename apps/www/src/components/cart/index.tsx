@@ -29,7 +29,10 @@ import { Fragment } from "react"
 import { CartItem } from "./cart-item"
 
 export function Cart() {
-  const { items, total, itemCount, isEmpty, isMutating } = useCart()
+  const { items, total, discountTotal, itemCount, isEmpty, isMutating } =
+    useCart()
+  const hasDiscount = discountTotal > 0
+  const payableSubtotal = total - discountTotal
 
   return (
     <Sheet modal>
@@ -107,23 +110,36 @@ export function Cart() {
         >
           {!isEmpty && (
             <div className="space-y-4">
-              {/* Streamlined Subtotal */}
-              <div className="flex items-center justify-between px-2.5">
-                <dl className="flex w-full items-center justify-between gap-2">
-                  <dt className="max-w-3/5">
-                    <p className="text-lg font-semibold">Subtotal</p>
-                  </dt>
-                  <div className="flex items-center">
-                    <dd className="flex items-center">
-                      <span className="text-muted-foreground">Ksh</span>
-                      &nbsp;
-                      <p className="font-variant-numeric-tabular-nums text-lg font-semibold">
-                        {formatWithCommas(total)}
-                      </p>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
+              {/* Totals */}
+              <dl className="space-y-1.5 px-2.5">
+                {hasDiscount && (
+                  <>
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <dt className="text-muted-foreground">Original</dt>
+                      <dd className="text-muted-foreground tabular-nums line-through">
+                        Ksh&nbsp;{formatWithCommas(total)}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <dt className="font-medium text-primary">You save</dt>
+                      <dd className="font-medium text-primary tabular-nums">
+                        −Ksh&nbsp;{formatWithCommas(discountTotal)}
+                      </dd>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-lg font-semibold">Subtotal</dt>
+                  <dd className="flex items-center">
+                    <span className="text-muted-foreground">Ksh</span>
+                    &nbsp;
+                    <span className="text-lg font-semibold tabular-nums">
+                      {formatWithCommas(payableSubtotal)}
+                    </span>
+                  </dd>
+                </div>
+              </dl>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2">

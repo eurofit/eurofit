@@ -13,7 +13,8 @@ type VariantPriceProps = {
   className?: string
 }
 
-function savingsLabel(discount: VariantDiscount): string {
+/** Short savings label, e.g. `-20%` or `Save Ksh 1,500`. */
+export function savingsLabel(discount: VariantDiscount): string {
   return discount.type === "percentage"
     ? `-${discount.amount}%`
     : `Save Ksh ${formatWithCommas(discount.amount)}`

@@ -1,9 +1,12 @@
 "use client"
 
 import { ImageWithRetry } from "@/components/image-with-retry"
+import { savingsLabel } from "@/components/product-variants/variant-price"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
 import { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
 import { ButtonGroup } from "@eurofit/ui/components/button-group"
 import { Input } from "@eurofit/ui/components/input"
@@ -31,6 +34,11 @@ export function CartItem({ index, item: { product, ...item } }: CartItemProps) {
   } = useCartQuantity({
     variant: { id: item.id, stock: item.stock },
   })
+
+  const discount = normalizeVariantDiscount(item.discount)
+  const retailPrice = item.retailPrice ?? 0
+  const unitPrice = discount?.price ?? retailPrice
+  const lineTotal = unitPrice * item.quantity
 
   return (
     <article className="flex items-start space-x-4">
@@ -119,17 +127,32 @@ export function CartItem({ index, item: { product, ...item } }: CartItemProps) {
             </div>
           </div>
 
-          {item.retailPrice && (
-            <div className="flex flex-col text-right">
-              <div className="text-xs leading-none text-muted-foreground">
-                <span className="text-muted-foreground">{item.quantity}</span>
-                &nbsp;x&nbsp;<span>{formatWithCommas(item.retailPrice)}</span>
+          {item.retailPrice != null && (
+            <div className="flex flex-col items-end gap-1 text-right">
+              {discount && (
+                <Badge
+                  variant="destructive"
+                  className="h-4 px-1 text-[10px] font-semibold"
+                >
+                  {savingsLabel(discount)}
+                </Badge>
+              )}
+
+              <div className="text-xs leading-none text-muted-foreground tabular-nums">
+                <span>{item.quantity}</span>
+                &nbsp;&times;&nbsp;
+                <span>{formatWithCommas(unitPrice)}</span>
+                {discount && (
+                  <span className="ml-1 text-muted-foreground/70 line-through">
+                    {formatWithCommas(retailPrice)}
+                  </span>
+                )}
               </div>
 
-              <div className="initem leading-none">
-                <span className="text-[10px]">Ksh</span>
-                <span className="text-sm font-medium oldstyle-nums">
-                  {formatWithCommas(item.retailPrice * item.quantity)}
+              <div className="leading-none tabular-nums">
+                <span className="text-[10px] text-muted-foreground">Ksh </span>
+                <span className="text-sm font-semibold">
+                  {formatWithCommas(lineTotal)}
                 </span>
               </div>
             </div>
