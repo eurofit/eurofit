@@ -10,29 +10,54 @@ import {
   CardHeader,
   CardTitle,
 } from "@eurofit/ui/components/card"
-import { ShoppingBag } from "lucide-react"
+import { ChevronRight, ShoppingBasket } from "lucide-react"
+import Link from "next/link"
+import pluralize from "pluralize-esm"
 import { CartItem } from "./cart-item"
 import { Stepper, useStepper } from "./steps"
 
 export function CartStep() {
   const stepper = useStepper()
-  const { items, isEmpty } = useCart()
+  const { items, itemCount, isEmpty } = useCart()
 
   return (
     <Stepper.Content step="cart">
       <Card>
         <CardHeader>
-          <CardTitle>Cart</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Cart
+            {itemCount > 0 && (
+              <span className="text-sm font-normal text-muted-foreground">
+                ({itemCount} {pluralize("item", itemCount)})
+              </span>
+            )}
+          </CardTitle>
           <CardDescription>
             Review your cart before placing your order.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isEmpty && (
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="size-4" />
-              <p>Your cart is empty</p>
-            </div>
+            <section className="flex flex-col items-center gap-6 py-10 text-center">
+              <ShoppingBasket
+                className="size-20 text-muted-foreground/30"
+                aria-hidden="true"
+              />
+              <hgroup className="space-y-1.5">
+                <h3 className="text-lg font-medium text-muted-foreground">
+                  Your cart is empty
+                </h3>
+                <p className="mx-auto max-w-xs text-sm text-balance text-muted-foreground">
+                  Add items to your cart to continue with your order.
+                </p>
+              </hgroup>
+              <Button variant="outline" asChild>
+                <Link href="/brands">
+                  Start Shopping
+                  <ChevronRight aria-hidden="true" />
+                </Link>
+              </Button>
+            </section>
           )}
 
           {!isEmpty && (

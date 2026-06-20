@@ -7,6 +7,7 @@ import { removeCartItem } from "@/actions/cart/remove-cart-item"
 import { updateCartItemQuantity } from "@/actions/cart/update-cart-item-quantity"
 import { CART_QUERY_KEY } from "@/const/cart"
 import { fetchCart } from "@/lib/api/cart/get-cart"
+import { computeCartTotals } from "@/lib/utils/cart/cart-totals"
 import { formatCartItem } from "@/lib/utils/cart/formatCartItem"
 import {
   applyAddToCart,
@@ -46,7 +47,8 @@ export function useCart() {
   })
 
   const items = cart?.items.map(formatCartItem) ?? []
-  const total = cart?.total ?? 0
+  const { subtotal, discountTotal } = computeCartTotals(items)
+  const total = subtotal
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const isEmpty = itemCount === 0
 
@@ -127,6 +129,7 @@ export function useCart() {
     cart,
     items,
     total,
+    discountTotal,
     itemCount,
     isEmpty,
     isLoading,

@@ -26,7 +26,7 @@ import { Stepper, useStepper } from "./steps"
 export function ReviewStep() {
   const stepper = useStepper()
   const address = stepper.data.get("address") as Address | undefined
-  const { items, itemCount, total } = useCart()
+  const { items, itemCount, total, discountTotal } = useCart()
   const { checkout, isCheckingout } = useCheckout()
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
@@ -115,7 +115,7 @@ export function ReviewStep() {
               </div>
             </div>
 
-            <OrderSummary total={total} />
+            <OrderSummary subtotal={total} discountTotal={discountTotal} />
           </div>
         </CardContent>
         <CardFooter className="hidden flex-col gap-2 md:flex">

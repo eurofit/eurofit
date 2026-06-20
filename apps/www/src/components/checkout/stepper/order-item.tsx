@@ -1,8 +1,9 @@
 "use client"
 
 import { ImageWithRetry } from "@/components/image-with-retry"
+import { VariantPrice } from "@/components/product-variants/variant-price"
 import { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
-import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { ImageOff } from "lucide-react"
 
 type OrderItemProps = {
@@ -37,12 +38,13 @@ export function OrderItem({ item }: OrderItemProps) {
           Qty: {item.quantity}
         </p>
       </div>
-      <div className="ml-auto space-y-2">
-        <div className="flex items-center justify-end text-right text-sm font-medium">
-          <span className="text-xs text-muted-foreground">Ksh</span>
-          &nbsp;
-          <span>{formatWithCommas(item.retailPrice!)}</span>
-        </div>
+      <div className="ml-auto text-right">
+        <VariantPrice
+          price={item.retailPrice ?? 0}
+          discount={normalizeVariantDiscount(item.discount)}
+          size="sm"
+          className="items-end"
+        />
       </div>
     </div>
   )
