@@ -2,7 +2,7 @@
 
 import { Address } from "@/payload-types"
 import { Button } from "@eurofit/ui/components/button"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, MapPin } from "lucide-react"
 
 type ShippingSummaryProps = {
   address: Address | undefined
@@ -11,15 +11,15 @@ type ShippingSummaryProps = {
 
 export function ShippingSummary({ address, onChange }: ShippingSummaryProps) {
   return (
-    <div className="space-y-6 rounded-md bg-muted/50 p-2">
+    <div className="space-y-4 rounded-md border bg-muted/50 p-4">
       <div className="flex items-center gap-2.5">
-        {/* <div className="flex size-16 rounded-md bg-muted">
-          <MapPin className="m-auto size-10" />
-        </div> */}
         <div>
-          <h3 className="text-base font-medium text-foreground">
-            Shipping Address
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <MapPin className="size-4 text-muted-foreground" aria-hidden />
+            <h3 className="text-base font-medium text-foreground">
+              Shipping Address
+            </h3>
+          </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Where your order will be delivered
           </p>
@@ -31,7 +31,7 @@ export function ShippingSummary({ address, onChange }: ShippingSummaryProps) {
         </div>
       </div>
       <div className="space-y-2">
-        <p className="capitalize">
+        <p className="font-semibold capitalize">
           {address?.title} {address?.firstName} {address?.lastName}
         </p>
         <div className="text-sm text-muted-foreground">

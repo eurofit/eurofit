@@ -1,7 +1,9 @@
 "use client"
 
+import { DELIVERY_FEE } from "@/const/delivery"
 import { useCart } from "@/hooks/use-cart"
 import { useCheckout } from "@/hooks/use-checkout"
+import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Address } from "@/payload-types"
 import { Button } from "@eurofit/ui/components/button"
 import {
@@ -28,6 +30,7 @@ export function ReviewStep() {
   const address = stepper.data.get("address") as Address | undefined
   const { items, itemCount, total, discountTotal } = useCart()
   const { checkout, isCheckingout } = useCheckout()
+  const grandTotal = total - discountTotal + DELIVERY_FEE
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
   const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
@@ -76,17 +79,14 @@ export function ReviewStep() {
           <CardDescription>Review your order & place it.</CardDescription>
         </CardHeader>
         <CardContent className="mt-4">
-          <div className="space-y-4">
+          <div className="space-y-6">
             <ShippingSummary
               address={address}
               onChange={() => stepper.goTo("address")}
             />
 
-            <div className="space-y-6 rounded-md bg-muted/50 p-2">
+            <div className="space-y-4 rounded-md border bg-muted/50 p-4">
               <div className="flex items-center gap-2.5">
-                {/* <div className="flex size-16 rounded-md bg-muted">
-                  <ShoppingCart className="m-auto size-8" />
-                </div> */}
                 <div>
                   <h3 className="text-base font-medium text-foreground">
                     Cart&nbsp;
@@ -139,7 +139,13 @@ export function ReviewStep() {
       />
 
       {/* mobile sticky  */}
-      <div className="sticky bottom-3 z-50 mt-6 flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-lg ring-1 ring-foreground/10 md:hidden">
+      <div className="sticky bottom-3 z-50 mt-6 flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-lg ring-1 ring-foreground/10 md:hidden">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Order Total</span>
+          <span className="font-semibold slashed-zero tabular-nums">
+            Ksh {formatWithCommas(grandTotal)}
+          </span>
+        </div>
         <PlaceOrderAction
           isCheckingout={isCheckingout}
           isReady={Boolean(turnstileToken)}

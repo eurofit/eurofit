@@ -12,7 +12,7 @@ type OrderItemProps = {
 
 export function OrderItem({ item }: OrderItemProps) {
   return (
-    <div className="flex items-start gap-2.5">
+    <div className="flex items-start gap-3 rounded-md border bg-background p-3">
       <div className="relative flex size-16 items-center justify-center rounded-md bg-muted">
         {item.product.image ? (
           <ImageWithRetry

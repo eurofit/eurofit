@@ -21,7 +21,7 @@ type SummaryRowProps = {
 function SummaryRow({ label, amount, isDeduction }: SummaryRowProps) {
   return (
     <div className="flex items-start justify-between gap-2 py-2">
-      <dt className="font-medium">{label}</dt>
+      <dt className="font-medium text-muted-foreground">{label}</dt>
       <dd className="text-right slashed-zero tabular-nums">
         <span className="text-muted-foreground">
           {isDeduction ? "−" : ""}Ksh
@@ -40,8 +40,8 @@ export function OrderSummary({ subtotal, discountTotal }: OrderSummaryProps) {
   const total = subtotal - discountTotal + DELIVERY_FEE
 
   return (
-    <div className="space-y-6 rounded-md bg-muted/50 p-2">
-      <h3 className="text-lg font-semibold tracking-tight text-foreground">
+    <div className="space-y-4 rounded-md border bg-muted/50 p-4">
+      <h3 className="text-base font-semibold tracking-tight text-foreground">
         Order Summary
       </h3>
 
@@ -52,12 +52,12 @@ export function OrderSummary({ subtotal, discountTotal }: OrderSummaryProps) {
         )}
         <SummaryRow label="Delivery Fee" amount={DELIVERY_FEE} />
         <Separator className="my-2" />
-        <div className="flex items-start justify-between gap-2 py-2 text-lg font-medium">
-          <dt className="uppercase">Total</dt>
+        <div className="-mx-2 flex items-center justify-between gap-2 rounded-md bg-muted/40 px-2 py-2 font-bold">
+          <dt className="text-sm tracking-wide uppercase">Total</dt>
           <dd className="text-right slashed-zero tabular-nums">
-            <span className="text-muted-foreground">Ksh</span>
+            <span className="text-sm text-muted-foreground">Ksh</span>
             &nbsp;
-            <span>{formatWithCommas(total)}</span>
+            <span className="text-xl">{formatWithCommas(total)}</span>
           </dd>
         </div>
       </dl>
