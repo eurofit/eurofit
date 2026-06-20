@@ -8,6 +8,7 @@ import { checkIfOutOfStock } from "./hooks/check-if-out-stock"
 import { checkIfPreorder } from "./hooks/check-if-preorder"
 import { checkIfNotfiyRequested } from "./hooks/check-notify-requested"
 import { checkIfWishlisted } from "./hooks/check-wishlisted"
+import { computeDiscount } from "./hooks/compute-discount"
 import {
   revalidateProductVariantTag,
   revalidateProductVariantTagOnDelete,
@@ -45,6 +46,7 @@ export const productVariants: CollectionConfig = {
   forceSelect: {
     stock: true,
     supplierStock: true,
+    retailPrice: true,
   },
 
   fields: [
@@ -427,6 +429,41 @@ export const productVariants: CollectionConfig = {
       },
       hooks: {
         afterRead: [checkIfPreorder],
+      },
+    },
+    {
+      name: "discount",
+      type: "group",
+      virtual: true,
+      admin: {
+        hidden: true,
+        description:
+          "Best active automatic discount for this variant. Computed on read.",
+      },
+      fields: [
+        {
+          name: "price",
+          type: "number",
+        },
+        {
+          name: "type",
+          type: "select",
+          options: [
+            { label: "Percentage", value: "percentage" },
+            { label: "Fixed amount", value: "fixed" },
+          ],
+        },
+        {
+          name: "amount",
+          type: "number",
+        },
+        {
+          name: "endDate",
+          type: "date",
+        },
+      ],
+      hooks: {
+        afterRead: [computeDiscount],
       },
     },
     {

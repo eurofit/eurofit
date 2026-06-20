@@ -61,6 +61,34 @@ export const enum_order_statuses_status = pgEnum("enum_order_statuses_status", [
   "delivered",
   "cancelled",
 ])
+export const enum_discounts_discount_target = pgEnum(
+  "enum_discounts_discount_target",
+  ["product", "free_shipping"]
+)
+export const enum_discounts_discount_method = pgEnum(
+  "enum_discounts_discount_method",
+  ["code", "automatic"]
+)
+export const enum_discounts_product_discount_type = pgEnum(
+  "enum_discounts_product_discount_type",
+  ["amount_off", "buy_x_get_y"]
+)
+export const enum_discounts_value_type = pgEnum("enum_discounts_value_type", [
+  "percentage",
+  "fixed",
+])
+export const enum_discounts_applies_to = pgEnum("enum_discounts_applies_to", [
+  "products",
+])
+export const enum_discounts_get_discount_type = pgEnum(
+  "enum_discounts_get_discount_type",
+  ["percentage", "amount_off_each", "free"]
+)
+export const enum_discounts_eligibility = pgEnum("enum_discounts_eligibility", [
+  "all",
+  "tags",
+  "customers",
+])
 export const enum_forms_confirmation_type = pgEnum(
   "enum_forms_confirmation_type",
   ["message", "redirect"]
@@ -1217,6 +1245,128 @@ export const transactions = pgTable(
   ]
 )
 
+export const discounts = pgTable(
+  "discounts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    isActive: boolean("is_active").notNull().default(true),
+    title: varchar("title").notNull(),
+    description: varchar("description"),
+    discountTarget: enum_discounts_discount_target("discount_target")
+      .notNull()
+      .default("product"),
+    discountMethod: enum_discounts_discount_method("discount_method")
+      .notNull()
+      .default("code"),
+    code: varchar("code"),
+    label: varchar("label"),
+    productDiscountType: enum_discounts_product_discount_type(
+      "product_discount_type"
+    ).default("amount_off"),
+    valueType: enum_discounts_value_type("value_type").default("percentage"),
+    discountAmount: numeric("discount_amount", { mode: "number" }),
+    appliesTo: enum_discounts_applies_to("applies_to").default("products"),
+    buyQuantity: numeric("buy_quantity", { mode: "number" }),
+    getQuantity: numeric("get_quantity", { mode: "number" }),
+    getDiscountType:
+      enum_discounts_get_discount_type("get_discount_type").default(
+        "percentage"
+      ),
+    getDiscountAmount: numeric("get_discount_amount", { mode: "number" }),
+    hasShippingRateLimit: boolean("has_shipping_rate_limit").default(false),
+    maxShippingRate: numeric("max_shipping_rate", { mode: "number" }),
+    eligibility: enum_discounts_eligibility("eligibility")
+      .notNull()
+      .default("all"),
+    startDate: timestamp("start_date", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
+    shouldSetEndDate: boolean("should_set_end_date").default(false),
+    endDate: timestamp("end_date", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    staff: uuid("staff_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("discounts_code_idx").on(columns.code),
+    index("discounts_staff_idx").on(columns.staff),
+    index("discounts_updated_at_idx").on(columns.updatedAt),
+    index("discounts_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const discounts_rels = pgTable(
+  "discounts_rels",
+  {
+    id: serial("id").primaryKey(),
+    order: integer("order"),
+    parent: uuid("parent_id").notNull(),
+    path: varchar("path").notNull(),
+    "product-variantsID": uuid("product_variants_id"),
+    "service-areasID": uuid("service_areas_id"),
+    tagsID: uuid("tags_id"),
+    usersID: uuid("users_id"),
+  },
+  (columns) => [
+    index("discounts_rels_order_idx").on(columns.order),
+    index("discounts_rels_parent_idx").on(columns.parent),
+    index("discounts_rels_path_idx").on(columns.path),
+    index("discounts_rels_product_variants_id_idx").on(
+      columns["product-variantsID"]
+    ),
+    index("discounts_rels_service_areas_id_idx").on(columns["service-areasID"]),
+    index("discounts_rels_tags_id_idx").on(columns.tagsID),
+    index("discounts_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [discounts.id],
+      name: "discounts_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["product-variantsID"]],
+      foreignColumns: [product_variants.id],
+      name: "discounts_rels_product_variants_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["service-areasID"]],
+      foreignColumns: [service_areas.id],
+      name: "discounts_rels_service_areas_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["tagsID"]],
+      foreignColumns: [tags.id],
+      name: "discounts_rels_tags_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "discounts_rels_users_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
 export const forms_blocks_checkbox = pgTable(
   "forms_blocks_checkbox",
   {
@@ -1638,6 +1788,7 @@ export const payload_locked_documents_rels = pgTable(
     ordersID: numeric("orders_id", { mode: "number" }),
     "order-statusesID": uuid("order_statuses_id"),
     transactionsID: uuid("transactions_id"),
+    discountsID: uuid("discounts_id"),
     formsID: uuid("forms_id"),
     "form-submissionsID": uuid("form_submissions_id"),
   },
@@ -1684,6 +1835,9 @@ export const payload_locked_documents_rels = pgTable(
     ),
     index("payload_locked_documents_rels_transactions_id_idx").on(
       columns.transactionsID
+    ),
+    index("payload_locked_documents_rels_discounts_id_idx").on(
+      columns.discountsID
     ),
     index("payload_locked_documents_rels_forms_id_idx").on(columns.formsID),
     index("payload_locked_documents_rels_form_submissions_id_idx").on(
@@ -1783,6 +1937,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["transactionsID"]],
       foreignColumns: [transactions.id],
       name: "payload_locked_documents_rels_transactions_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["discountsID"]],
+      foreignColumns: [discounts.id],
+      name: "payload_locked_documents_rels_discounts_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["formsID"]],
@@ -2394,6 +2553,46 @@ export const relations_transactions = relations(transactions, ({ one }) => ({
     relationName: "order",
   }),
 }))
+export const relations_discounts_rels = relations(
+  discounts_rels,
+  ({ one }) => ({
+    parent: one(discounts, {
+      fields: [discounts_rels.parent],
+      references: [discounts.id],
+      relationName: "_rels",
+    }),
+    "product-variantsID": one(product_variants, {
+      fields: [discounts_rels["product-variantsID"]],
+      references: [product_variants.id],
+      relationName: "product-variants",
+    }),
+    "service-areasID": one(service_areas, {
+      fields: [discounts_rels["service-areasID"]],
+      references: [service_areas.id],
+      relationName: "service-areas",
+    }),
+    tagsID: one(tags, {
+      fields: [discounts_rels.tagsID],
+      references: [tags.id],
+      relationName: "tags",
+    }),
+    usersID: one(users, {
+      fields: [discounts_rels.usersID],
+      references: [users.id],
+      relationName: "users",
+    }),
+  })
+)
+export const relations_discounts = relations(discounts, ({ one, many }) => ({
+  staff: one(users, {
+    fields: [discounts.staff],
+    references: [users.id],
+    relationName: "staff",
+  }),
+  _rels: many(discounts_rels, {
+    relationName: "_rels",
+  }),
+}))
 export const relations_forms_blocks_checkbox = relations(
   forms_blocks_checkbox,
   ({ one }) => ({
@@ -2658,6 +2857,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [transactions.id],
       relationName: "transactions",
     }),
+    discountsID: one(discounts, {
+      fields: [payload_locked_documents_rels.discountsID],
+      references: [discounts.id],
+      relationName: "discounts",
+    }),
     formsID: one(forms, {
       fields: [payload_locked_documents_rels.formsID],
       references: [forms.id],
@@ -2780,6 +2984,13 @@ type DatabaseSchema = {
   enum_tags_type: typeof enum_tags_type
   enum_orders_payment_status: typeof enum_orders_payment_status
   enum_order_statuses_status: typeof enum_order_statuses_status
+  enum_discounts_discount_target: typeof enum_discounts_discount_target
+  enum_discounts_discount_method: typeof enum_discounts_discount_method
+  enum_discounts_product_discount_type: typeof enum_discounts_product_discount_type
+  enum_discounts_value_type: typeof enum_discounts_value_type
+  enum_discounts_applies_to: typeof enum_discounts_applies_to
+  enum_discounts_get_discount_type: typeof enum_discounts_get_discount_type
+  enum_discounts_eligibility: typeof enum_discounts_eligibility
   enum_forms_confirmation_type: typeof enum_forms_confirmation_type
   users_roles: typeof users_roles
   users_sessions: typeof users_sessions
@@ -2815,6 +3026,8 @@ type DatabaseSchema = {
   orders: typeof orders
   order_statuses: typeof order_statuses
   transactions: typeof transactions
+  discounts: typeof discounts
+  discounts_rels: typeof discounts_rels
   forms_blocks_checkbox: typeof forms_blocks_checkbox
   forms_blocks_country: typeof forms_blocks_country
   forms_blocks_email: typeof forms_blocks_email
@@ -2877,6 +3090,8 @@ type DatabaseSchema = {
   relations_orders: typeof relations_orders
   relations_order_statuses: typeof relations_order_statuses
   relations_transactions: typeof relations_transactions
+  relations_discounts_rels: typeof relations_discounts_rels
+  relations_discounts: typeof relations_discounts
   relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox
   relations_forms_blocks_country: typeof relations_forms_blocks_country
   relations_forms_blocks_email: typeof relations_forms_blocks_email

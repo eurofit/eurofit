@@ -2,6 +2,7 @@ import { addresses } from "./addresses"
 import { brands } from "./brands"
 import { carts } from "./carts"
 import { categories } from "./categories"
+import { discounts } from "./discounts"
 import { media } from "./media"
 import { orders } from "./orders"
 import { orderStatus } from "./orders/order-status"
@@ -36,4 +37,5 @@ export const collections = [
   orders,
   orderStatus,
   transactions,
+  discounts,
 ]
