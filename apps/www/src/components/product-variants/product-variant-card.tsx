@@ -1,8 +1,8 @@
 "use client"
 
-import { CountdownTimer } from "@/components/countdown-timer/countdown-timer"
 import { VariantActions } from "@/components/product-variants/variant-actions"
 import { VariantStockStatus } from "@/components/product-variants/variant-stock-status"
+import { CountdownTimerBadge } from "@/components/timer/countdown-timer-badge"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
 import { type ProductVariant } from "@/types/product-variant"
 import { cn } from "@eurofit/ui/lib/utils"
@@ -59,10 +59,7 @@ export function ProductVariantCard({
         <div className="!mt-2 flex flex-wrap items-center gap-2">
           <VariantStockStatus variant={variant} />
           {variant.discount?.endDate && (
-            <CountdownTimer
-              endDate={variant.discount.endDate}
-              variant="inline"
-            />
+            <CountdownTimerBadge endDate={variant.discount.endDate} />
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
-import { CountdownTimer } from "@/components/countdown-timer/countdown-timer"
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
+import { CountdownTimerBlock } from "@/components/timer/countdown-timer-block"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -131,7 +131,7 @@ export function ProductInfo({
         <div className="space-y-3">
           <VariantPrice price={price} discount={discount} size="lg" />
           {discount?.endDate && (
-            <CountdownTimer endDate={discount.endDate} variant="boxed" />
+            <CountdownTimerBlock endDate={discount.endDate} />
           )}
         </div>
       )}
