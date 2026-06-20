@@ -81,6 +81,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
       },
       snapshot: true,
       subtotal: true,
+      discountTotal: true,
       deliveryFee: true,
       total: true,
       createdAt: true,
@@ -207,6 +208,17 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                       <span>{formatWithCommas(order.subtotal!)}</span>
                     </dd>
                   </div>
+                  {!!order.discountTotal && order.discountTotal > 0 && (
+                    <div className="flex items-start justify-between gap-2 py-1.5">
+                      <dt className="font-medium">Discount</dt>
+                      <dd className="text-right text-green-600 slashed-zero tabular-nums">
+                        <span>−</span>
+                        <span className="text-muted-foreground">Ksh</span>
+                        &nbsp;
+                        <span>{formatWithCommas(order.discountTotal)}</span>
+                      </dd>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-2 py-1.5">
                     <dt className="font-medium">Delivery Fee</dt>
                     <dd className="text-right slashed-zero tabular-nums">
