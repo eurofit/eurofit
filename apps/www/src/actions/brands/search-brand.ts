@@ -1,5 +1,6 @@
 "use server"
 
+import { captureError } from "@/lib/observability/capture-error"
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
 import { brands } from "@/payload-generated-schema"
 import { ActionResult } from "@/types/action-result"
@@ -72,7 +73,8 @@ export async function searchBrand(
     const totalBrands = totalCountResult[0]?.count ?? 0
 
     return { success: true, data: { brands: matchedBrands, totalBrands } }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "brands.search" })
     return { success: false, code: 500, message: "Failed to search brands." }
   }
 }

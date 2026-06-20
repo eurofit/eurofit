@@ -28,18 +28,20 @@ so concurrent checkout requests serialize on the lock.
 
 ---
 
-### H-03 · Implement Error Tracking Service
+### H-03 · Implement Error Tracking Service — ✅ RESOLVED
 
 **Severity:** HIGH  
 **Related files:**
 
-- `src/app/api/webhooks/paystack/route.ts` — `after()` callback currently uses `console.error`
-- `src/collections/transactions/hooks/send-order-confimation-email.tsx` — email send failure uses `console.error`
+- `src/app/api/webhooks/paystack/route.ts` — `after()` callback captures via `captureError`
+- `src/collections/transactions/hooks/send-order-confimation-email.tsx` — email send failure captures via `captureError`
 
-`console.error` is a temporary stopgap. Payment failures silently disappear in production
-unless the server log is actively monitored. Wire a real error tracking service (Sentry,
-Datadog, BetterStack, etc.) so that any failure inside the webhook handler or the email hook
-creates an alert and an audit trail.
+Sentry is now wired across `apps/www`. The shared `captureError()` helper
+(`src/lib/observability/capture-error.ts`) sends caught/swallowed errors to Sentry with a
+`scope` tag, and `Sentry.startSpan` traces the checkout and `charge.success` payment pipeline.
+The two stopgap `console.error` sites above now report to Sentry (scopes `paystack-webhook` and
+`order-confirmation-email`) and the broader app (server actions, API routes, cron) was swept the
+same way. Configure Sentry alerts on these scopes to complete the audit-trail/alert requirement.
 
 ---
 
@@ -55,6 +57,10 @@ creates an alert and an audit trail.
 If the Paystack webhook is never delivered (network failure, cold-start timeout) or the
 `after()` callback fails silently, a customer is charged at Paystack but their order stays
 `paymentStatus = "unpaid"` indefinitely. No automated recovery path exists.
+
+> **Now observable (not yet fixed):** `handle-charge-success.ts` and `resolve-order-for-payment.ts`
+> emit a `Sentry.logger.warn` when a verified charge has no matching unpaid order, so orphaned
+> charges are visible in Sentry. The reconciliation cron below is still required to auto-recover.
 
 **Proposed fix:** Schedule a cron (Vercel Cron, pg_cron, or a standalone job) that:
 

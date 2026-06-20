@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import {
   AddressWithId,
   addressWithIdSchema,
@@ -65,7 +66,8 @@ export async function updateAddress(
     })
 
     return { success: true, data: updated }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "addresses.update" })
     return {
       success: false,
       code: 500,

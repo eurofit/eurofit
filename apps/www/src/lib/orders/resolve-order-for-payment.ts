@@ -1,3 +1,4 @@
+import { logger } from "@/lib/observability/capture-error"
 import config from "@payload-config"
 import { getPayload } from "payload"
 
@@ -19,11 +20,13 @@ export async function resolveOrderForPayment(reference: string) {
 
   const order = docs[0] ?? null
 
-  console.log(
-    "[resolve-order]",
-    order ? "found unpaid order:" : "no unpaid order for reference:",
-    order ? order.id : reference
-  )
+  if (order) {
+    logger.info(logger.fmt`[resolve-order] found unpaid order ${order.id}`)
+  } else {
+    logger.warn(
+      logger.fmt`[resolve-order] no unpaid order for reference ${reference}`
+    )
+  }
 
   return order
 }

@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import {
   ForgotPasswordData,
   forgotPasswordSchema,
@@ -40,7 +41,8 @@ export async function forgotPassword(
       data: { email },
     })
     return { success: true, data: { email } }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "auth.forgot-password" })
     return {
       success: false,
       code: 500,

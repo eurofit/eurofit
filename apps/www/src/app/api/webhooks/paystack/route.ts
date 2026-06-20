@@ -1,5 +1,7 @@
+import { captureError, logger } from "@/lib/observability/capture-error"
 import { handleChargeSuccess } from "@/lib/payment/handle-charge-success"
 import { validatePaystackSignature } from "@/lib/payment/validate-paystack-signature"
+import * as Sentry from "@sentry/nextjs"
 import { after } from "next/server"
 
 export async function POST(req: Request) {
@@ -8,15 +10,14 @@ export async function POST(req: Request) {
   try {
     body = await req.json()
   } catch (error) {
-    console.error("[paystack-webhook] failed to parse request body:", error)
+    captureError(error, { scope: "paystack-webhook", tags: { stage: "parse" } })
     return Response.json({ success: false }, { status: 400 })
   }
 
-  console.log(
-    "[paystack-webhook] received event:",
-    body.event,
-    "reference:",
-    body.data?.reference
+  const reference = body.data?.reference ?? "unknown"
+
+  logger.info(
+    logger.fmt`[paystack-webhook] received event ${body.event ?? "unknown"} reference ${reference}`
   )
 
   const isPaystackSignatureValid = validatePaystackSignature(
@@ -25,39 +26,44 @@ export async function POST(req: Request) {
   )
 
   if (!isPaystackSignatureValid) {
-    console.log(
-      "[paystack-webhook] rejecting event — invalid signature, reference:",
-      body.data?.reference
+    logger.warn(
+      logger.fmt`[paystack-webhook] rejecting event — invalid signature, reference ${reference}`
     )
     return Response.json({ success: false }, { status: 401 })
   }
 
-  console.log(
-    "[paystack-webhook] signature valid — dispatching, reference:",
-    body.data?.reference
+  logger.info(
+    logger.fmt`[paystack-webhook] signature valid — dispatching, reference ${reference}`
   )
 
   // Return 200 immediately per Paystack docs — long-running work triggers retries
   after(async () => {
     if (body.event === "charge.success") {
-      console.log(
-        "[paystack-webhook] handling charge.success, reference:",
-        body.data?.reference
+      await Sentry.startSpan(
+        {
+          name: "paystack.charge_success",
+          op: "queue.process",
+          attributes: { reference },
+        },
+        async () => {
+          try {
+            await handleChargeSuccess(body.data as { reference: string })
+          } catch (error) {
+            // The customer may already be charged: a failure here means a paid
+            // order never gets reconciled, so it must be surfaced (TODOS H-03).
+            captureError(error, {
+              scope: "paystack-webhook",
+              tags: { stage: "handle-charge-success", reference },
+            })
+          }
+        }
       )
-      try {
-        await handleChargeSuccess(body.data as { reference: string })
-      } catch (error) {
-        // TODO: implement error tracking service (see TODOS.md)
-        console.error(
-          "[paystack-webhook] handleChargeSuccess failed, reference:",
-          body.data?.reference,
-          error
-        )
-      }
       return
     }
 
-    console.log("[paystack-webhook] ignoring unhandled event:", body.event)
+    logger.info(
+      logger.fmt`[paystack-webhook] ignoring unhandled event ${body.event ?? "unknown"}`
+    )
   })
 
   return Response.json({ success: true })

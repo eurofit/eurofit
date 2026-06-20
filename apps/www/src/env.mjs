@@ -36,6 +36,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().min(1),
     NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY: z.string().min(1),
     NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY: z.string().min(1),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -65,6 +66,7 @@ export const env = createEnv({
       process.env.CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY,
     NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY:
       process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
 })
 

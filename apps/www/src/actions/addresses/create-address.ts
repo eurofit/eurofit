@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { env } from "@/env.mjs"
+import { captureError } from "@/lib/observability/capture-error"
 import { Address, addressSchema } from "@/lib/schemas/addresses/address"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { Address as AddressDoc } from "@/payload-types"
@@ -49,7 +50,8 @@ export async function createAddress(
     })
 
     return { success: true, data: address }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "addresses.create" })
     return {
       success: false,
       code: 500,

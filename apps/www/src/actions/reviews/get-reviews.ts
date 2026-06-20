@@ -1,6 +1,7 @@
 "use server"
 
 import { REVIEWS_PER_PAGE } from "@/const/reviews"
+import { captureError } from "@/lib/observability/capture-error"
 import { User } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import { ReviewListPage } from "@/types/review"
@@ -84,7 +85,8 @@ export async function getReviews(
         totalPages,
       },
     }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "reviews.get" })
     return { success: false, code: 500, message: "Failed to load reviews." }
   }
 }

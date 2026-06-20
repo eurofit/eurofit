@@ -1,5 +1,6 @@
 "use server"
 
+import { captureError } from "@/lib/observability/capture-error"
 import { ActionResult } from "@/types/action-result"
 import { Brand } from "@/types/brand"
 import payloadConfig from "@payload-config"
@@ -99,7 +100,8 @@ export async function getBrands(
         page: responsePage,
       },
     }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "brands.get" })
     return { success: false, code: 500, message: "Failed to load brands." }
   }
 }
@@ -140,7 +142,8 @@ export async function getAllBrands(): Promise<
         })),
       },
     }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "brands.get" })
     return { success: false, code: 500, message: "Failed to load brands." }
   }
 }

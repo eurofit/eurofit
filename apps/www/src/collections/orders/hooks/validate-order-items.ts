@@ -1,3 +1,4 @@
+import { logger } from "@/lib/observability/capture-error"
 import { buildOrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
 import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
@@ -78,6 +79,9 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
     }
 
     if (productVariant.isOutOfStock) {
+      logger.warn(
+        logger.fmt`[validate-order-items] out of stock variant ${itemId} requested ${item.quantity}`
+      )
       throw new APIError(
         `Product with ID ${itemId} is out of stock.`,
         400,
@@ -92,6 +96,10 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
     )
 
     if (item.quantity > availableStock) {
+      // Surfaces the C-01 oversell window if it is ever hit at checkout time.
+      logger.warn(
+        logger.fmt`[validate-order-items] insufficient stock variant ${itemId} requested ${item.quantity} available ${availableStock}`
+      )
       throw new APIError(
         `Insufficient stock for product with ID ${itemId}.`,
         400,

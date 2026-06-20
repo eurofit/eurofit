@@ -1,6 +1,7 @@
 "use server"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { captureError } from "@/lib/observability/capture-error"
 import { AddressId, addressIdSchema } from "@/lib/schemas/addresses/address"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
@@ -42,7 +43,8 @@ export async function deleteAddress(
     await payload.delete({ collection: "addresses", id, depth: 0 })
 
     return { success: true, data: { id } }
-  } catch {
+  } catch (error) {
+    captureError(error, { scope: "addresses.delete" })
     return {
       success: false,
       code: 500,
