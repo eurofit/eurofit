@@ -1,3 +1,4 @@
+import { CITIES } from "@/const/cities"
 import { titles } from "@/const/titles"
 import * as z from "zod"
 
@@ -25,7 +26,7 @@ export const addressSchema = z.object({
   area: z.string().max(150, "Area is too long").optional(),
   landmark: z.string().max(150, "Landmark is too long").optional(),
   postalCode: z.string().length(5, "Postal code must be 5 characters long"),
-  city: z.string().min(1, "City is required").max(100, "City is too long"),
+  city: z.enum(CITIES, { error: "Please select a valid city" }),
   county: z
     .string()
     .min(1, "County is required")
