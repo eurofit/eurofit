@@ -166,12 +166,20 @@ export const discounts: CollectionConfig = {
         condition: (data) => isAmountOff(data),
       },
       validate: ((value, { data }) => {
-        if (!isAmountOff(data as Partial<Discount>)) return true
+        const discount = data as Partial<Discount>
+        if (!isAmountOff(discount)) return true
         if (value === null || value === undefined) {
           return "A discount value is required."
         }
         if (typeof value === "number" && value < 0) {
           return "The discount value must be a non-negative number."
+        }
+        if (
+          discount.valueType === "percentage" &&
+          typeof value === "number" &&
+          value > 100
+        ) {
+          return "A percentage discount cannot exceed 100."
         }
         return true
       }) as NumberFieldValidation,
