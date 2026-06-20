@@ -59,6 +59,7 @@ export function ProductDetailPage({
             title={product.detailTitle ?? product.title}
             brand={product.product?.brand || null}
             price={product.retailPrice}
+            discount={product.discount}
             inStock={!product.isOutOfStock}
             isPreorder={product.isPreorder}
             stock={product.stock}

@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { getVariantReviewStats } from "@/lib/utils/reviews/get-variant-review-stats"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import config from "@payload-config"
@@ -34,7 +35,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
       barcode: true,
       category: true,
       product: true,
-      discounts: true,
+      discount: true,
       stock: true,
       supplierStock: true,
       isBackorder: true,
@@ -96,6 +97,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
         averageRating,
         totalRatings,
         stock: resolveAvailableStock(stock, supplierStock),
+        discount: normalizeVariantDiscount(productVariant.discount),
         images,
         meta: meta
           ? {

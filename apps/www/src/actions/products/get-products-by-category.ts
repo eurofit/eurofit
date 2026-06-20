@@ -2,6 +2,7 @@ import "server-only"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { CATEGORY_PRODUCTS_PER_PAGE } from "@/const/category-filters"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { buildProductFilterConditions } from "@/lib/utils/products/build-product-filter-conditions"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import { Media } from "@/payload-types"
@@ -93,6 +94,7 @@ export async function getProductsByCategory(opts: GetProductsByCategoryArgs) {
         stock: true,
         supplierStock: true,
         retailPrice: true,
+        discount: true,
         isPreorder: true,
         isLowStock: true,
         isOutOfStock: true,
@@ -114,12 +116,19 @@ export async function getProductsByCategory(opts: GetProductsByCategoryArgs) {
       productVariants: (product.productVariants.docs ?? [])
         .filter((variant) => typeof variant === "object")
         .map((variant) => {
-          const { supplierStock, retailPrice, stock, ...variantRest } = variant
+          const {
+            supplierStock,
+            retailPrice,
+            stock,
+            discount,
+            ...variantRest
+          } = variant
 
           return {
             ...variantRest,
             stock: resolveAvailableStock(stock, supplierStock),
             price: retailPrice ?? null,
+            discount: normalizeVariantDiscount(discount),
           }
         }),
     }

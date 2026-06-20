@@ -5,11 +5,11 @@ import { NotifyMeButton } from "@/components/stock-alert/notify-me-button"
 import { site } from "@/const/site"
 import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
 import { buildWhatsAppLink } from "@/lib/utils/build-wa-link"
-import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { ProductVariant } from "@/types/product-variant"
 import { Button } from "@eurofit/ui/components/button"
 import Link from "next/link"
 import { QuantityInput } from "./quantity-input"
+import { VariantPrice } from "./variant-price"
 
 type VariantActionsProps = {
   variant: ProductVariant
@@ -27,11 +27,12 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
 
   return (
     <div className="flex w-full flex-row items-center justify-between gap-3 md:w-auto md:flex-col md:items-end md:gap-2">
-      {variant.price && (
-        <span className="text-lg font-bold tabular-nums">
-          <span className="text-muted-foreground">Ksh</span>
-          {formatWithCommas(variant.price)}
-        </span>
+      {variant.price !== null && (
+        <VariantPrice
+          price={variant.price}
+          discount={variant.discount}
+          size="sm"
+        />
       )}
 
       {variant.isOutOfStock && (

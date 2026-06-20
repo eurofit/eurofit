@@ -3,6 +3,7 @@ import "server-only"
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { SEARCH_PRODUCTS_PER_PAGE } from "@/const/search-filters"
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { buildProductFilterConditions } from "@/lib/utils/products/build-product-filter-conditions"
 import { buildProductSearchMatchCondition } from "@/lib/utils/products/build-product-search-match-condition"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
@@ -145,6 +146,7 @@ export async function searchProducts(
         stock: true,
         supplierStock: true,
         retailPrice: true,
+        discount: true,
         isPreorder: true,
         isLowStock: true,
         isOutOfStock: true,
@@ -166,12 +168,19 @@ export async function searchProducts(
       productVariants: (product.productVariants.docs ?? [])
         .filter((variant) => typeof variant === "object")
         .map((variant) => {
-          const { supplierStock, retailPrice, stock, ...variantRest } = variant
+          const {
+            supplierStock,
+            retailPrice,
+            stock,
+            discount,
+            ...variantRest
+          } = variant
 
           return {
             ...variantRest,
             stock: resolveAvailableStock(stock, supplierStock),
             price: retailPrice ?? null,
+            discount: normalizeVariantDiscount(discount),
           }
         }),
     }
