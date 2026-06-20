@@ -43,9 +43,11 @@ type ThankYouPageProps = {
 export default async function ThankYouPage({ params }: ThankYouPageProps) {
   const { orderId } = await params
 
-  //TODO: validate orderId number to be positive integer
-
   const orderIdNumber = Number(orderId)
+
+  if (!Number.isInteger(orderIdNumber) || orderIdNumber <= 0) {
+    notFound()
+  }
 
   const user = await getCurrentUser()
 
