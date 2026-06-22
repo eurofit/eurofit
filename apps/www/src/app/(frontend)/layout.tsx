@@ -1,12 +1,14 @@
 import { JsonLd } from "@/components/json-ld"
 import { localBusiness, organization, website } from "@/const/json-ld"
 import { site } from "@/const/site"
+import { env } from "@/env.mjs"
 import { dmSans } from "@/fonts/dm-sans"
 import { montserrat } from "@/fonts/montserrat"
 import { JotaiProvider } from "@/providers/jotai"
 import { ReactQueryProvider } from "@/providers/react-query"
 import { Toaster } from "@eurofit/ui/components//sonner"
 import "@eurofit/ui/globals.css"
+import { GoogleTagManager } from "@next/third-parties/google"
 import type { Metadata, Viewport } from "next"
 import NextTopLoader from "nextjs-toploader"
 
@@ -37,6 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scrollbar-gutter-stable">
+      <GoogleTagManager gtmId={env.NEXT_PUBLIC_GTM_ID} />
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
         <JsonLd jsonLd={[organization, website, localBusiness]} />
         <Toaster richColors duration={8000} closeButton />
