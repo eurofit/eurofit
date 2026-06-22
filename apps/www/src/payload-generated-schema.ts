@@ -432,6 +432,7 @@ export const pages = pgTable(
     title: varchar("title").notNull(),
     generateSlug: boolean("generate_slug").default(true),
     slug: varchar("slug").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
     meta_title: varchar("meta_title"),
     meta_description: varchar("meta_description"),
     meta_image: uuid("meta_image_id").references(() => media.id, {
@@ -1134,6 +1135,7 @@ export const orders = pgTable(
         onDelete: "set null",
       }),
     subtotal: numeric("subtotal", { mode: "number" }).default(0),
+    discountTotal: numeric("discount_total", { mode: "number" }).default(0),
     deliveryFee: numeric("delivery_fee", { mode: "number" }).default(0),
     total: numeric("total", { mode: "number" }).default(0),
     paymentStatus: enum_orders_payment_status("payment_status")

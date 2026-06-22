@@ -1,6 +1,7 @@
 import { adminOnly } from "@/access/admin"
 import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
+import { activeField } from "@/fields/active"
 import { titleCase } from "@/payload-hooks/title-case"
 import { CollectionConfig, slugField } from "payload"
 import { revalidatePageTag } from "./hooks/revalidate-page-tag"
@@ -35,6 +36,7 @@ export const pages: CollectionConfig = {
       },
     },
     slugField(),
+    activeField(),
     {
       name: "layout",
       label: "Layout",
