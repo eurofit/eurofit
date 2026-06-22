@@ -29,6 +29,7 @@ import { Spinner } from "@eurofit/ui/components/spinner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { useMutation } from "@tanstack/react-query"
 import Link from "next/link"
 import { useRouter } from "nextjs-toploader/app"
@@ -52,6 +53,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         description: "Please check your email to verify your account.",
       })
       router.push("/verify-email")
+
+      sendGTMEvent({
+        event: "sign_up",
+        method: "email",
+      })
     },
     onError: (error) => {
       turnstileRef.current?.reset()
