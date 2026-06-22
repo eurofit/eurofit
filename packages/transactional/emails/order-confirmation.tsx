@@ -459,8 +459,7 @@ export default function OrderConfirmation({
                 <tr>
                   <td align="center">
                     <Text className="my-2 leading-6 font-semibold text-gray-500">
-                      Unit 111, 1st Floor, 6th Street Tower, 6th Street,
-                      Eastleigh, Nairobi, Kenya
+                      Seventh Street, Eastleigh, Nairobi, Kenya
                     </Text>
                     <Text className="mt-1 mb-0 leading-6 font-semibold text-gray-500">
                       info@eurofit.co.ke +254 110 990 660

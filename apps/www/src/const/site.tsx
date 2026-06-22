@@ -114,6 +114,7 @@ export const site = {
     },
   ],
   address: {
+    placeId: "ChIJy-3WqCsXLxgRLu-kV-fw6BA",
     line1: "Seventh Street",
     line2: "Eastleigh",
     city: "Nairobi",
