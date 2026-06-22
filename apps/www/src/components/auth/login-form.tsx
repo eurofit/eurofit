@@ -26,6 +26,7 @@ import { cn } from "@eurofit/ui/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
+import { sendGTMEvent } from "@next/third-parties/google"
 import { useMutation } from "@tanstack/react-query"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -54,6 +55,11 @@ export function LoginForm({
     },
     onSuccess: () => {
       router.push(isSafeRedirect(next) ? next : "/")
+
+      sendGTMEvent({
+        event: "login",
+        method: "email",
+      })
     },
     onError: (error: unknown) => {
       // Clear the consumed token; the invisible widget re-solves and fires
