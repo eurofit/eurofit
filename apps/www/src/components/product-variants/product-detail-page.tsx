@@ -79,7 +79,7 @@ export function ProductDetailPage({
             price={product.retailPrice}
             discount={product.discount}
             inStock={!product.isOutOfStock}
-            isPreorder={product.isPreorder}
+            isBackorder={product.isBackorder}
             stock={product.stock}
             variant={product.variant}
             isWishlisted={product.isWishlisted}

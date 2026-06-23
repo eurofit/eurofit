@@ -97,7 +97,7 @@ export async function getProductsByBrand(opts: GetProductsByBrandArgs) {
         supplierStock: true,
         retailPrice: true,
         discount: true,
-        isPreorder: true,
+        isBackorder: true,
         isLowStock: true,
         isOutOfStock: true,
         isNotifyRequested: true,

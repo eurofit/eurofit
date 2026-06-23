@@ -147,7 +147,7 @@ export async function searchProducts(
         supplierStock: true,
         retailPrice: true,
         discount: true,
-        isPreorder: true,
+        isBackorder: true,
         isLowStock: true,
         isOutOfStock: true,
         isNotifyRequested: true,

@@ -20,7 +20,7 @@ export type ProductVariant = {
   expiryDate?: string | null
   variant?: string | null
   barcode?: string | null
-  isPreorder: boolean
+  isBackorder: boolean
   isOutOfStock: boolean
   isLowStock: boolean
   isNotifyRequested: boolean

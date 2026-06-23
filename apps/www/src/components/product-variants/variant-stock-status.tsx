@@ -21,8 +21,8 @@ export function VariantStockStatus({ variant }: VariantStockStatusProps) {
   return (
     <p className="text-sm text-green-600 tabular-nums">
       {variant.stock} in Stock
-      {variant.isPreorder && (
-        <span className="text-muted-foreground">&nbsp;(preorder)</span>
+      {variant.isBackorder && (
+        <span className="text-muted-foreground">&nbsp;(backorder)</span>
       )}
     </p>
   )
