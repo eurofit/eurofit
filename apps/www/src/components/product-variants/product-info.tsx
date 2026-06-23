@@ -70,7 +70,7 @@ export function ProductInfo({
       ? toGTMItem({
           slug: variantSlug,
           productTitle: productTitle ?? title,
-          price,
+          price: price ?? null,
           discountedPrice: discount?.price ?? null,
           brand: brand?.title ?? null,
           variantLabel: variant ?? null,
