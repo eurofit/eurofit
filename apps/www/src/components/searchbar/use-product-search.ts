@@ -5,6 +5,7 @@ import {
   searchProductSuggestions,
 } from "@/actions/products/search-product-suggestions"
 import { recentSearchesAtom } from "@/atoms/search-bar"
+import { sendSearchEvent } from "@/lib/analytics/send-search-event"
 import { useMutation } from "@tanstack/react-query"
 import { useAtom } from "jotai"
 import { useSearchParams } from "next/navigation"
@@ -25,6 +26,8 @@ export function useProductSearch() {
   const [totalProducts, setTotalProducts] = React.useState<number>(0)
 
   const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom)
+
+  const lastSearchTermRef = React.useRef<string | null>(null)
 
   // sync search params
   React.useEffect(() => {
@@ -47,6 +50,11 @@ export function useProductSearch() {
       if (result.query) {
         setTotalProducts(result.totalProducts)
         setProducts(result.products)
+
+        if (result.query !== lastSearchTermRef.current) {
+          lastSearchTermRef.current = result.query
+          sendSearchEvent({ searchTerm: result.query })
+        }
       }
     },
     onError: () => {
