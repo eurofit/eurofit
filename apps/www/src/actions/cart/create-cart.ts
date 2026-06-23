@@ -5,7 +5,11 @@ import {
   invalidCartInput,
   toCartActionError,
 } from "@/lib/utils/cart/cart-action-error"
-import { buildCartOwner } from "@/lib/utils/cart/get-cart"
+import {
+  CART_DETAIL_DEPTH,
+  CART_DETAIL_POPULATE,
+  buildCartOwner,
+} from "@/lib/utils/cart/get-cart"
 import { getCurrentIdentity } from "@/lib/utils/get-current-identity"
 import { Cart } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
@@ -34,6 +38,8 @@ export async function createCart(
         items: [{ productVariant: productVariantId, quantity }],
         lastActiveAt: new Date().toISOString(),
       },
+      depth: CART_DETAIL_DEPTH,
+      populate: CART_DETAIL_POPULATE,
     })
 
     return { success: true, data: cart }
