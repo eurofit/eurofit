@@ -39,7 +39,7 @@ export const productVariants: CollectionConfig = {
       "title",
       "barcode",
       "slug",
-      "srcProductCode",
+      "supplierProductCode",
     ],
     defaultColumns: ["title", "variant", "sku", "expiryDate", "stock"],
   },
