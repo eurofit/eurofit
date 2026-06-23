@@ -11,5 +11,8 @@ export const checkIfPreorder: FieldHook<
       "Stock and supplierStock fields are required to determine back-ordered status."
     )
   }
-  return true
+  const hasInHouseStock = data.stock !== undefined && data.stock > 0
+  const hasSupplierStock =
+    data.supplierStock !== undefined && data.supplierStock > 0
+  return !hasInHouseStock && hasSupplierStock
 }
