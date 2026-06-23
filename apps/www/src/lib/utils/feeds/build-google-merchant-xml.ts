@@ -13,6 +13,7 @@ export type MerchantFeedItem = {
   link: string
   price: number
   availability: MerchantAvailability
+  availabilityDate?: string
   imageLink?: string
   brand?: string
   gtin?: string
@@ -44,6 +45,9 @@ function buildItemXml(item: MerchantFeedItem): string {
     tag("g:availability", item.availability),
     tag("g:condition", "new"),
   ]
+
+  if (item.availabilityDate)
+    tags.push(tag("g:availability_date", item.availabilityDate))
 
   if (item.imageLink) tags.push(tag("g:image_link", item.imageLink))
   if (item.brand) tags.push(tag("g:brand", item.brand))
