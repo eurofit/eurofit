@@ -188,7 +188,15 @@ export function ProductInfo({
 
       {/* Add to Cart Button */}
       <ProductDetailCartActions
-        variant={{ id, stock, sku, title, variant, price: price ?? null }}
+        variant={{
+          id,
+          stock,
+          sku,
+          slug: variantSlug ?? "",
+          title,
+          variant,
+          price: price ?? null,
+        }}
         inStock={inStock}
       />
 

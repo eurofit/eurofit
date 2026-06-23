@@ -3,6 +3,7 @@
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { site } from "@/const/site"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
+import { sendInquireItemPriceEvent } from "@/lib/analytics/send-inquire-item-price-event"
 import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
 import { buildWhatsAppLink } from "@/lib/utils/build-wa-link"
 import { ProductVariant } from "@/types/product-variant"
@@ -17,7 +18,7 @@ import Link from "next/link"
 type ProductDetailCartActionsProps = {
   variant: Pick<
     ProductVariant,
-    "id" | "stock" | "sku" | "title" | "variant" | "price"
+    "id" | "stock" | "sku" | "slug" | "title" | "variant" | "price"
   >
   inStock: boolean
 }
@@ -27,6 +28,14 @@ export function ProductDetailCartActions({
   inStock,
 }: ProductDetailCartActionsProps) {
   const shouldInquirePrice = variant.price == null
+
+  const handlePriceInquiry = () =>
+    sendInquireItemPriceEvent({
+      slug: variant.slug,
+      productTitle: variant.title,
+      price: variant.price,
+      variantLabel: variant.variant,
+    })
 
   if (shouldInquirePrice) {
     return (
@@ -44,6 +53,7 @@ export function ProductDetailCartActions({
             })}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handlePriceInquiry}
           >
             <Whatsapp aria-hidden="true" />
             Inquire Price

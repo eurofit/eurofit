@@ -9,6 +9,8 @@ export const GTM_ECOMMERCE_EVENT = {
   ADD_TO_CART: "add_to_cart",
   ADD_TO_WISHLIST: "add_to_wishlist",
   BEGIN_CHECKOUT: "begin_checkout",
+  INQUIRE_ITEM_PRICE: "inquire_item_price",
+  NOTIFY_ME: "notify_me",
   PURCHASE: "purchase",
   REFUND: "refund",
   REMOVE_FROM_CART: "remove_from_cart",
