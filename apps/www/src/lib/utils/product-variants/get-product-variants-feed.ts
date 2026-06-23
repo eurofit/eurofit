@@ -3,7 +3,9 @@ import {
   MerchantAvailability,
   MerchantFeedItem,
 } from "@/lib/utils/feeds/build-google-merchant-xml"
+import { getBackorderAvailabilityDate } from "@/lib/utils/feeds/get-backorder-availability-date"
 import payloadConfig from "@payload-config"
+import { format } from "date-fns"
 import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 
@@ -103,6 +105,9 @@ export async function getProductVariantsFeed(): Promise<MerchantFeedItem[]> {
       link: `${site.url}/product-variants/${variant.slug}`,
       price: variant.retailPrice as number,
       availability: resolveAvailability(variant),
+      availabilityDate: variant.isBackorder
+        ? `${format(getBackorderAvailabilityDate(new Date()), "yyyy-MM-dd")}T00:00+0300`
+        : undefined,
       imageLink: resolveImageLink(variant),
       brand: resolveBrand(variant),
       gtin: variant.barcode ?? undefined,
