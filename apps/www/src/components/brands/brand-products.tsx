@@ -88,15 +88,15 @@ export async function BrandProducts({
 
       <div className="space-y-10">
         <section id="brand-products-list" className="grid gap-8 md:gap-10">
-          <ProductAnalyticsProvider brand={brand?.title}>
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                userId={user?.id}
-              />
-            ))}
-          </ProductAnalyticsProvider>
+          {products.map((product) => (
+            <ProductAnalyticsProvider
+              key={product.id}
+              brand={brand?.title}
+              categories={product.categories}
+            >
+              <ProductCard product={product} userId={user?.id} />
+            </ProductAnalyticsProvider>
+          ))}
         </section>
 
         <Pagination count={totalPages} page={page} />
