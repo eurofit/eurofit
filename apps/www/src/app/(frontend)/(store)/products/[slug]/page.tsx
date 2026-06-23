@@ -77,7 +77,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const gtmItems = productVariants.map((variant, index) =>
     toGTMItem(
       {
-        slug: variant.slug,
+        sku: variant.sku,
         productTitle: title,
         price: variant.price,
         discountedPrice: variant.discount?.price ?? null,

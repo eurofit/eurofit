@@ -69,7 +69,7 @@ export function ProductInfo({
   const gtmItem =
     variantSlug != null
       ? toGTMItem({
-          slug: variantSlug,
+          sku,
           productTitle: productTitle ?? title,
           price: price ?? null,
           discountedPrice: discount?.price ?? null,

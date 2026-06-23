@@ -30,7 +30,7 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
 
   const handlePriceInquiry = () =>
     sendInquireItemPriceEvent({
-      slug: variant.slug,
+      sku: variant.sku,
       productTitle: variant.title,
       price: variant.price,
       variantLabel: variant.variant,
@@ -54,7 +54,7 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
           productVariantId={variant.id}
           isNotifyRequested={variant.isNotifyRequested}
           analytics={{
-            slug: variant.slug,
+            sku: variant.sku,
             productTitle: variant.title,
             price: variant.price,
             variantLabel: variant.variant,

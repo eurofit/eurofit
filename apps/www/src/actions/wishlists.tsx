@@ -107,6 +107,7 @@ export async function getWishlistItems(
         {
           id: doc.id,
           variantId: variant.id,
+          sku: variant.sku,
           title: variant.title,
           productTitle: product?.title ?? variant.title,
           slug,

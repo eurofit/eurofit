@@ -34,7 +34,7 @@ export type GTMItem = {
  * (wishlist, `view_item`) and is set explicitly for cart events.
  */
 export type GTMItemInput = {
-  slug: string
+  sku: string
   productTitle: string
   price: number | null
   discountedPrice?: number | null
@@ -75,10 +75,7 @@ export function toGTMItem(input: GTMItemInput, index = 0): GTMItem {
       : undefined
 
   return {
-    // The variant slug is the feed-matching id: it's always present, human
-    // readable, and survives the id/sku churn that comes with scraped data,
-    // so it's the most stable join key for Google Ads dynamic remarketing.
-    item_id: input.slug,
+    item_id: input.sku,
     item_name: input.productTitle,
     affiliation: site.name,
     location_id: site.address.placeId,
@@ -120,7 +117,7 @@ export function formattedCartItemToGTMInput(
   item: FormattedCartItem
 ): GTMItemInput {
   return {
-    slug: item.slug,
+    sku: item.sku,
     productTitle: item.product.title,
     price: item.retailPrice ?? 0,
     discountedPrice: normalizeVariantDiscount(item.discount)?.price ?? null,

@@ -31,7 +31,7 @@ export function WishlistCard({ item, currentUserId }: WishlistCardProps) {
       if (result.success) {
         sendRemoveFromWishlistEvent({
           item: toGTMItem({
-            slug: item.slug,
+            sku: item.sku,
             productTitle: item.productTitle,
             price: item.price,
             discountedPrice: item.discountedPrice,

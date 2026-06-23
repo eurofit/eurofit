@@ -83,9 +83,7 @@ export function getProductVariantJsonLd(
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${url}#product`,
-    // The slug is the stable join key shared by the Merchant Center feed `id`
-    // and the GA4 `item_id`, so dynamic remarketing matches across all three.
-    productID: variant.slug,
+    productID: variant.sku,
     name: variant.detailTitle ?? variant.title,
     sku: variant.sku,
     gtin: variant.barcode ?? undefined,

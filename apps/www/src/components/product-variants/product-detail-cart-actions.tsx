@@ -33,7 +33,7 @@ export function ProductDetailCartActions({
 
   const handlePriceInquiry = () =>
     sendInquireItemPriceEvent({
-      slug: variant.slug,
+      sku: variant.sku,
       productTitle: variant.title,
       price: variant.price,
       variantLabel: variant.variant,

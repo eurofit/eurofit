@@ -9,6 +9,7 @@ import { getPayload } from "payload"
 
 type FeedVariant = {
   slug: string
+  sku: string
   title: string
   detailTitle?: string | null
   retailPrice?: number | null
@@ -73,6 +74,7 @@ export async function getProductVariantsFeed(): Promise<MerchantFeedItem[]> {
     where: { isActive: { equals: true } },
     select: {
       slug: true,
+      sku: true,
       title: true,
       detailTitle: true,
       retailPrice: true,
@@ -96,7 +98,7 @@ export async function getProductVariantsFeed(): Promise<MerchantFeedItem[]> {
   return (docs as FeedVariant[])
     .filter((variant) => typeof variant.retailPrice === "number")
     .map((variant) => ({
-      id: variant.slug,
+      id: variant.sku,
       title: variant.detailTitle ?? variant.title,
       link: `${site.url}/product-variants/${variant.slug}`,
       price: variant.retailPrice as number,

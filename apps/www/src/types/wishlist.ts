@@ -1,6 +1,7 @@
 export type WishlistItem = {
   id: string
   variantId: string
+  sku: string
   title: string
   productTitle: string
   slug: string
