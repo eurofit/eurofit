@@ -1,6 +1,9 @@
 "use client"
 
 import { toggleWishlist } from "@/actions/wishlists"
+import { sendAddToWishlistEvent } from "@/lib/analytics/ecommerce/add-to-wishlist"
+import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
+import type { GTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
 import { Button } from "@eurofit/ui/components/button"
 import { cn } from "@eurofit/ui/lib/utils"
 import { Heart } from "lucide-react"
@@ -11,12 +14,14 @@ type WishlistButtonProps = {
   currentUserId: string | undefined
   variantId: string
   isWishlisted: boolean
+  gtmItem?: GTMWishlistItem
 }
 
 export function WishlistButton({
   currentUserId,
   variantId,
   isWishlisted,
+  gtmItem,
 }: WishlistButtonProps) {
   const [optimisticIsWishlisted, setOptimisticIsWishlisted] =
     React.useOptimistic(isWishlisted)
@@ -39,11 +44,18 @@ export function WishlistButton({
   const handleClick = () => {
     React.startTransition(async () => {
       setOptimisticIsWishlisted((prev) => !prev)
-      await toggleWishlist({
+      const result = await toggleWishlist({
         currentUserId,
         isWishlisted,
         variantId,
       })
+      if (result.success && gtmItem) {
+        if (isWishlisted) {
+          sendRemoveFromWishlistEvent({ item: gtmItem })
+        } else {
+          sendAddToWishlistEvent({ item: gtmItem })
+        }
+      }
     })
   }
 

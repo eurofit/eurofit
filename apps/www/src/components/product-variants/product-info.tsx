@@ -2,6 +2,7 @@ import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { CountdownTimerBlock } from "@/components/timer/countdown-timer-block"
+import { toGTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -19,6 +20,9 @@ interface ProductInfoProps {
   id: string
   sku: string
   title: string
+  productTitle?: string
+  variantSlug?: string
+  categories?: string[]
   brand: {
     title: string
     slug: string
@@ -39,6 +43,9 @@ export function ProductInfo({
   id,
   sku,
   title,
+  productTitle,
+  variantSlug,
+  categories,
   brand,
   price,
   discount,
@@ -50,6 +57,19 @@ export function ProductInfo({
   averageRating,
   totalRatings,
 }: ProductInfoProps) {
+  const gtmItem =
+    variantSlug != null && price != null
+      ? toGTMWishlistItem({
+          slug: variantSlug,
+          productTitle: productTitle ?? title,
+          price,
+          discountedPrice: discount?.price ?? null,
+          brand: brand?.title ?? null,
+          variantLabel: variant ?? null,
+          categories,
+        })
+      : undefined
+
   return (
     <div className="flex flex-col justify-start gap-6">
       {/* Header with Wishlist */}
@@ -66,6 +86,7 @@ export function ProductInfo({
             currentUserId={currentUserId}
             variantId={id}
             isWishlisted={isWishlisted}
+            gtmItem={gtmItem}
           />
         </div>
         <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">

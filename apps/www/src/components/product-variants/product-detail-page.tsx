@@ -23,6 +23,21 @@ export function ProductDetailPage({
   product,
   currentUserId,
 }: ProductDetailPageProps) {
+  const productCategories = (product.product?.categories ?? []).flatMap(
+    (cat) =>
+      typeof cat === "object" && cat && "title" in cat
+        ? [cat.title as string]
+        : []
+  )
+  const variantCategory = product.category ?? null
+  const categories = [
+    ...new Set(
+      variantCategory
+        ? [...productCategories, variantCategory]
+        : productCategories
+    ),
+  ]
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -57,6 +72,9 @@ export function ProductDetailPage({
             id={product.id}
             sku={product.sku}
             title={product.detailTitle ?? product.title}
+            productTitle={product.product?.title ?? product.title}
+            variantSlug={product.slug}
+            categories={categories}
             brand={product.product?.brand || null}
             price={product.retailPrice}
             discount={product.discount}

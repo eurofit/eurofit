@@ -12,6 +12,7 @@ export const GTM_ECOMMERCE_EVENT = {
   PURCHASE: "purchase",
   REFUND: "refund",
   REMOVE_FROM_CART: "remove_from_cart",
+  REMOVE_FROM_WISHLIST: "remove_from_wishlist",
   SELECT_ITEM: "select_item",
   SELECT_PROMOTION: "select_promotion",
   VIEW_CART: "view_cart",

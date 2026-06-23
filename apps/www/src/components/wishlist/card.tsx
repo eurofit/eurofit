@@ -1,6 +1,8 @@
 "use client"
 
 import { toggleWishlist } from "@/actions/wishlists"
+import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
+import { toGTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
 import { WishlistItem } from "@/types/wishlist"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
@@ -21,11 +23,24 @@ export function WishlistCard({ item, currentUserId }: WishlistCardProps) {
   const handleRemove = () => {
     React.startTransition(async () => {
       setOptimisticRemoved(true)
-      await toggleWishlist({
+      const result = await toggleWishlist({
         currentUserId,
         variantId: item.variantId,
         isWishlisted: true,
       })
+      if (result.success) {
+        sendRemoveFromWishlistEvent({
+          item: toGTMWishlistItem({
+            slug: item.slug,
+            productTitle: item.productTitle,
+            price: item.price,
+            discountedPrice: item.discountedPrice,
+            brand: item.brand ?? null,
+            variantLabel: item.title,
+            categories: item.categories,
+          }),
+        })
+      }
     })
   }
 
