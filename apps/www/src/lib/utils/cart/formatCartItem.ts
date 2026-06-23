@@ -1,3 +1,4 @@
+import { Category } from "@/payload-types"
 import { CartItem } from "@/types/cart"
 import { getPayloadImageUrl } from "../payload-image"
 import { resolveAvailableStock } from "../stock/resolve-available-stock"
@@ -15,11 +16,22 @@ export function formatCartItem(item: CartItem) {
     throw new Error("Cart Items 'product' field is not populated")
   }
 
+  const brand =
+    product.brand && typeof product.brand === "object"
+      ? product.brand.title
+      : undefined
+
+  const categories = (product.categories ?? [])
+    .filter((category): category is Category => typeof category === "object")
+    .map((category) => category.title)
+
   return {
     product: {
       id: product.id,
       slug: product.slug,
       title: product.title,
+      brand,
+      categories,
       image:
         getPayloadImageUrl(product.images?.[0]) ??
         product.supplierImageUrl ??

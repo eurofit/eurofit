@@ -45,8 +45,8 @@ export async function Footer() {
           </div>
 
           <address className="max-w-sm text-sm text-muted-foreground not-italic">
-            Seventh St, Easleigh, <br />
-            Nairobi, kenya
+            Seventh St, Eastleigh, <br />
+            Nairobi, Kenya
           </address>
 
           {/* Social Links */}

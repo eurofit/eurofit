@@ -38,7 +38,9 @@ export function NavLinks({ items }: NavLinksProps) {
                   "text-muted-foreground transition-colors data-active:font-semibold data-active:text-foreground"
                 )}
               >
-                <Link href={url}>{label}</Link>
+                <Link href={url} data-gtm-label="nav_link">
+                  {label}
+                </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           )

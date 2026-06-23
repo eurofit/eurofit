@@ -1,6 +1,7 @@
 "use client"
 
 import { useCart } from "@/hooks/use-cart"
+import { sendViewCartEvent } from "@/lib/analytics/ecommerce/view-cart"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
@@ -34,8 +35,15 @@ export function Cart() {
   const hasDiscount = discountTotal > 0
   const payableSubtotal = total - discountTotal
 
+  // GA4 `view_cart` fires each time the cart is opened with at least one item.
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen || isEmpty) return
+
+    sendViewCartEvent({ items, value: payableSubtotal })
+  }
+
   return (
-    <Sheet modal>
+    <Sheet modal onOpenChange={handleOpenChange}>
       <SheetTrigger disabled={isMutating} asChild>
         <Button
           variant="outline"

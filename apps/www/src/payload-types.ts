@@ -729,6 +729,7 @@ export interface Page {
    */
   generateSlug?: boolean | null;
   slug: string;
+  isActive: boolean;
   layout: (SliderBlock | FAQBlock | RichTextBlock)[];
   meta?: {
     title?: string | null;
@@ -1463,6 +1464,7 @@ export interface PagesSelect<T extends boolean = true> {
   title?: T;
   generateSlug?: T;
   slug?: T;
+  isActive?: T;
   layout?: T | {};
   meta?:
     | T

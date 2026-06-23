@@ -37,10 +37,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const gtmId = env.NEXT_PUBLIC_GTM_ID
   return (
     <html lang="en" className="scrollbar-gutter-stable">
-      <GoogleTagManager gtmId={env.NEXT_PUBLIC_GTM_ID} />
+      <GoogleTagManager gtmId={gtmId} />
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
+        {/* <!-- Google Tag Manager (noscript) --> */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+            height="0"
+            width="0"
+            style={{
+              display: "none",
+              visibility: "hidden",
+            }}
+          />
+        </noscript>
+        {/* <!-- End Google Tag Manager (noscript) --> */}
         <JsonLd jsonLd={[organization, website, localBusiness]} />
         <Toaster richColors duration={8000} closeButton />
         <NextTopLoader

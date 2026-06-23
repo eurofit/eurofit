@@ -4,7 +4,7 @@ export function getBrandFaqs(
   return [
     {
       question: `Where can I buy ${brandName} in Kenya?`,
-      answer: `You can buy original ${brandName} products from Eurofit, the biggest and leading supplier of supplements, sports nutrition, and vitamins products in Kenya. Order online through our website (https://www.eurofit.co.ke), WhatsApp (+254110990666), or visit our Nairobi store at Unit 111, 1st Floor, 6th Street Tower, 6th Street, Eastleigh.`,
+      answer: `You can buy original ${brandName} products from Eurofit, the biggest and leading supplier of supplements, sports nutrition, and vitamins products in Kenya. Order online through our website (https://www.eurofit.co.ke), WhatsApp (+254110990666), or visit our Nairobi store at Seventh Street, Eastleigh, Nairobi.`,
     },
     {
       question: `Do you sell ${brandName} products in wholesale and retail?`,
@@ -20,7 +20,7 @@ export function getBrandFaqs(
     },
     {
       question: `Can I visit your shop to buy ${brandName} products?`,
-      answer: `Yes, you can visit Eurofit at Unit 111, 1st Floor, 6th Street Tower, 6th Street, Eastleigh, Nairobi. For inquiries, call or WhatsApp us on +254110990666 or email us at: info@eurofit.uk.`,
+      answer: `Yes, you can visit Eurofit at Seventh Street, Eastleigh, Nairobi. For inquiries, call or WhatsApp us on +254110990666 or email us at: info@eurofit.co.ke.`,
     },
     {
       question: `Is ${brandName} popular in Kenya?`,

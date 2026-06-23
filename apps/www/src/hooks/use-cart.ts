@@ -6,6 +6,8 @@ import { deleteCart } from "@/actions/cart/delete-cart"
 import { removeCartItem } from "@/actions/cart/remove-cart-item"
 import { updateCartItemQuantity } from "@/actions/cart/update-cart-item-quantity"
 import { CART_QUERY_KEY } from "@/const/cart"
+import { sendAddToCartEvent } from "@/lib/analytics/ecommerce/add-to-cart"
+import { sendRemoveFromCartEvent } from "@/lib/analytics/ecommerce/remove-from-cart"
 import { fetchCart } from "@/lib/api/cart/get-cart"
 import { computeCartTotals } from "@/lib/utils/cart/cart-totals"
 import { formatCartItem } from "@/lib/utils/cart/formatCartItem"
@@ -26,6 +28,20 @@ type AddToCart = {
 }
 type SetQuantity = { productVariantId: string; quantity: number }
 type CartRollback = { previousCart: Cart | null }
+
+/**
+ * Finds a variant's line in a cart snapshot and formats it for analytics. Matches
+ * on the variant id whether the line's `productVariant` is populated or a raw id.
+ */
+function formatLine(cart: Cart | null, productVariantId: string) {
+  const line = cart?.items?.find((item) => {
+    const variant = item.productVariant
+    return typeof variant === "object"
+      ? variant.id === productVariantId
+      : variant === productVariantId
+  })
+  return line ? formatCartItem(line) : null
+}
 
 /**
  * Client cart state + mutations. Mutations orchestrate the single-purpose server
@@ -95,6 +111,13 @@ export function useCart() {
           optimisticItem,
         })
     ),
+    // `add_to_cart` reports the amount added, so override the line's quantity
+    // with the input delta rather than the resulting line total.
+    onSuccess: (updatedCart, { productVariantId, quantity }) => {
+      const line = formatLine(updatedCart, productVariantId)
+      if (!line) return
+      sendAddToCartEvent({ items: [{ ...line, quantity }] })
+    },
   })
 
   const setQuantityMutation = useMutation({
@@ -110,6 +133,19 @@ export function useCart() {
           ? applyRemoveItem({ cart: currentCart, productVariantId })
           : applySetQuantity({ cart: currentCart, productVariantId, quantity })
     ),
+    // A stepper/typed change is an add or a remove depending on the delta against
+    // the previous quantity. Source the line from `previousCart` so it's still
+    // present even when the new quantity removed it.
+    onSuccess: (_updatedCart, { productVariantId, quantity }, context) => {
+      const line = formatLine(context?.previousCart ?? null, productVariantId)
+      if (!line) return
+      const delta = quantity - line.quantity
+      if (delta > 0) {
+        sendAddToCartEvent({ items: [{ ...line, quantity: delta }] })
+      } else if (delta < 0) {
+        sendRemoveFromCartEvent({ items: [{ ...line, quantity: -delta }] })
+      }
+    },
   })
 
   const removeItemMutation = useMutation({
@@ -118,6 +154,13 @@ export function useCart() {
     ...withOptimisticCart<string>((currentCart, productVariantId) =>
       applyRemoveItem({ cart: currentCart, productVariantId })
     ),
+    // The whole line leaves the cart, so `remove_from_cart` reports its full
+    // pre-removal quantity from `previousCart`.
+    onSuccess: (_updatedCart, productVariantId, context) => {
+      const line = formatLine(context?.previousCart ?? null, productVariantId)
+      if (!line) return
+      sendRemoveFromCartEvent({ items: [line] })
+    },
   })
 
   const clearCartMutation = useMutation({
