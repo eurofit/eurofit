@@ -1,9 +1,15 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { JsonLd } from "@/components/json-ld"
 import { ProductVariantsList } from "@/components/product-variants/product-variants-list"
 import { getProductJsonLd } from "@/components/products/get-product-json-ld"
 import { H1 } from "@/components/typography"
+import {
+  GTM_ECOMMERCE_CURRENCY,
+  GTM_ECOMMERCE_EVENT,
+} from "@/const/gtm-ecommerce-events"
+import { toGTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { getProductBySlug } from "@/lib/utils/products/get-product-by-slug"
 import { Badge } from "@eurofit/ui/components/badge"
 import {
@@ -56,9 +62,49 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const jsonLd = getProductJsonLd(product)
 
+  const productBrand =
+    product.brand && typeof product.brand === "object"
+      ? product.brand.title
+      : null
+
+  const productCategories = (product.categories ?? []).flatMap((cat) =>
+    typeof cat === "object" && cat !== null && "title" in cat
+      ? [cat.title as string]
+      : []
+  )
+
+  const gtmItems = productVariants.map((variant, index) =>
+    toGTMItem(
+      {
+        slug: variant.slug,
+        productTitle: title,
+        price: variant.price,
+        discountedPrice: variant.discount?.price ?? null,
+        brand: productBrand,
+        variantLabel: variant.variant ?? variant.title,
+        categories: productCategories,
+      },
+      index
+    )
+  )
+
   return (
     <>
       <JsonLd jsonLd={jsonLd} />
+      {gtmItems.length > 0 && (
+        <GTMEventTracker
+          ecommerce
+          event={{
+            event: GTM_ECOMMERCE_EVENT.VIEW_ITEM_LIST,
+            ecommerce: {
+              currency: GTM_ECOMMERCE_CURRENCY,
+              item_list_id: product.slug,
+              item_list_name: title,
+              items: gtmItems,
+            },
+          }}
+        />
+      )}
       <div className="space-y-10">
         <Breadcrumb>
           <BreadcrumbList>
