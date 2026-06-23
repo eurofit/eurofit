@@ -28,12 +28,16 @@ export function NotifyMeButton({
   const [isRequested, setIsRequested] = React.useState(isNotifyRequested)
   const { mutate: createStockAlert, isPending } = useMutation({
     mutationFn: createStockAlertAction,
-    onSuccess: (isCreated) => {
-      if (isCreated && analytics) {
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+      if (result.data.isCreated && analytics) {
         sendNotifyMeEvent(analytics)
       }
       toast.success("You will be notified when the product is back in stock!")
-      setIsRequested(isCreated)
+      setIsRequested(result.data.isCreated)
     },
     onError: () => {
       toast.error("Something went wrong!")
@@ -58,11 +62,7 @@ export function NotifyMeButton({
     )
   }
 
-  const handleClick = () =>
-    createStockAlert({
-      userId,
-      productVariantId,
-    })
+  const handleClick = () => createStockAlert({ productVariantId })
 
   return (
     <Button
