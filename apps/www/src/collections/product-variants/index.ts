@@ -3,9 +3,9 @@ import { everyone } from "@/access/everyone"
 import { isAdmin } from "@/access/is-admin"
 import { activeField } from "@/fields/active"
 import { CollectionConfig, slugField } from "payload"
+import { checkIfBackorder } from "./hooks/check-if-backorder"
 import { checkIfLowStock } from "./hooks/check-if-low-stock"
 import { checkIfOutOfStock } from "./hooks/check-if-out-stock"
-import { checkIfPreorder } from "./hooks/check-if-preorder"
 import { checkIfNotfiyRequested } from "./hooks/check-notify-requested"
 import { checkIfWishlisted } from "./hooks/check-wishlisted"
 import { computeDiscount } from "./hooks/compute-discount"
@@ -417,7 +417,7 @@ export const productVariants: CollectionConfig = {
     },
 
     {
-      name: "isPreorder",
+      name: "isBackorder",
       type: "checkbox",
       defaultValue: false,
       required: true,
@@ -428,7 +428,7 @@ export const productVariants: CollectionConfig = {
           "Indicates if the product is back-orderable. Managed programmatically.",
       },
       hooks: {
-        afterRead: [checkIfPreorder],
+        afterRead: [checkIfBackorder],
       },
     },
     {

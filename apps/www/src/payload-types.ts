@@ -509,7 +509,7 @@ export interface ProductVariant {
   /**
    * Indicates if the product is back-orderable. Managed programmatically.
    */
-  isPreorder: boolean;
+  isBackorder: boolean;
   /**
    * Best active automatic discount for this variant. Computed on read.
    */
@@ -1606,7 +1606,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   isWishlisted?: T;
   isLowStock?: T;
   isOutOfStock?: T;
-  isPreorder?: T;
+  isBackorder?: T;
   discount?:
     | T
     | {

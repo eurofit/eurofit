@@ -7,7 +7,7 @@ const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000
 
 function resolveAvailability(variant: ProductDetail) {
   if (variant.isOutOfStock) return "https://schema.org/OutOfStock"
-  if (variant.isPreorder) return "https://schema.org/PreOrder"
+  if (variant.isBackorder) return "https://schema.org/BackOrder"
   return "https://schema.org/InStock"
 }
 

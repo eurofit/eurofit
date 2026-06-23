@@ -59,7 +59,7 @@ export async function getProductBySlug(slug: string) {
         supplierStock: true,
         retailPrice: true,
         discount: true,
-        isPreorder: true,
+        isBackorder: true,
         isLowStock: true,
         isOutOfStock: true,
         isNotifyRequested: true,

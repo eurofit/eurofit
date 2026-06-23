@@ -17,7 +17,7 @@ type FeedVariant = {
   category?: string | null
   images?: ({ url?: string | null } | string)[] | null
   isOutOfStock: boolean
-  isPreorder: boolean
+  isBackorder: boolean
   product?:
     | { supplierImageUrl?: string | null; brand?: { title?: string } | string }
     | string
@@ -26,7 +26,7 @@ type FeedVariant = {
 
 function resolveAvailability(variant: FeedVariant): MerchantAvailability {
   if (variant.isOutOfStock) return "out_of_stock"
-  if (variant.isPreorder) return "preorder"
+  if (variant.isBackorder) return "backorder"
   return "in_stock"
 }
 
@@ -82,7 +82,7 @@ export async function getProductVariantsFeed(): Promise<MerchantFeedItem[]> {
       category: true,
       images: true,
       isOutOfStock: true,
-      isPreorder: true,
+      isBackorder: true,
       product: true,
     },
     populate: {

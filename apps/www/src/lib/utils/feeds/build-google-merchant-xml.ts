@@ -1,7 +1,7 @@
 import { site } from "@/const/site"
 
 /** Google Merchant Center `availability` values we map our stock state onto. */
-export type MerchantAvailability = "in_stock" | "out_of_stock" | "preorder"
+export type MerchantAvailability = "in_stock" | "out_of_stock" | "backorder"
 
 /**
  * A single Google Merchant Center product offer. `id` is the variant slug so it
