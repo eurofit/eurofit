@@ -1,6 +1,8 @@
 "use client"
 
 import { createStockAlert as createStockAlertAction } from "@/actions/stock-alert/notify-me"
+import type { GTMItemInput } from "@/lib/analytics/ecommerce/to-gtm-item"
+import { sendNotifyMeEvent } from "@/lib/analytics/send-notify-me-event"
 import { Button } from "@eurofit/ui/components/button"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { cn } from "@eurofit/ui/lib/utils"
@@ -14,20 +16,28 @@ type NotifyMeButtonProps = {
   productVariantId: string
   userId?: string | null
   isNotifyRequested: boolean
+  analytics?: GTMItemInput
 } & React.ComponentProps<typeof Button>
 
 export function NotifyMeButton({
   productVariantId,
   userId,
   isNotifyRequested,
+  analytics,
 }: NotifyMeButtonProps) {
   const [isRequested, setIsRequested] = React.useState(isNotifyRequested)
   const { mutate: createStockAlert, isPending } = useMutation({
     mutationFn: createStockAlertAction,
-    onSuccess: (isRequested) => {
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+      if (result.data.isCreated && analytics) {
+        sendNotifyMeEvent(analytics)
+      }
       toast.success("You will be notified when the product is back in stock!")
-
-      setIsRequested(isRequested)
+      setIsRequested(result.data.isCreated)
     },
     onError: () => {
       toast.error("Something went wrong!")
@@ -52,11 +62,7 @@ export function NotifyMeButton({
     )
   }
 
-  const handleClick = () =>
-    createStockAlert({
-      userId,
-      productVariantId,
-    })
+  const handleClick = () => createStockAlert({ productVariantId })
 
   return (
     <Button

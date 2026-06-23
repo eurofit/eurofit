@@ -5,7 +5,10 @@ import {
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
 import { sendGTMEcommerceEvent } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
-import { toGTMCartItems } from "@/lib/analytics/ecommerce/to-gtm-cart-items"
+import {
+  formattedCartItemToGTMInput,
+  toGTMItems,
+} from "@/lib/analytics/ecommerce/to-gtm-item"
 import type { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 
 type SendViewCartEventInput = {
@@ -23,7 +26,7 @@ export function sendViewCartEvent({
     ecommerce: {
       currency: GTM_ECOMMERCE_CURRENCY,
       value,
-      items: toGTMCartItems(items),
+      items: toGTMItems(items.map(formattedCartItemToGTMInput)),
     },
   })
 }

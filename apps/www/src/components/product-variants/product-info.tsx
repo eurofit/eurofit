@@ -1,7 +1,17 @@
+import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { CountdownTimerBlock } from "@/components/timer/countdown-timer-block"
+import {
+  GTM_ECOMMERCE_CURRENCY,
+  GTM_ECOMMERCE_EVENT,
+} from "@/const/gtm-ecommerce-events"
+import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
+import {
+  toGTMItem,
+  toGTMItemsValue,
+} from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -19,6 +29,9 @@ interface ProductInfoProps {
   id: string
   sku: string
   title: string
+  productTitle?: string
+  variantSlug?: string
+  categories?: string[]
   brand: {
     title: string
     slug: string
@@ -39,6 +52,9 @@ export function ProductInfo({
   id,
   sku,
   title,
+  productTitle,
+  variantSlug,
+  categories,
   brand,
   price,
   discount,
@@ -50,8 +66,34 @@ export function ProductInfo({
   averageRating,
   totalRatings,
 }: ProductInfoProps) {
+  const gtmItem =
+    variantSlug != null
+      ? toGTMItem({
+          sku,
+          productTitle: productTitle ?? title,
+          price: price ?? null,
+          discountedPrice: discount?.price ?? null,
+          brand: brand?.title ?? null,
+          variantLabel: variant ?? null,
+          categories,
+        })
+      : undefined
+
   return (
     <div className="flex flex-col justify-start gap-6">
+      {gtmItem && (
+        <GTMEventTracker
+          ecommerce
+          event={{
+            event: GTM_ECOMMERCE_EVENT.VIEW_ITEM,
+            ecommerce: {
+              currency: GTM_ECOMMERCE_CURRENCY,
+              value: toGTMItemsValue([gtmItem]),
+              items: [gtmItem],
+            },
+          }}
+        />
+      )}
       {/* Header with Wishlist */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
@@ -66,6 +108,7 @@ export function ProductInfo({
             currentUserId={currentUserId}
             variantId={id}
             isWishlisted={isWishlisted}
+            gtmItem={gtmItem}
           />
         </div>
         <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
@@ -145,10 +188,20 @@ export function ProductInfo({
       </div>
 
       {/* Add to Cart Button */}
-      <ProductDetailCartActions
-        variant={{ id, stock, sku, title, variant, price: price ?? null }}
-        inStock={inStock}
-      />
+      <ProductAnalyticsProvider brand={brand?.title} categories={categories}>
+        <ProductDetailCartActions
+          variant={{
+            id,
+            stock,
+            sku,
+            slug: variantSlug ?? "",
+            title,
+            variant,
+            price: price ?? null,
+          }}
+          inStock={inStock}
+        />
+      </ProductAnalyticsProvider>
 
       {/* Trust */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">

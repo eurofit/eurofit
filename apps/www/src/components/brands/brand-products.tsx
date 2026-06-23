@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/products/product-card"
 import { ProductsToolbar } from "@/components/products/products-toolbar"
 import { BRAND_PRODUCTS_PER_PAGE } from "@/const/brand-filters"
 import { site } from "@/const/site"
+import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import { BrandSearchParams } from "@/lib/utils/brands/brand-search-params"
 import { buildAreaFaqs } from "@/lib/utils/brands/build-area-copy"
 import { getBrandJsonLd } from "@/lib/utils/brands/get-brand-jsonld"
@@ -88,7 +89,13 @@ export async function BrandProducts({
       <div className="space-y-10">
         <section id="brand-products-list" className="grid gap-8 md:gap-10">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} userId={user?.id} />
+            <ProductAnalyticsProvider
+              key={product.id}
+              brand={brand?.title}
+              categories={product.categories}
+            >
+              <ProductCard product={product} userId={user?.id} />
+            </ProductAnalyticsProvider>
           ))}
         </section>
 

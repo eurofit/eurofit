@@ -12,13 +12,13 @@ const CART_DEPTH = 2
  * Depth that reaches the product's `brand`/`categories` relations (one level
  * below the variant's product), which GA4 ecommerce events consume.
  */
-const CART_DETAIL_DEPTH = 3
+export const CART_DETAIL_DEPTH = 3
 
 /**
  * Trims the extra depth-3 relations to only the fields the cart actually reads,
  * so populating brand/categories doesn't bloat the response with full records.
  */
-const CART_DETAIL_POPULATE: PopulateType = {
+export const CART_DETAIL_POPULATE: PopulateType = {
   brands: { title: true },
   categories: { title: true },
   media: { url: true },

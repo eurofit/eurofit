@@ -3,6 +3,8 @@
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { NotifyMeButton } from "@/components/stock-alert/notify-me-button"
 import { site } from "@/const/site"
+import { useProductAnalytics } from "@/contexts/product-analytics-context"
+import { sendInquireItemPriceEvent } from "@/lib/analytics/send-inquire-item-price-event"
 import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
 import { buildWhatsAppLink } from "@/lib/utils/build-wa-link"
 import type { ProductVariant } from "@/types/product-variant"
@@ -22,8 +24,19 @@ type VariantActionsProps = {
  * WhatsApp price inquiry when the variant has no listed price.
  */
 export function VariantActions({ variant, userId }: VariantActionsProps) {
+  const { brand, categories } = useProductAnalytics()
   const canPurchase = !variant.isOutOfStock && variant.price !== null
   const shouldInquirePrice = !variant.isOutOfStock && variant.price === null
+
+  const handlePriceInquiry = () =>
+    sendInquireItemPriceEvent({
+      sku: variant.sku,
+      productTitle: variant.title,
+      price: variant.price,
+      variantLabel: variant.variant,
+      brand,
+      categories,
+    })
 
   return (
     <div className="flex w-full flex-row items-center justify-between gap-3 md:w-auto md:flex-col md:items-end md:gap-2">
@@ -40,6 +53,14 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
           userId={userId}
           productVariantId={variant.id}
           isNotifyRequested={variant.isNotifyRequested}
+          analytics={{
+            sku: variant.sku,
+            productTitle: variant.title,
+            price: variant.price,
+            variantLabel: variant.variant,
+            brand,
+            categories,
+          }}
         />
       )}
 
@@ -54,6 +75,7 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
             })}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handlePriceInquiry}
           >
             <Whatsapp aria-hidden="true" />
             Inquire Price

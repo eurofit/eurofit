@@ -80,6 +80,7 @@ export async function getProductsByBrand(opts: GetProductsByBrandArgs) {
       origin: true,
       supplierImageUrl: true,
       images: true,
+      categories: true,
       productVariants: true,
     },
     joins: {
@@ -101,6 +102,10 @@ export async function getProductsByBrand(opts: GetProductsByBrandArgs) {
         isOutOfStock: true,
         isNotifyRequested: true,
       },
+      categories: {
+        slug: true,
+        title: true,
+      },
     },
     sort,
     user: user?.id,
@@ -109,11 +114,16 @@ export async function getProductsByBrand(opts: GetProductsByBrandArgs) {
   })
 
   const formattedProducts = products.map((product) => {
-    const { supplierImageUrl, images, ...rest } = product
+    const { supplierImageUrl, images, categories, ...rest } = product
 
     return {
       ...rest,
       image: resolveProductImage(images, supplierImageUrl),
+      categories: (categories ?? []).flatMap((cat) =>
+        typeof cat === "object" && cat !== null && "title" in cat
+          ? [cat.title as string]
+          : []
+      ),
       productVariants: (product.productVariants.docs ?? [])
         .filter((variant) => typeof variant === "object")
         .map((variant) => {

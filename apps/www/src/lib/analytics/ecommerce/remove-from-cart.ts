@@ -6,9 +6,10 @@ import {
 } from "@/const/gtm-ecommerce-events"
 import { sendGTMEcommerceEvent } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import {
-  toGTMCartItems,
-  toGTMEventValue,
-} from "@/lib/analytics/ecommerce/to-gtm-cart-items"
+  formattedCartItemToGTMInput,
+  toGTMItems,
+  toGTMItemsValue,
+} from "@/lib/analytics/ecommerce/to-gtm-item"
 import type { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 
 type SendRemoveFromCartEventInput = {
@@ -26,13 +27,13 @@ export function sendRemoveFromCartEvent({
 }: SendRemoveFromCartEventInput): void {
   if (items.length === 0) return
 
-  const gtmItems = toGTMCartItems(items)
+  const gtmItems = toGTMItems(items.map(formattedCartItemToGTMInput))
 
   sendGTMEcommerceEvent({
     event: GTM_ECOMMERCE_EVENT.REMOVE_FROM_CART,
     ecommerce: {
       currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMEventValue(gtmItems),
+      value: toGTMItemsValue(gtmItems),
       items: gtmItems,
     },
   })

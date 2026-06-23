@@ -6,6 +6,7 @@ import {
 } from "@/actions/products/search-product-suggestions"
 import { PreventScroll } from "@/components/prevent-scroll"
 import { useToggle } from "@/hooks/use-toggle"
+import { sendSearchEvent } from "@/lib/analytics/send-search-event"
 import { Button, buttonVariants } from "@eurofit/ui/components/button"
 import {
   InputGroup,
@@ -40,6 +41,8 @@ export function SearchSheet() {
   const [totalProducts, setTotalProducts] = React.useState<number>(0)
   const [hasSearched, setHasSearched] = React.useState(false)
 
+  const lastSearchTermRef = React.useRef<string | null>(null)
+
   const {
     mutate: search,
     isPending: isSearching,
@@ -54,6 +57,11 @@ export function SearchSheet() {
       }
       setTotalProducts(result.totalProducts)
       setProducts(result.products)
+
+      if (result.query !== lastSearchTermRef.current) {
+        lastSearchTermRef.current = result.query
+        sendSearchEvent({ searchTerm: result.query })
+      }
     },
     onError: () => {
       setProducts([])

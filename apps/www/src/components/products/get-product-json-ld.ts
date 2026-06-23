@@ -52,8 +52,7 @@ export function getProductJsonLd(product: ProductDetails) {
       "@context": "https://schema.org",
       "@type": "Product",
       "@id": `${site.url}/product-variants/${line.slug}#product`,
-      // Shared key with the Merchant Center feed `id` and GA4 `item_id`.
-      productID: line.slug,
+      productID: line.sku,
       name: line.title,
       sku: line.sku,
       gtin13: line.barcode ?? undefined,

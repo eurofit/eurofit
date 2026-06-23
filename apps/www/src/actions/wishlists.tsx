@@ -78,9 +78,9 @@ export async function getWishlistItems(
       const variant = doc.productVariant
       if (typeof variant !== "object" || !variant) return []
 
-      const product = variant.product
-      const productSlug =
-        typeof product === "object" && product ? product.slug : null
+      const product =
+        typeof variant.product === "object" ? variant.product : null
+      const productSlug = product?.slug ?? null
       const slug = productSlug ? `${productSlug}/${variant.slug}` : variant.slug
 
       const firstImage = Array.isArray(variant.images)
@@ -90,16 +90,33 @@ export async function getWishlistItems(
 
       const stock = resolveAvailableStock(variant.stock, variant.supplierStock)
 
+      const brand =
+        typeof product?.brand === "object" && product.brand
+          ? (product.brand.title as string | undefined)
+          : undefined
+
+      const categories = Array.isArray(product?.categories)
+        ? product.categories.flatMap((cat) =>
+            typeof cat === "object" && cat && "title" in cat
+              ? [cat.title as string]
+              : []
+          )
+        : []
+
       return [
         {
           id: doc.id,
           variantId: variant.id,
+          sku: variant.sku,
           title: variant.title,
+          productTitle: product?.title ?? variant.title,
           slug,
           price: variant.retailPrice ?? null,
           discountedPrice: null,
           image,
           isOutOfStock: stock === 0,
+          brand,
+          categories,
         } satisfies WishlistItem,
       ]
     })

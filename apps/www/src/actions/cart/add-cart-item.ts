@@ -6,7 +6,11 @@ import {
   toCartActionError,
 } from "@/lib/utils/cart/cart-action-error"
 import { addItem } from "@/lib/utils/cart/cart-items"
-import { findCartByIdentity } from "@/lib/utils/cart/get-cart"
+import {
+  CART_DETAIL_DEPTH,
+  CART_DETAIL_POPULATE,
+  findCartByIdentity,
+} from "@/lib/utils/cart/get-cart"
 import { getCurrentIdentity } from "@/lib/utils/get-current-identity"
 import { Cart } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
@@ -41,6 +45,8 @@ export async function addCartItem(
         items: addItem({ items: cart.items, productVariantId, quantity }),
         lastActiveAt: new Date().toISOString(),
       },
+      depth: CART_DETAIL_DEPTH,
+      populate: CART_DETAIL_POPULATE,
     })
 
     return { success: true, data: updatedCart }

@@ -52,6 +52,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
         supplierImageUrl: true,
         origin: true,
         brand: true,
+        categories: true,
       },
       brands: {
         slug: true,
