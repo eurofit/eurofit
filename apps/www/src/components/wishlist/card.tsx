@@ -2,7 +2,7 @@
 
 import { toggleWishlist } from "@/actions/wishlists"
 import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
-import { toGTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
+import { toGTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { WishlistItem } from "@/types/wishlist"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
@@ -30,7 +30,7 @@ export function WishlistCard({ item, currentUserId }: WishlistCardProps) {
       })
       if (result.success) {
         sendRemoveFromWishlistEvent({
-          item: toGTMWishlistItem({
+          item: toGTMItem({
             slug: item.slug,
             productTitle: item.productTitle,
             price: item.price,

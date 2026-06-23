@@ -1,8 +1,16 @@
+import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { CountdownTimerBlock } from "@/components/timer/countdown-timer-block"
-import { toGTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
+import {
+  GTM_ECOMMERCE_CURRENCY,
+  GTM_ECOMMERCE_EVENT,
+} from "@/const/gtm-ecommerce-events"
+import {
+  toGTMItem,
+  toGTMItemsValue,
+} from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -59,7 +67,7 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const gtmItem =
     variantSlug != null && price != null
-      ? toGTMWishlistItem({
+      ? toGTMItem({
           slug: variantSlug,
           productTitle: productTitle ?? title,
           price,
@@ -72,6 +80,19 @@ export function ProductInfo({
 
   return (
     <div className="flex flex-col justify-start gap-6">
+      {gtmItem && (
+        <GTMEventTracker
+          ecommerce
+          event={{
+            event: GTM_ECOMMERCE_EVENT.VIEW_ITEM,
+            ecommerce: {
+              currency: GTM_ECOMMERCE_CURRENCY,
+              value: toGTMItemsValue([gtmItem]),
+              items: [gtmItem],
+            },
+          }}
+        />
+      )}
       {/* Header with Wishlist */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">

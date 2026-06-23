@@ -6,12 +6,12 @@ import {
 } from "@/const/gtm-ecommerce-events"
 import { sendGTMEcommerceEvent } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import {
-  toGTMWishlistEventValue,
-  type GTMWishlistItem,
-} from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
+  toGTMItemsValue,
+  type GTMItem,
+} from "@/lib/analytics/ecommerce/to-gtm-item"
 
 type SendAddToWishlistEventInput = {
-  item: GTMWishlistItem
+  item: GTMItem
 }
 
 export function sendAddToWishlistEvent({
@@ -21,7 +21,7 @@ export function sendAddToWishlistEvent({
     event: GTM_ECOMMERCE_EVENT.ADD_TO_WISHLIST,
     ecommerce: {
       currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMWishlistEventValue(item),
+      value: toGTMItemsValue([item]),
       items: [item],
     },
   })

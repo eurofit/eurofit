@@ -3,7 +3,7 @@
 import { toggleWishlist } from "@/actions/wishlists"
 import { sendAddToWishlistEvent } from "@/lib/analytics/ecommerce/add-to-wishlist"
 import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
-import type { GTMWishlistItem } from "@/lib/analytics/ecommerce/to-gtm-wishlist-item"
+import type { GTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { Button } from "@eurofit/ui/components/button"
 import { cn } from "@eurofit/ui/lib/utils"
 import { Heart } from "lucide-react"
@@ -14,7 +14,7 @@ type WishlistButtonProps = {
   currentUserId: string | undefined
   variantId: string
   isWishlisted: boolean
-  gtmItem?: GTMWishlistItem
+  gtmItem?: GTMItem
 }
 
 export function WishlistButton({
