@@ -1,12 +1,7 @@
 "use client"
 
-import {
-  GTM_ECOMMERCE_CURRENCY,
-  GTM_ECOMMERCE_EVENT,
-} from "@/const/gtm-ecommerce-events"
 import { useCart } from "@/hooks/use-cart"
-import { sendGTMEcommerceEvent } from "@/lib/analytics/gtm"
-import { toGTMCartItems } from "@/lib/analytics/to-gtm-cart-items"
+import { sendViewCartEvent } from "@/lib/analytics/ecommerce/view-cart"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
@@ -44,14 +39,7 @@ export function Cart() {
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen || isEmpty) return
 
-    sendGTMEcommerceEvent({
-      event: GTM_ECOMMERCE_EVENT.VIEW_CART,
-      ecommerce: {
-        currency: GTM_ECOMMERCE_CURRENCY,
-        value: payableSubtotal,
-        items: toGTMCartItems(items),
-      },
-    })
+    sendViewCartEvent({ items, value: payableSubtotal })
   }
 
   return (
