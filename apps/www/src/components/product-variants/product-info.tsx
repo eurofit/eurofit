@@ -66,7 +66,7 @@ export function ProductInfo({
   totalRatings,
 }: ProductInfoProps) {
   const gtmItem =
-    variantSlug != null && price != null
+    variantSlug != null
       ? toGTMItem({
           slug: variantSlug,
           productTitle: productTitle ?? title,
