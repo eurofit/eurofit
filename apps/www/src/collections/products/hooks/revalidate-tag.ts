@@ -5,14 +5,14 @@ import { CollectionAfterChangeHook, CollectionAfterDeleteHook } from "payload"
 export const revalidateProductTag: CollectionAfterChangeHook<Product> = ({
   doc,
 }) => {
-  revalidateTag("products")
-  revalidateTag(`products:${doc.id}`)
+  revalidateTag("products", "max")
+  revalidateTag(`products:${doc.id}`, "max")
   return doc
 }
 
 export const revalidateProductTagOnDelete: CollectionAfterDeleteHook = ({
   id,
 }) => {
-  revalidateTag("products")
-  revalidateTag(`products:${id}`)
+  revalidateTag("products", "max")
+  revalidateTag(`products:${id}`, "max")
 }
