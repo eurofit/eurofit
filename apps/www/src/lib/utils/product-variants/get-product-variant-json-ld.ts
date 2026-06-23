@@ -77,19 +77,20 @@ export function getProductVariantJsonLd(
 
   const offers = buildOffer(variant, url)
   const aggregateRating = buildAggregateRating(variant)
+  const brandName = product?.brand?.title
 
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${url}#product`,
+    // The slug is the stable join key shared by the Merchant Center feed `id`
+    // and the GA4 `item_id`, so dynamic remarketing matches across all three.
+    productID: variant.slug,
     name: variant.detailTitle ?? variant.title,
     sku: variant.sku,
     gtin: variant.barcode ?? undefined,
     image: variant.images,
-    brand: {
-      "@type": "Brand",
-      name: product?.brand?.title || undefined,
-    },
+    brand: brandName ? { "@type": "Brand", name: brandName } : undefined,
     category: variant.category ?? undefined,
     size: variant.size ?? undefined,
     color: variant.flavorColor ?? undefined,
