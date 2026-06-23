@@ -2,6 +2,7 @@
 
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { site } from "@/const/site"
+import { useProductAnalytics } from "@/contexts/product-analytics-context"
 import { useCartQuantity } from "@/hooks/use-cart-quantity"
 import { sendInquireItemPriceEvent } from "@/lib/analytics/send-inquire-item-price-event"
 import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
@@ -27,6 +28,7 @@ export function ProductDetailCartActions({
   variant,
   inStock,
 }: ProductDetailCartActionsProps) {
+  const { brand, categories } = useProductAnalytics()
   const shouldInquirePrice = variant.price == null
 
   const handlePriceInquiry = () =>
@@ -35,6 +37,8 @@ export function ProductDetailCartActions({
       productTitle: variant.title,
       price: variant.price,
       variantLabel: variant.variant,
+      brand,
+      categories,
     })
 
   if (shouldInquirePrice) {

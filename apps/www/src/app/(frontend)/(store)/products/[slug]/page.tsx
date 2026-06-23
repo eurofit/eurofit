@@ -9,6 +9,7 @@ import {
   GTM_ECOMMERCE_CURRENCY,
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
+import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import { toGTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { getProductBySlug } from "@/lib/utils/products/get-product-by-slug"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -149,10 +150,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     {pluralize("option", productVariants.length)}
                   </Badge>
                 </div>
-                <ProductVariantsList
-                  productVariants={productVariants}
-                  userId={user?.id}
-                />
+                <ProductAnalyticsProvider
+                  brand={productBrand}
+                  categories={productCategories}
+                >
+                  <ProductVariantsList
+                    productVariants={productVariants}
+                    userId={user?.id}
+                  />
+                </ProductAnalyticsProvider>
               </div>
             </main>
           </div>

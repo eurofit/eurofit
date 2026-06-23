@@ -3,6 +3,7 @@
 import { Whatsapp } from "@/components/icons/whatsapp"
 import { NotifyMeButton } from "@/components/stock-alert/notify-me-button"
 import { site } from "@/const/site"
+import { useProductAnalytics } from "@/contexts/product-analytics-context"
 import { sendInquireItemPriceEvent } from "@/lib/analytics/send-inquire-item-price-event"
 import { buildPriceInquiryMessage } from "@/lib/utils/build-price-inquiry-message"
 import { buildWhatsAppLink } from "@/lib/utils/build-wa-link"
@@ -23,6 +24,7 @@ type VariantActionsProps = {
  * WhatsApp price inquiry when the variant has no listed price.
  */
 export function VariantActions({ variant, userId }: VariantActionsProps) {
+  const { brand, categories } = useProductAnalytics()
   const canPurchase = !variant.isOutOfStock && variant.price !== null
   const shouldInquirePrice = !variant.isOutOfStock && variant.price === null
 
@@ -32,6 +34,8 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
       productTitle: variant.title,
       price: variant.price,
       variantLabel: variant.variant,
+      brand,
+      categories,
     })
 
   return (
@@ -54,6 +58,8 @@ export function VariantActions({ variant, userId }: VariantActionsProps) {
             productTitle: variant.title,
             price: variant.price,
             variantLabel: variant.variant,
+            brand,
+            categories,
           }}
         />
       )}

@@ -7,6 +7,7 @@ import {
   GTM_ECOMMERCE_CURRENCY,
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
+import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import {
   toGTMItem,
   toGTMItemsValue,
@@ -187,18 +188,20 @@ export function ProductInfo({
       </div>
 
       {/* Add to Cart Button */}
-      <ProductDetailCartActions
-        variant={{
-          id,
-          stock,
-          sku,
-          slug: variantSlug ?? "",
-          title,
-          variant,
-          price: price ?? null,
-        }}
-        inStock={inStock}
-      />
+      <ProductAnalyticsProvider brand={brand?.title} categories={categories}>
+        <ProductDetailCartActions
+          variant={{
+            id,
+            stock,
+            sku,
+            slug: variantSlug ?? "",
+            title,
+            variant,
+            price: price ?? null,
+          }}
+          inStock={inStock}
+        />
+      </ProductAnalyticsProvider>
 
       {/* Trust */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">

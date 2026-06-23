@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/products/product-card"
 import { ProductsToolbar } from "@/components/products/products-toolbar"
 import { CATEGORY_PRODUCTS_PER_PAGE } from "@/const/category-filters"
 import { site } from "@/const/site"
+import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import { CategorySearchParams } from "@/lib/utils/categories/category-search-params"
 import { getCategoryJsonLd } from "@/lib/utils/categories/get-category-jsonld"
 import pluralize from "pluralize-esm"
@@ -80,9 +81,17 @@ export async function CategoryProducts({
 
       <div className="space-y-10">
         <section id="category-products-list" className="grid gap-8 md:gap-10">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} userId={user?.id} />
-          ))}
+          <ProductAnalyticsProvider
+            categories={category ? [category.title] : undefined}
+          >
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                userId={user?.id}
+              />
+            ))}
+          </ProductAnalyticsProvider>
         </section>
 
         <Pagination count={totalPages} page={page} preserveParams />
