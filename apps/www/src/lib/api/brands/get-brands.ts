@@ -1,4 +1,4 @@
-import type { GetBrandsData } from "@/actions/brands/get-brands"
+import type { GetBrandsData } from "@/lib/utils/brands/get-brands"
 
 export type FetchBrandsResult = GetBrandsData
 

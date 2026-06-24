@@ -1,6 +1,3 @@
-import { getBrand } from "@/actions/brands/get-brand"
-import { getBrandFilters } from "@/actions/brands/get-brand-filters"
-import { getTotalBrandProductVariants } from "@/actions/products/get-products-by-brand"
 import {
   BrandBreadcrumbs,
   BrandBreadcrumbsSkeleton,
@@ -20,6 +17,9 @@ import { ProductFiltersSidebar } from "@/components/products/product-filters-sid
 import { BRAND_FILTER_KEYS } from "@/const/brand-filters"
 import { site } from "@/const/site"
 import { parseBrandSearchParams } from "@/lib/utils/brands/brand-search-params"
+import { getBrand } from "@/lib/utils/brands/get-brand"
+import { getBrandFilters } from "@/lib/utils/brands/get-brand-filters"
+import { getTotalBrandProductVariants } from "@/lib/utils/products/get-products-by-brand"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import * as React from "react"

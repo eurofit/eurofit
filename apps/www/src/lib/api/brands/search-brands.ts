@@ -1,4 +1,4 @@
-import type { SearchBrandData } from "@/actions/brands/search-brand"
+import type { SearchBrandData } from "@/lib/utils/brands/search-brand"
 
 export type FetchBrandsSearchResult = SearchBrandData
 

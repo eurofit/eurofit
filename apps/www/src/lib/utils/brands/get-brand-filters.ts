@@ -28,11 +28,6 @@ function isVariantDoc(value: unknown): value is VariantDoc {
   return typeof value === "object" && value !== null
 }
 
-/**
- * Counts how many products contain each distinct value. A product contributes
- * at most once per value (deduped within the product), so the count reflects
- * "number of products" rather than "number of occurrences".
- */
 function countDistinctPerProduct<T>(
   products: T[],
   extract: (product: T) => LabeledValue[]

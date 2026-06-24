@@ -1,6 +1,6 @@
-import { getBrands, GetBrandsData } from "@/actions/brands/get-brands"
 import { JsonLd } from "@/components/json-ld"
 import { getBrandListJsonLd } from "@/lib/utils/brands/get-brand-list-jsonld"
+import { getBrands, GetBrandsData } from "@/lib/utils/brands/get-brands"
 import { getQueryClient } from "@/providers/get-query-client"
 import {
   Empty,

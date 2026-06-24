@@ -1,3 +1,5 @@
+import "server-only"
+
 import { captureError } from "@/lib/observability/capture-error"
 import { ActionResult } from "@/types/action-result"
 import payloadConfig from "@payload-config"

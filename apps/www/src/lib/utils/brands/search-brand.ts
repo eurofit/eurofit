@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { captureError } from "@/lib/observability/capture-error"
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"

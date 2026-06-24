@@ -1,4 +1,4 @@
-import { getBrands } from "@/actions/brands/get-brands"
+import { getBrands } from "@/lib/utils/brands/get-brands"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {

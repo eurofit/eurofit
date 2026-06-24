@@ -1,7 +1,3 @@
-import { getBrand } from "@/actions/brands/get-brand"
-import { getBrandFilters } from "@/actions/brands/get-brand-filters"
-import { getTotalBrandProductVariants } from "@/actions/products/get-products-by-brand"
-import { getServiceArea } from "@/actions/service-areas/get-service-area"
 import { AreaDeliveryInfo } from "@/components/brands/area-delivery-info"
 import {
   BrandBreadcrumbs,
@@ -27,6 +23,10 @@ import {
   areaMetaDescription,
   areaPageTitle,
 } from "@/lib/utils/brands/build-area-copy"
+import { getBrand } from "@/lib/utils/brands/get-brand"
+import { getBrandFilters } from "@/lib/utils/brands/get-brand-filters"
+import { getTotalBrandProductVariants } from "@/lib/utils/products/get-products-by-brand"
+import { getServiceArea } from "@/lib/utils/service-areas/get-service-area"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import * as React from "react"

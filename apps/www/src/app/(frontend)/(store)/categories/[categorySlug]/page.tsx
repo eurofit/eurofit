@@ -1,6 +1,3 @@
-import { getCategory } from "@/actions/categories/get-category"
-import { getCategoryFilters } from "@/actions/categories/get-category-filters"
-import { getTotalProductsByCategory } from "@/actions/products/get-products-by-category"
 import {
   CategoryHeader,
   CategoryHeaderSkeleton,
@@ -16,6 +13,9 @@ import { ProductFiltersSidebar } from "@/components/products/product-filters-sid
 import { CATEGORY_FILTER_KEYS } from "@/const/category-filters"
 import { site } from "@/const/site"
 import { parseCategorySearchParams } from "@/lib/utils/categories/category-search-params"
+import { getCategory } from "@/lib/utils/categories/get-category"
+import { getCategoryFilters } from "@/lib/utils/categories/get-category-filters"
+import { getTotalProductsByCategory } from "@/lib/utils/products/get-products-by-category"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import pluralize from "pluralize-esm"

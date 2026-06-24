@@ -1,8 +1,8 @@
+import { JsonLd } from "@/components/json-ld"
 import {
   getCategories,
   GetCategoriesData,
-} from "@/actions/categories/get-categories"
-import { JsonLd } from "@/components/json-ld"
+} from "@/lib/utils/categories/get-categories"
 import { getCategoriesJsonLd } from "@/lib/utils/categories/get-categories-json-ld"
 import { getQueryClient } from "@/providers/get-query-client"
 import {

@@ -1,4 +1,4 @@
-import type { GetCategoriesData } from "@/actions/categories/get-categories"
+import type { GetCategoriesData } from "@/lib/utils/categories/get-categories"
 
 export type FetchCategoriesResult = GetCategoriesData
 

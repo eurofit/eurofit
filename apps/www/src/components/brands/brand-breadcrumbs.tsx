@@ -1,4 +1,4 @@
-import { getBrand } from "@/actions/brands/get-brand"
+import { getBrand } from "@/lib/utils/brands/get-brand"
 import { ServiceAreaDetail } from "@/types/service-area"
 import {
   Breadcrumb,
