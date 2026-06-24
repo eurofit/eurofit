@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { REVIEWS_PER_PAGE } from "@/const/reviews"
 import { captureError } from "@/lib/observability/capture-error"

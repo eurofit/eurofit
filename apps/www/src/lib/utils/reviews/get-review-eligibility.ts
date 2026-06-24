@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { captureError } from "@/lib/observability/capture-error"
@@ -17,7 +17,10 @@ export async function getReviewEligibility(
     const user = await getCurrentUser()
 
     if (!user) {
-      return { success: true, data: { canReview: false, hasReviewed: false } }
+      return {
+        success: true,
+        data: { isAuthenticated: false, canReview: false, hasReviewed: false },
+      }
     }
 
     const payload = await getPayload({ config })
@@ -37,7 +40,11 @@ export async function getReviewEligibility(
 
     return {
       success: true,
-      data: { canReview: didPurchaseVariant && !hasReviewed, hasReviewed },
+      data: {
+        isAuthenticated: true,
+        canReview: didPurchaseVariant && !hasReviewed,
+        hasReviewed,
+      },
     }
   } catch (error) {
     captureError(error, { scope: "reviews.eligibility" })

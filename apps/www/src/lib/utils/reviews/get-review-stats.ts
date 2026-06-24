@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { captureError } from "@/lib/observability/capture-error"
 import { getVariantReviewStats } from "@/lib/utils/reviews/get-variant-review-stats"

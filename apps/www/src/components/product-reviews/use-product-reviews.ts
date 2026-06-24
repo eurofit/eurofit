@@ -33,16 +33,12 @@ export function useReviewList(productVariantId: string) {
   })
 }
 
-export function useReviewEligibility(
-  productVariantId: string,
-  currentUserId?: string | null
-) {
+export function useReviewEligibility(productVariantId: string) {
   return useQuery({
     queryKey: reviewKeys.eligibility(productVariantId),
     queryFn: () =>
       fetchJson<ReviewEligibility>(
         `/api/reviews/eligibility?productVariant=${productVariantId}`
       ),
-    enabled: Boolean(currentUserId),
   })
 }

@@ -1,5 +1,5 @@
-import { getReviews } from "@/actions/reviews/get-reviews"
 import { REVIEWS_PER_PAGE } from "@/const/reviews"
+import { getReviews } from "@/lib/utils/reviews/get-reviews"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
