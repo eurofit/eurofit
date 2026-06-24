@@ -6,6 +6,7 @@ import { addressSchema } from "@/lib/schemas/addresses/address"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import { formatDeliveryDateRange } from "@/lib/utils/orders/format-delivery-date-range"
 import { tz } from "@date-fns/tz"
 import {
   Alert,
@@ -87,6 +88,11 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
       deliveryFee: true,
       total: true,
       createdAt: true,
+      estimatedDelivery: {
+        minDate: true,
+        maxDate: true,
+      },
+      shipTogether: true,
     },
     overrideAccess: false,
     user: user,
@@ -297,7 +303,20 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                   <Box />
                   <div>
                     <AlertTitle>Estimated Delivery</AlertTitle>
-                    <p>Wednesday, March 18 - Saturday, March 19</p>
+                    <p>
+                      {order.estimatedDelivery?.minDate &&
+                      order.estimatedDelivery?.maxDate
+                        ? formatDeliveryDateRange(
+                            new Date(order.estimatedDelivery.minDate),
+                            new Date(order.estimatedDelivery.maxDate)
+                          )
+                        : "To be confirmed"}
+                    </p>
+                    {order.shipTogether === false && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        In-stock items shipped separately.
+                      </p>
+                    )}
                   </div>
                   <AlertDescription>
                     We will send you a tracking number once your order has

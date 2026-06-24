@@ -1,8 +1,8 @@
-import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { getVariantReviewStats } from "@/lib/utils/reviews/get-variant-review-stats"
 import { resolveAvailableStock } from "@/lib/utils/stock/resolve-available-stock"
 import config from "@payload-config"
+import { cacheLife, cacheTag } from "next/cache"
 import { getPayload } from "payload"
 
 type Args = {
@@ -10,10 +10,10 @@ type Args = {
 }
 
 export async function getProductVariantBySlug({ slug }: Args) {
-  const [payload, user] = await Promise.all([
-    getPayload({ config }),
-    getCurrentUser(),
-  ])
+  "use cache"
+  cacheLife("hours")
+
+  const payload = await getPayload({ config })
 
   const { docs: productVariants } = await payload.find({
     collection: "product-variants",
@@ -41,8 +41,6 @@ export async function getProductVariantBySlug({ slug }: Args) {
       isBackorder: true,
       isLowStock: true,
       isOutOfStock: true,
-      isWishlisted: true,
-      isNotifyRequested: true,
       meta: true,
     },
     populate: {
@@ -61,7 +59,6 @@ export async function getProductVariantBySlug({ slug }: Args) {
     },
     limit: 1,
     pagination: false,
-    user,
   })
 
   const pv = productVariants?.[0]
@@ -69,6 +66,8 @@ export async function getProductVariantBySlug({ slug }: Args) {
   if (!pv) {
     return null
   }
+
+  cacheTag(`product-variants:${pv.id}`)
 
   const { stock, supplierStock, meta, ...productVariant } = pv
 

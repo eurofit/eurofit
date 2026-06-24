@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
-import { getUserStockAlerts } from "@/actions/stock-alert/get-user-stock-alerts"
 import { StockAlertsTable } from "@/components/stock-alert/table"
 import { columns } from "@/components/stock-alert/table/columns"
+import { getUserStockAlerts } from "@/lib/utils/stock-alerts/get-user-stock-alerts"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 

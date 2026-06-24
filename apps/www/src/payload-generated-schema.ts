@@ -1137,6 +1137,17 @@ export const orders = pgTable(
     subtotal: numeric("subtotal", { mode: "number" }).default(0),
     discountTotal: numeric("discount_total", { mode: "number" }).default(0),
     deliveryFee: numeric("delivery_fee", { mode: "number" }).default(0),
+    estimatedDelivery_minDate: timestamp("estimated_delivery_min_date", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    estimatedDelivery_maxDate: timestamp("estimated_delivery_max_date", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    shipTogether: boolean("ship_together").default(true),
     total: numeric("total", { mode: "number" }).default(0),
     paymentStatus: enum_orders_payment_status("payment_status")
       .notNull()

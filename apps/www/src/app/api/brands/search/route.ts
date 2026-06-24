@@ -1,4 +1,4 @@
-import { searchBrand } from "@/actions/brands/search-brand"
+import { searchBrand } from "@/lib/utils/brands/search-brand"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {

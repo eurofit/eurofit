@@ -1,4 +1,4 @@
-import { getReviewEligibility } from "@/actions/reviews/get-review-eligibility"
+import { getReviewEligibility } from "@/lib/utils/reviews/get-review-eligibility"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {

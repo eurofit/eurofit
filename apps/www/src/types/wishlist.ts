@@ -12,3 +12,8 @@ export type WishlistItem = {
   brand?: string
   categories: string[]
 }
+
+export type WishlistStatus = {
+  isAuthenticated: boolean
+  isWishlisted: boolean
+}

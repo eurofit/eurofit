@@ -36,23 +36,22 @@ type ProductReviewsProps = {
     variant?: string | null
     sku: string
   }
-  currentUserId?: string
 }
 
 export function ProductReviews({
   productVariantId,
   variant,
-  currentUserId,
 }: ProductReviewsProps) {
   const pathname = usePathname()
   const statsQuery = useReviewStats(productVariantId)
   const listQuery = useReviewList(productVariantId)
-  const eligibilityQuery = useReviewEligibility(productVariantId, currentUserId)
+  const eligibilityQuery = useReviewEligibility(productVariantId)
 
   const reviews = listQuery.data?.pages.flatMap((page) => page.reviews) ?? []
 
-  const writeAction = currentUserId ? (
-    eligibilityQuery.data?.canReview ? (
+  const eligibility = eligibilityQuery.data
+  const writeAction = eligibility?.isAuthenticated ? (
+    eligibility.canReview ? (
       <WriteReviewDialog productVariantId={productVariantId} />
     ) : null
   ) : (

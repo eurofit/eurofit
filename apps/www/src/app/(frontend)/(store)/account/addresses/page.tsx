@@ -1,6 +1,6 @@
-import { getAddresses } from "@/actions/addresses/get-addresses"
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { AddressesManager } from "@/components/addresses/manager"
+import { getAddresses } from "@/lib/utils/addresses/get-addresses"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 

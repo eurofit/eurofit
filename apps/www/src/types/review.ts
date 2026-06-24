@@ -28,6 +28,7 @@ export type ReviewListPage = {
 }
 
 export type ReviewEligibility = {
+  isAuthenticated: boolean
   canReview: boolean
   hasReviewed: boolean
 }

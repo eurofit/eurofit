@@ -904,6 +904,17 @@ export interface Order {
    */
   discountTotal?: number | null;
   deliveryFee?: number | null;
+  /**
+   * Delivery window computed at order creation.
+   */
+  estimatedDelivery?: {
+    minDate?: string | null;
+    maxDate?: string | null;
+  };
+  /**
+   * Customer preference: hold all items and ship together when backorder stock arrives.
+   */
+  shipTogether?: boolean | null;
   total?: number | null;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentStatus: 'unpaid' | 'paid' | 'refunded';
@@ -1719,6 +1730,13 @@ export interface OrdersSelect<T extends boolean = true> {
   subtotal?: T;
   discountTotal?: T;
   deliveryFee?: T;
+  estimatedDelivery?:
+    | T
+    | {
+        minDate?: T;
+        maxDate?: T;
+      };
+  shipTogether?: T;
   total?: T;
   status?: T;
   paymentStatus?: T;

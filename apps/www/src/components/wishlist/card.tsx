@@ -14,17 +14,15 @@ import * as React from "react"
 
 type WishlistCardProps = {
   item: WishlistItem
-  currentUserId: string
 }
 
-export function WishlistCard({ item, currentUserId }: WishlistCardProps) {
+export function WishlistCard({ item }: WishlistCardProps) {
   const [optimisticRemoved, setOptimisticRemoved] = React.useOptimistic(false)
 
   const handleRemove = () => {
     React.startTransition(async () => {
       setOptimisticRemoved(true)
       const result = await toggleWishlist({
-        currentUserId,
         variantId: item.variantId,
         isWishlisted: true,
       })

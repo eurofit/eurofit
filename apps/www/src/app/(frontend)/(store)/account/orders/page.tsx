@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
-import { getUserOrders } from "@/actions/orders/get-user-orders"
 import { OrdersTable } from "@/components/orders/table"
 import { columns } from "@/components/orders/table/columns"
+import { getUserOrders } from "@/lib/utils/orders/get-user-orders"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 

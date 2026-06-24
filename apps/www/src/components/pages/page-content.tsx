@@ -1,7 +1,7 @@
-import { getPage } from "@/actions/pages/get-page"
 import { RenderBlocks } from "@/blocks/render-blocks"
 import { JsonLd } from "@/components/json-ld"
 import { getFaqJsonLd } from "@/lib/utils/get-faqs-json-ld"
+import { getPage } from "@/lib/utils/pages/get-page"
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext"
 import { notFound } from "next/navigation"
 

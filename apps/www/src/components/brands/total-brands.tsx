@@ -1,4 +1,4 @@
-import { getTotalBrands } from "@/actions/brands/get-total-brands"
+import { getTotalBrands } from "@/lib/utils/brands/get-total-brands"
 import { floorToNearest } from "@/lib/utils/math"
 
 export async function TotalBrands() {

@@ -1,4 +1,4 @@
-import { getReviewStats } from "@/actions/reviews/get-review-stats"
+import { getReviewStats } from "@/lib/utils/reviews/get-review-stats"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {

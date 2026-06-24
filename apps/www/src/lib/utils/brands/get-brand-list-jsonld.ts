@@ -1,5 +1,5 @@
-import { GetBrandsData } from "@/actions/brands/get-brands"
 import { site } from "@/const/site"
+import { GetBrandsData } from "@/lib/utils/brands/get-brands"
 import {
   BreadcrumbList,
   CollectionPage,

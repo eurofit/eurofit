@@ -1,4 +1,4 @@
-import { getCategory } from "@/actions/categories/get-category"
+import { getCategory } from "@/lib/utils/categories/get-category"
 import { Skeleton } from "@eurofit/ui/components/skeleton"
 
 type CategoryHeaderProps = {

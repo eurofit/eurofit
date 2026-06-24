@@ -1,5 +1,5 @@
-import { getBrand } from "@/actions/brands/get-brand"
 import { areaH1, areaPageSubtitle } from "@/lib/utils/brands/build-area-copy"
+import { getBrand } from "@/lib/utils/brands/get-brand"
 import { ServiceAreaDetail } from "@/types/service-area"
 import { Skeleton } from "@eurofit/ui/components/skeleton"
 

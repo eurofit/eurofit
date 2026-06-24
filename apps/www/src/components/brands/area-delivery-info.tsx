@@ -1,9 +1,9 @@
-import { getBrand } from "@/actions/brands/get-brand"
 import {
   buildAreaFaqs,
   formatDeliveryPrice,
   formatDeliveryWindow,
 } from "@/lib/utils/brands/build-area-copy"
+import { getBrand } from "@/lib/utils/brands/get-brand"
 import { ServiceAreaDetail } from "@/types/service-area"
 import {
   Accordion,

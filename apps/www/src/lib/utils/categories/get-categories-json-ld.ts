@@ -1,5 +1,5 @@
-import { GetCategoriesData } from "@/actions/categories/get-categories"
 import { site } from "@/const/site"
+import { GetCategoriesData } from "@/lib/utils/categories/get-categories"
 import {
   BreadcrumbList,
   CollectionPage,

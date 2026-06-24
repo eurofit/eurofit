@@ -25,7 +25,6 @@ import { VariantPrice } from "./variant-price"
 import { WishlistButton } from "./wishlist-button"
 
 interface ProductInfoProps {
-  currentUserId: string | undefined
   id: string
   sku: string
   title: string
@@ -42,13 +41,11 @@ interface ProductInfoProps {
   isBackorder: boolean
   stock: number
   variant?: string | null
-  isWishlisted: boolean
   averageRating: number
   totalRatings: number
 }
 
 export function ProductInfo({
-  currentUserId,
   id,
   sku,
   title,
@@ -62,7 +59,6 @@ export function ProductInfo({
   isBackorder,
   stock,
   variant,
-  isWishlisted,
   averageRating,
   totalRatings,
 }: ProductInfoProps) {
@@ -104,12 +100,7 @@ export function ProductInfo({
             </Badge>
             <Badge variant="secondary">Best seller</Badge>
           </div>
-          <WishlistButton
-            currentUserId={currentUserId}
-            variantId={id}
-            isWishlisted={isWishlisted}
-            gtmItem={gtmItem}
-          />
+          <WishlistButton variantId={id} gtmItem={gtmItem} />
         </div>
         <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
           {title}
