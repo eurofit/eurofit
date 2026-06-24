@@ -1,11 +1,11 @@
 "use client"
 
+import { recentSearchesAtom } from "@/atoms/search-bar"
+import { sendSearchEvent } from "@/lib/analytics/send-search-event"
 import {
   SearchProductResult,
   searchProductSuggestions,
-} from "@/actions/products/search-product-suggestions"
-import { recentSearchesAtom } from "@/atoms/search-bar"
-import { sendSearchEvent } from "@/lib/analytics/send-search-event"
+} from "@/lib/api/products/search-product-suggestions"
 import { useMutation } from "@tanstack/react-query"
 import { useAtom } from "jotai"
 import { useSearchParams } from "next/navigation"

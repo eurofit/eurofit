@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
 import { buildProductSearchMatchCondition } from "@/lib/utils/products/build-product-search-match-condition"
@@ -52,7 +52,7 @@ export async function getSearchProductFilters(
               'slug', ${categories.slug},
               'title', ${categories.title}
             )
-          ) FILTER (WHERE ${categories.id} IS NOT NULL), 
+          ) FILTER (WHERE ${categories.id} IS NOT NULL),
           '[]'::jsonb
         )`,
       productLines: sql<{ size: string | null; flavorColor: string | null }[]>`
@@ -62,7 +62,7 @@ export async function getSearchProductFilters(
               'size', ${product_variants.size},
               'flavorColor', ${product_variants.flavorColor}
             )
-          ) FILTER (WHERE ${product_variants.id} IS NOT NULL), 
+          ) FILTER (WHERE ${product_variants.id} IS NOT NULL),
           '[]'::jsonb
         )`,
     })

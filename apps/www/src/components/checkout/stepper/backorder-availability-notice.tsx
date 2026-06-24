@@ -1,6 +1,6 @@
 "use client"
 
-import { getDeliveryDateRange } from "@/actions/get-delivery-date-range"
+import { getDeliveryDateRange } from "@/lib/api/orders/get-delivery-date-range"
 import { formatDeliveryDateRange } from "@/lib/utils/orders/format-delivery-date-range"
 import {
   Alert,

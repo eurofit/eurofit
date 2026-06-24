@@ -1,4 +1,3 @@
-import { getSearchProductFilters } from "@/actions/products/get-search-product-filters"
 import { FilterSkeleton } from "@/components/products/filter-primitives"
 import {
   MobileProductFilters,
@@ -9,6 +8,7 @@ import { ProductFiltersSidebar } from "@/components/products/product-filters-sid
 import { SearchProducts } from "@/components/products/search-products"
 import { SEARCH_FILTER_KEYS } from "@/const/search-filters"
 import { site } from "@/const/site"
+import { getSearchProductFilters } from "@/lib/utils/products/get-search-product-filters"
 import { parseSearchParams } from "@/lib/utils/search/search-params"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"

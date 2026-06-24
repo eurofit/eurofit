@@ -44,7 +44,6 @@ const EMPTY_RESULT = {
   pagingCounter: 0,
 } as const
 
-/** Maps the storefront sort direction onto Payload's `sort` syntax (title). */
 function resolveSort(sortDirection?: string | null): "title" | "-title" {
   return sortDirection === "desc" ? "-title" : "title"
 }
@@ -62,15 +61,6 @@ function resolveProductImage(
   return imageUrl ?? supplierImageUrl ?? null
 }
 
-/**
- * Searches products by full-text query, applies the active storefront filters
- * and returns a paginated, fully-formed product list.
- *
- * Two phases keep the result shape identical to `getProductsByBrand`: a Drizzle
- * full-text query resolves the matching product IDs, then `payload.find` narrows
- * by the selected filters and formats images, stock and pricing. Each filter
- * group is combined with AND so picks narrow the results.
- */
 export async function searchProducts(
   query: string,
   opts: SearchProductsOptions = {}
@@ -91,7 +81,6 @@ export async function searchProducts(
     getPayload({ config }),
   ])
 
-  // Phase 1: resolve the IDs of products matching the full-text query.
   const matchedRows = await payload.db.drizzle
     .select({ id: products.id })
     .from(products)
@@ -105,7 +94,6 @@ export async function searchProducts(
 
   const sort = resolveSort(sortDirection)
 
-  // Phase 2: narrow the matches by the active filters and format like brands.
   const {
     docs: matchedProducts,
     totalDocs: totalProducts,

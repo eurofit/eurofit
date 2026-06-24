@@ -33,7 +33,6 @@ const optionsSchema = z.object({
 
 type GetProductsByBrandArgs = z.infer<typeof optionsSchema>
 
-/** Maps the storefront sort direction onto Payload's `sort` syntax (title). */
 function resolveSort(sortDirection?: string | null): "title" | "-title" {
   return sortDirection === "desc" ? "-title" : "title"
 }

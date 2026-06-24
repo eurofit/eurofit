@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import payloadConfig from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"

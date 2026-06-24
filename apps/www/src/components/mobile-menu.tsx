@@ -1,4 +1,4 @@
-import { getNav } from "@/actions/get-nav"
+import { getNav } from "@/lib/utils/nav/get-nav"
 import { Button } from "@eurofit/ui/components/button"
 import { Menu } from "lucide-react"
 import { MobileMenuClient } from "./mobile-menu.client"

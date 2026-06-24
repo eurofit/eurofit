@@ -1,4 +1,4 @@
-import { getNav } from "@/actions/get-nav"
+import { getNav } from "@/lib/utils/nav/get-nav"
 import { Skeleton } from "@eurofit/ui/components/skeleton"
 import { NavLinks } from "./nav.client"
 

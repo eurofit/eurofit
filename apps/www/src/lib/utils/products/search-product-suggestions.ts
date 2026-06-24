@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { buildPrefixTsQuery } from "@/lib/utils/build-prefix-ts-query"
 import { buildProductSearchMatchCondition } from "@/lib/utils/products/build-product-search-match-condition"

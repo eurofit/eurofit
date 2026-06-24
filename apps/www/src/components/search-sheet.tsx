@@ -1,12 +1,12 @@
 "use client"
 
-import {
-  SearchProductResult,
-  searchProductSuggestions,
-} from "@/actions/products/search-product-suggestions"
 import { PreventScroll } from "@/components/prevent-scroll"
 import { useToggle } from "@/hooks/use-toggle"
 import { sendSearchEvent } from "@/lib/analytics/send-search-event"
+import {
+  SearchProductResult,
+  searchProductSuggestions,
+} from "@/lib/api/products/search-product-suggestions"
 import { Button, buttonVariants } from "@eurofit/ui/components/button"
 import {
   InputGroup,

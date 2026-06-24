@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { computeDeliveryDateRange } from "@/lib/utils/orders/compute-delivery-date-range"
 import config from "@payload-config"

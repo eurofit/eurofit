@@ -17,7 +17,6 @@ type RawShippingRate = {
   price?: number | null
 }
 
-/** Maps populated shipping rates to display-ready pairs, sorted cheapest first. */
 function resolveShippingRates(
   rates: RawShippingRate[] | null | undefined
 ): ServiceAreaShippingRate[] {
