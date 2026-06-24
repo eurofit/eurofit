@@ -137,6 +137,9 @@ importers:
       libphonenumber-js:
         specifier: ^1.13.6
         version: 1.13.6
+      little-date:
+        specifier: ^1.2.1
+        version: 1.2.1
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -4624,6 +4627,10 @@ packages:
   dataloader@2.2.3:
     resolution: {integrity: sha512-y2krtASINtPFS1rSDjacrFgn1dcUuoREVabwlOGOe4SdxenREqwjwjElAdwvbGM7kgZz9a3KVicWR7vcz8rnzA==}
 
+  date-fns@2.30.0:
+    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
+    engines: {node: '>=0.11'}
+
   date-fns@3.6.0:
     resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
 
@@ -6086,6 +6093,10 @@ packages:
   listr2@10.2.1:
     resolution: {integrity: sha512-7I5knELsJKTUjXG+A6BkKAiGkW1i25fNa/xlUl9hFtk15WbE9jndA89xu5FzQKrY5llajE1hfZZFMILXkDHk/Q==}
     engines: {node: '>=22.13.0'}
+
+  little-date@1.2.1:
+    resolution: {integrity: sha512-O5LUKWMw96qEyS+12mxnRP49MZEEM9fPWzIylgutX6RHf6F1JakvfNeBgteP0CIeEyNFiPM8nohTldtbmyjEqQ==}
+    engines: {node: '>=10'}
 
   loader-runner@4.3.2:
     resolution: {integrity: sha512-DFEqQ3ihfS9blba08cLfYf1NRAIEm+dDjic073DRDc3/JspI/8wYmtDsHwd3+4hwvdxSK7PGaElfTmm0awWJ4w==}
@@ -12656,6 +12667,10 @@ snapshots:
 
   dataloader@2.2.3: {}
 
+  date-fns@2.30.0:
+    dependencies:
+      '@babel/runtime': 7.29.7
+
   date-fns@3.6.0: {}
 
   date-fns@4.1.0: {}
@@ -14186,6 +14201,10 @@ snapshots:
       log-update: 6.1.0
       rfdc: 1.4.1
       wrap-ansi: 10.0.0
+
+  little-date@1.2.1:
+    dependencies:
+      date-fns: 2.30.0
 
   loader-runner@4.3.2: {}
 

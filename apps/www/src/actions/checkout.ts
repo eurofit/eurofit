@@ -8,6 +8,8 @@ import type { OrderItemSnapshot } from "@/lib/orders/build-order-item-snapshot"
 import { paystack } from "@/lib/paystack"
 import { addressWithIdSchema } from "@/lib/schemas/addresses/address"
 import { orderSchema } from "@/lib/schemas/orders/order"
+import { getBackorderAvailabilityDate } from "@/lib/utils/feeds/get-backorder-availability-date"
+import { computeDeliveryDateRange } from "@/lib/utils/orders/compute-delivery-date-range"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { Order } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
@@ -23,6 +25,7 @@ const checkoutSchema = orderSchema
   })
   .extend({
     addressId: z.uuid("Address ID must be a valid UUID"),
+    shipTogether: z.boolean().default(true),
   })
 
 type CheckoutArgs = z.infer<typeof checkoutSchema>
@@ -48,7 +51,8 @@ async function runCheckout(
     return { success: false, code: 400, message: "CAPTCHA validation failed." }
   }
 
-  const { items, addressId } = checkoutSchema.parse(unSafCheckoutData)
+  const { items, addressId, shipTogether } =
+    checkoutSchema.parse(unSafCheckoutData)
 
   const orderItems: Order["items"] = items.map(({ id, ...item }) => ({
     productVariant: id,
@@ -98,6 +102,25 @@ async function runCheckout(
     // verify stock availability
     // verify items price
 
+    // Compute estimated delivery server-side so the stored dates always match
+    // what the user was shown (same function, same inputs, independent of client).
+    const variantIds = orderItems.map((i) => i.productVariant as string)
+    const { docs: variants } = await payload.find({
+      collection: "product-variants",
+      where: { id: { in: variantIds } },
+      depth: 0,
+      pagination: false,
+    })
+    const hasBackorderItems = variants.some((v) => v.isBackorder)
+    const deliveryStartDate = hasBackorderItems
+      ? getBackorderAvailabilityDate(new Date())
+      : new Date()
+    const deliveryRange = await computeDeliveryDateRange(
+      address.city,
+      deliveryStartDate,
+      payload
+    )
+
     // proceed to create order
     const order = await Sentry.startSpan(
       { name: "order.create", op: "db.create" },
@@ -110,6 +133,13 @@ async function runCheckout(
             items: orderItems,
             status: "pending",
             paymentStatus: "unpaid",
+            shipTogether,
+            estimatedDelivery: deliveryRange
+              ? {
+                  minDate: deliveryRange.min.toISOString(),
+                  maxDate: deliveryRange.max.toISOString(),
+                }
+              : undefined,
             snapshot: {
               user: {
                 id: user.id,

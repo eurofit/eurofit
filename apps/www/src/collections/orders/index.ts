@@ -126,6 +126,47 @@ export const orders: CollectionConfig = {
       },
     },
     {
+      name: "estimatedDelivery",
+      type: "group",
+      label: "Estimated Delivery",
+      admin: {
+        readOnly: true,
+        description: "Delivery window computed at order creation.",
+      },
+      fields: [
+        {
+          name: "minDate",
+          type: "date",
+          access: {
+            create: adminOnlyFieldAccess,
+            update: adminOnlyFieldAccess,
+          },
+        },
+        {
+          name: "maxDate",
+          type: "date",
+          access: {
+            create: adminOnlyFieldAccess,
+            update: adminOnlyFieldAccess,
+          },
+        },
+      ],
+    },
+    {
+      name: "shipTogether",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        readOnly: true,
+        description:
+          "Customer preference: hold all items and ship together when backorder stock arrives.",
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
       name: "total",
       type: "number",
       defaultValue: 0,

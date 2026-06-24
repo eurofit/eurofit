@@ -3,6 +3,7 @@
 import { DELIVERY_FEE } from "@/const/delivery"
 import { useCart } from "@/hooks/use-cart"
 import { useCheckout } from "@/hooks/use-checkout"
+import { getBackorderAvailabilityDate } from "@/lib/utils/feeds/get-backorder-availability-date"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Address } from "@/payload-types"
 import { Button } from "@eurofit/ui/components/button"
@@ -20,6 +21,7 @@ import { Turnstile } from "@marsidev/react-turnstile"
 import { ChevronRight, Lock } from "lucide-react"
 import React from "react"
 import { toast } from "sonner"
+import { BackorderAvailabilityNotice } from "./backorder-availability-notice"
 import { OrderItem } from "./order-item"
 import { OrderSummary } from "./order-summary"
 import { ShippingSummary } from "./shipping-summary"
@@ -31,6 +33,19 @@ export function ReviewStep() {
   const { items, itemCount, total, discountTotal } = useCart()
   const { checkout, isCheckingout } = useCheckout()
   const grandTotal = total - discountTotal + DELIVERY_FEE
+
+  const hasBackorderItems = items.some((i) => i.isBackorder)
+  const hasInStockItems = items.some((i) => !i.isBackorder && !i.isOutOfStock)
+
+  const backorderStartDate = React.useMemo(
+    () =>
+      hasBackorderItems
+        ? getBackorderAvailabilityDate(new Date()).toISOString()
+        : undefined,
+    [hasBackorderItems]
+  )
+
+  const [shipTogether, setShipTogether] = React.useState(true)
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
   const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
@@ -63,6 +78,7 @@ export function ReviewStep() {
           },
         })),
         addressId: address.id,
+        shipTogether,
       },
       turnstileToken,
     })
@@ -114,6 +130,16 @@ export function ReviewStep() {
                 ))}
               </div>
             </div>
+
+            {hasBackorderItems && address && (
+              <BackorderAvailabilityNotice
+                city={address.city}
+                startDate={backorderStartDate}
+                hasInStockItems={hasInStockItems}
+                shipTogether={shipTogether}
+                onShipTogetherChange={setShipTogether}
+              />
+            )}
 
             <OrderSummary subtotal={total} discountTotal={discountTotal} />
           </div>
