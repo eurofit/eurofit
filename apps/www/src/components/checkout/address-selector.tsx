@@ -2,6 +2,8 @@
 
 import { AddressRadioItem } from "@/components/addresses/radio-item"
 import { stepper } from "@/components/checkout/stepper/steps"
+import { useCart } from "@/hooks/use-cart"
+import { sendAddShippingInfoEvent } from "@/lib/analytics/ecommerce/add-shipping-info"
 import { AddressId, addressIdSchema } from "@/lib/schemas/addresses/address"
 import { Address } from "@/payload-types"
 import { Button } from "@eurofit/ui/components/button"
@@ -23,6 +25,7 @@ export function AddressSelector({
   onEditAddress,
 }: AddressSelectorProps) {
   const stepper = useStepper()
+  const { items, total } = useCart()
 
   const addressForm = useForm<AddressId>({
     resolver: zodResolver(addressIdSchema),
@@ -37,6 +40,14 @@ export function AddressSelector({
       toast.error("Address not found")
       return
     }
+
+    const lastConfirmedAddress = stepper.data.get("address") as
+      | Address
+      | undefined
+    if (lastConfirmedAddress?.id !== address.id) {
+      sendAddShippingInfoEvent({ items, value: total })
+    }
+
     stepper.data.set("address", address)
     stepper.next()
   }
