@@ -1,6 +1,7 @@
 "use client"
 
 import { useCart } from "@/hooks/use-cart"
+import { sendBeginCheckoutEvent } from "@/lib/analytics/ecommerce/begin-checkout"
 import { Button } from "@eurofit/ui/components/button"
 import {
   Card,
@@ -18,7 +19,7 @@ import { Stepper, useStepper } from "./steps"
 
 export function CartStep() {
   const stepper = useStepper()
-  const { items, itemCount, isEmpty } = useCart()
+  const { items, itemCount, isEmpty, total } = useCart()
 
   return (
     <Stepper.Content step="cart">
@@ -69,7 +70,13 @@ export function CartStep() {
           )}
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button onClick={() => stepper.next()} disabled={isEmpty}>
+          <Button
+            onClick={() => {
+              sendBeginCheckoutEvent({ items, value: total })
+              stepper.next()
+            }}
+            disabled={isEmpty}
+          >
             Next: Address
           </Button>
         </CardFooter>
