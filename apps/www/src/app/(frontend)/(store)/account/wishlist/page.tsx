@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
-import { getWishlistItems } from "@/actions/wishlists"
 import { WishlistGrid } from "@/components/wishlist/grid"
+import { getWishlistItems } from "@/lib/utils/wishlists/get-wishlist-items"
 import { Button } from "@eurofit/ui/components/button"
 import { Heart } from "lucide-react"
 import { Metadata } from "next"
@@ -48,7 +48,7 @@ export default async function WishlistPage() {
           </Button>
         </div>
       ) : (
-        <WishlistGrid items={items} currentUserId={user.id} />
+        <WishlistGrid items={items} />
       )}
     </div>
   )

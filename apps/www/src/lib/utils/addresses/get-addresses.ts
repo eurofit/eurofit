@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { captureError } from "@/lib/observability/capture-error"

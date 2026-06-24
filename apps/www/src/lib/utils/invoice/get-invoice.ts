@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { Invoice } from "@/lib/schemas/invoice"
 import { orderToInvoice } from "@/lib/utils/invoice/orderToInvoice"

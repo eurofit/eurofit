@@ -1,5 +1,5 @@
-import { getInvoice } from "@/actions/invoice/get-invoice"
 import { site } from "@/const/site"
+import { getInvoice } from "@/lib/utils/invoice/get-invoice"
 import { getInvoiceBuffer } from "@/lib/utils/invoice/getInvoiceBuffer"
 import { formatDate } from "date-fns"
 import { NextResponse } from "next/server"

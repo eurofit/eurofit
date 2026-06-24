@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import { captureError } from "@/lib/observability/capture-error"
 import { getPayloadImageUrl } from "@/lib/utils/payload-image"
