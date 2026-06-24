@@ -15,14 +15,10 @@ import {
 import { Separator } from "@eurofit/ui/components/separator"
 
 interface ProductDetailPageProps {
-  currentUserId: string | undefined
   product: ProductDetail
 }
 
-export function ProductDetailPage({
-  product,
-  currentUserId,
-}: ProductDetailPageProps) {
+export function ProductDetailPage({ product }: ProductDetailPageProps) {
   const productCategories = (product.product?.categories ?? []).flatMap(
     (cat) =>
       typeof cat === "object" && cat && "title" in cat
@@ -68,7 +64,6 @@ export function ProductDetailPage({
 
           {/* Right Column - Info */}
           <ProductInfo
-            currentUserId={currentUserId}
             id={product.id}
             sku={product.sku}
             title={product.detailTitle ?? product.title}
@@ -82,7 +77,6 @@ export function ProductDetailPage({
             isBackorder={product.isBackorder}
             stock={product.stock}
             variant={product.variant}
-            isWishlisted={product.isWishlisted}
             averageRating={product.averageRating}
             totalRatings={product.totalRatings}
           />
@@ -138,7 +132,6 @@ export function ProductDetailPage({
             variant: product.variant,
             sku: product.sku,
           }}
-          currentUserId={currentUserId}
         />
       </div>
     </main>
