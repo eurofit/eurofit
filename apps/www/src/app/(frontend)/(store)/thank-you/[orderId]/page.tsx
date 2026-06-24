@@ -1,7 +1,13 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { OrderCard } from "@/components/orders/card"
+import {
+  GTM_ECOMMERCE_CURRENCY,
+  GTM_ECOMMERCE_EVENT,
+} from "@/const/gtm-ecommerce-events"
 import { APP_TIME_ZONE } from "@/const/time"
+import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { addressSchema } from "@/lib/schemas/addresses/address"
 import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
 import { orderItem } from "@/lib/schemas/orders/order-item"
@@ -126,6 +132,31 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
   return (
     <>
       {/* <pre>{JSON.stringify(order, null, 2)}</pre> */}
+      <GTMEventTracker
+        ecommerce
+        event={{
+          event: GTM_ECOMMERCE_EVENT.PURCHASE,
+          ecommerce: {
+            currency: GTM_ECOMMERCE_CURRENCY,
+            transaction_id: orderId,
+            value: order.total!,
+            shipping: order.deliveryFee!,
+            discount: order.discountTotal ?? 0,
+            items: toGTMItems(
+              formattedItems.map((item) => ({
+                sku: item.sku,
+                productTitle: item.product.title,
+                price: item.price,
+                discountedPrice: item.discount?.price ?? null,
+                brand: item.product.brand ?? null,
+                categories: item.product.categories,
+                variantLabel: item.variant,
+                quantity: item.quantity,
+              }))
+            ),
+          },
+        }}
+      />
       <main className="mx-auto flex max-w-lg flex-col items-center justify-center">
         <div className="relative flex w-full flex-col items-center justify-center gap-4">
           <div className="flex size-12 rounded-full bg-green-50 text-green-700">

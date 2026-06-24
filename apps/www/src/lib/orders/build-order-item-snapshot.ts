@@ -29,6 +29,8 @@ export type OrderItemSnapshot = {
     title: string
     slug: string
     image: string | null
+    brand: string | null
+    categories: string[]
   }
 }
 
@@ -37,6 +39,12 @@ export function buildOrderItemSnapshot(
 ): OrderItemSnapshot {
   const product = variant.product
   const discount = variant.discount
+
+  const brand = typeof product.brand === "object" ? product.brand.title : null
+
+  const categories = (product.categories ?? []).flatMap((c) =>
+    typeof c === "object" ? [c.title] : []
+  )
 
   return {
     sku: variant.sku,
@@ -52,6 +60,8 @@ export function buildOrderItemSnapshot(
       title: product.title,
       slug: product.slug,
       image: product.supplierImageUrl ?? null,
+      brand,
+      categories,
     },
   }
 }
