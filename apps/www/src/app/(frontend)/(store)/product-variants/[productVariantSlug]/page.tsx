@@ -1,4 +1,3 @@
-import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { JsonLd } from "@/components/json-ld"
 import { ProductDetailPage } from "@/components/product-variants/product-detail-page"
 import { site } from "@/const/site"
@@ -22,10 +21,6 @@ export async function generateMetadata({
 
   if (!productVarint) {
     notFound()
-  }
-
-  if ("errors" in productVarint || "properties" in productVarint) {
-    throw new Error("Something went wrong!")
   }
 
   const title = productVarint.meta?.title || productVarint.title
@@ -58,27 +53,17 @@ export async function generateMetadata({
   }
 }
 
-export default async function ProductLinePage({ params }: ProductPageProps) {
+export default async function ProductVariantPage({ params }: ProductPageProps) {
   const { productVariantSlug: slug } = await params
 
-  const [currentUser, productVariant] = await Promise.all([
-    getCurrentUser(),
-    getProductVariantBySlug({ slug }),
-  ])
+  const productVariant = await getProductVariantBySlug({ slug })
 
   if (!productVariant) notFound()
-
-  if ("errors" in productVariant || "properties" in productVariant) {
-    throw new Error("Something went wrong!")
-  }
 
   return (
     <>
       <JsonLd jsonLd={getProductVariantJsonLd(productVariant)} />
-      <ProductDetailPage
-        product={productVariant}
-        currentUserId={currentUser?.id}
-      />
+      <ProductDetailPage product={productVariant} />
     </>
   )
 }
