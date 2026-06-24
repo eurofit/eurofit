@@ -1,3 +1,5 @@
+"use client"
+
 import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { Facebook } from "@/components/icons/facebook"
 import { Twitter } from "@/components/icons/twitter"
@@ -7,11 +9,13 @@ import {
   GTM_ECOMMERCE_CURRENCY,
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
+import { site } from "@/const/site"
 import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import {
   toGTMItem,
   toGTMItemsValue,
 } from "@/lib/analytics/ecommerce/to-gtm-item"
+import { sendShareEvent } from "@/lib/analytics/send-share-event"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
@@ -74,6 +78,17 @@ export function ProductInfo({
           categories,
         })
       : undefined
+
+  const productUrl =
+    variantSlug != null ? `${site.url}/product-variants/${variantSlug}` : null
+
+  const shareUrls = productUrl
+    ? {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`,
+        twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(title)}`,
+        whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} ${productUrl}`)}`,
+      }
+    : null
 
   return (
     <div className="flex flex-col justify-start gap-6">
@@ -203,31 +218,75 @@ export function ProductInfo({
       <Separator />
 
       {/* Share */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Share this product
-        </h2>
-        <ul className="flex items-center gap-2">
-          <li>
-            <Button variant="outline" size="icon-lg" className="rounded-full">
-              <Facebook />
-              <span className="sr-only">Share on Facebook</span>
-            </Button>
-          </li>
-          <li>
-            <Button variant="outline" size="icon-lg" className="rounded-full">
-              <Twitter />
-              <span className="sr-only">Share on Twitter</span>
-            </Button>
-          </li>
-          <li>
-            <Button variant="outline" size="icon-lg" className="rounded-full">
-              <Whatsapp />
-              <span className="sr-only">Share on Whatsapp</span>
-            </Button>
-          </li>
-        </ul>
-      </section>
+      {shareUrls && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">
+            Share this product
+          </h2>
+          <ul className="flex items-center gap-2">
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
+              >
+                <a
+                  href={shareUrls.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "Facebook", itemId: sku })
+                  }
+                >
+                  <Facebook />
+                  <span className="sr-only">Share on Facebook</span>
+                </a>
+              </Button>
+            </li>
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
+              >
+                <a
+                  href={shareUrls.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "Twitter", itemId: sku })
+                  }
+                >
+                  <Twitter />
+                  <span className="sr-only">Share on Twitter</span>
+                </a>
+              </Button>
+            </li>
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
+              >
+                <a
+                  href={shareUrls.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "WhatsApp", itemId: sku })
+                  }
+                >
+                  <Whatsapp />
+                  <span className="sr-only">Share on WhatsApp</span>
+                </a>
+              </Button>
+            </li>
+          </ul>
+        </section>
+      )}
     </div>
   )
 }
