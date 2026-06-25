@@ -10,6 +10,7 @@ import { APP_TIME_ZONE } from "@/const/time"
 import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { formatDeliveryDateRange } from "@/lib/utils/orders/format-delivery-date-range"
+import { getCustomerLifetimeValue } from "@/lib/utils/orders/get-customer-lifetime-value"
 import { getThankYouOrder } from "@/lib/utils/orders/get-thank-you-order"
 import { tz } from "@date-fns/tz"
 import {
@@ -57,7 +58,13 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
     redirect("/login" + "?next=/thank-you/" + orderId)
   }
 
-  const orderData = await getThankYouOrder({ orderId: orderIdNumber, user })
+  const [orderData, { clv, isCustomerNew }] = await Promise.all([
+    getThankYouOrder({ orderId: orderIdNumber, user }),
+    getCustomerLifetimeValue({
+      email: user.email,
+      currentOrderId: orderIdNumber,
+    }).catch(() => ({ clv: 0, isCustomerNew: false })),
+  ])
 
   if (!orderData) notFound()
 
@@ -67,7 +74,11 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
     <>
       <GTMEventTracker
         ecommerce
-        userData={{ email: user.email }}
+        userData={{
+          email: user.email,
+          is_new_customer: isCustomerNew,
+          customer_lifetime_value: clv,
+        }}
         event={{
           event: GTM_ECOMMERCE_EVENT.PURCHASE,
           ecommerce: {
