@@ -44,8 +44,10 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
       stock: true,
       supplierStock: true,
       isOutOfStock: true,
-      product: {
-        id: true,
+      product: true,
+    },
+    populate: {
+      products: {
         title: true,
         slug: true,
         supplierImageUrl: true,
