@@ -131,7 +131,6 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
 
   return (
     <>
-      {/* <pre>{JSON.stringify(order, null, 2)}</pre> */}
       <GTMEventTracker
         ecommerce
         event={{
