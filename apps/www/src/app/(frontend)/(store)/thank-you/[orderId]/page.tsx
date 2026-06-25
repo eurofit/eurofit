@@ -8,11 +8,9 @@ import {
 } from "@/const/gtm-ecommerce-events"
 import { APP_TIME_ZONE } from "@/const/time"
 import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
-import { addressSchema } from "@/lib/schemas/addresses/address"
-import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
-import { orderItem } from "@/lib/schemas/orders/order-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { formatDeliveryDateRange } from "@/lib/utils/orders/format-delivery-date-range"
+import { getThankYouOrder } from "@/lib/utils/orders/get-thank-you-order"
 import { tz } from "@date-fns/tz"
 import {
   Alert,
@@ -26,7 +24,6 @@ import {
   CollapsibleTrigger,
 } from "@eurofit/ui/components/collapsible"
 import { Separator } from "@eurofit/ui/components/separator"
-import config from "@payload-config"
 import { format as formatDate } from "date-fns"
 import {
   Box,
@@ -38,8 +35,6 @@ import {
   MapPinIcon,
 } from "lucide-react"
 import { notFound, redirect } from "next/navigation"
-import { getPayload } from "payload"
-import * as z from "zod"
 
 type ThankYouPageProps = {
   params: Promise<{
@@ -62,72 +57,11 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
     redirect("/login" + "?next=/thank-you/" + orderId)
   }
 
-  const payload = await getPayload({
-    config,
-  })
+  const orderData = await getThankYouOrder({ orderId: orderIdNumber, user })
 
-  const { docs: orders } = await payload.find({
-    collection: "orders",
-    where: {
-      and: [
-        {
-          id: {
-            equals: orderIdNumber,
-          },
-        },
-        {
-          user: {
-            equals: user.id,
-          },
-        },
-      ],
-    },
-    select: {
-      items: {
-        productVariant: true,
-        quantity: true,
-        snapshot: true,
-      },
-      snapshot: true,
-      subtotal: true,
-      discountTotal: true,
-      deliveryFee: true,
-      total: true,
-      createdAt: true,
-      estimatedDelivery: {
-        minDate: true,
-        maxDate: true,
-      },
-      shipTogether: true,
-    },
-    overrideAccess: false,
-    user: user,
-    depth: 2,
-    limit: 1,
-    pagination: false,
-    showHiddenFields: false,
-  })
+  if (!orderData) notFound()
 
-  const order = orders[0]
-
-  if (!order) notFound()
-
-  const items = order.items.map(({ snapshot, ...item }) => ({
-    ...item,
-    ...(typeof snapshot === "object" ? snapshot : {}),
-    id:
-      typeof item.productVariant === "string"
-        ? item.productVariant
-        : item.productVariant.id,
-  }))
-
-  const itemSchema = orderItemSnapShotSchema.extend(
-    orderItem.pick({ id: true, quantity: true }).shape
-  )
-
-  const formattedItems = z.array(itemSchema).parse(items)
-
-  const shippingAddress = addressSchema.parse((order.snapshot as any)?.address)
+  const { order, formattedItems, shippingAddress } = orderData
 
   return (
     <>
