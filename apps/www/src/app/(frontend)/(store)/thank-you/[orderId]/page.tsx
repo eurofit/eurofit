@@ -67,6 +67,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
     <>
       <GTMEventTracker
         ecommerce
+        userData={{ email: user.email }}
         event={{
           event: GTM_ECOMMERCE_EVENT.PURCHASE,
           ecommerce: {

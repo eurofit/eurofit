@@ -1,5 +1,6 @@
 "use client"
 
+import type { GTMUserData } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import { sendGTMEcommerceEvent } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import { sendGTMEvent } from "@next/third-parties/google"
 import * as React from "react"
@@ -16,6 +17,8 @@ type GTMEventTrackerProps = {
    * events (login, sign_up, search, …).
    */
   ecommerce?: boolean
+  /** User identity for GA4 Enhanced Conversions. Only used when `ecommerce` is true. */
+  userData?: GTMUserData
 }
 
 /**
@@ -26,6 +29,7 @@ type GTMEventTrackerProps = {
 export function GTMEventTracker({
   event,
   ecommerce = false,
+  userData,
 }: GTMEventTrackerProps) {
   const didFireRef = React.useRef(false)
 
@@ -37,7 +41,8 @@ export function GTMEventTracker({
 
     if (ecommerce) {
       sendGTMEcommerceEvent(
-        event as Parameters<typeof sendGTMEcommerceEvent>[0]
+        event as Parameters<typeof sendGTMEcommerceEvent>[0],
+        userData
       )
     } else {
       sendGTMEvent(event)
