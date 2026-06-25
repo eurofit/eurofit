@@ -60,10 +60,7 @@ function BackorderOnlyAlert({
     <Alert className="border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-200">
       <CalendarClock className="size-4 text-blue-600 dark:text-blue-400" />
       <AlertTitle>Estimated delivery</AlertTitle>
-      <AlertDescription>
-        {formattedRange ?? "To be confirmed"} — these items ship once stock
-        arrives from our supplier.
-      </AlertDescription>
+      <AlertDescription>{formattedRange ?? "To be confirmed"}</AlertDescription>
     </Alert>
   )
 }
@@ -92,14 +89,14 @@ function MixedCartShippingOptions({
           title="Ship everything together"
           description={
             formattedRange
-              ? `We'll hold your order until all backorder items arrive. Estimated delivery: ${formattedRange}.`
-              : "We'll hold your order until all backorder items arrive."
+              ? `We'll ship everything together. Estimated delivery: ${formattedRange}.`
+              : "We'll ship everything together once all items are ready."
           }
         />
         <ShippingOptionCard
           value="separate"
           title="Ship available items now"
-          description="In-stock items ship immediately. Backorder items ship separately when they arrive."
+          description="In-stock items ship now. Other items ship separately once ready."
         />
       </RadioGroup>
     </div>
