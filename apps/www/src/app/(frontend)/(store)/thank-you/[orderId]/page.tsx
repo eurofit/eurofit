@@ -1,12 +1,16 @@
 import { getCurrentUser } from "@/actions/auth/get-current-user"
+import { GTMEventTracker } from "@/components/analytics/gtm-event-tracker"
 import { ImageWithRetry } from "@/components/image-with-retry"
 import { OrderCard } from "@/components/orders/card"
+import {
+  GTM_ECOMMERCE_CURRENCY,
+  GTM_ECOMMERCE_EVENT,
+} from "@/const/gtm-ecommerce-events"
 import { APP_TIME_ZONE } from "@/const/time"
-import { addressSchema } from "@/lib/schemas/addresses/address"
-import { orderItemSnapShotSchema } from "@/lib/schemas/orders/item-snapshort"
-import { orderItem } from "@/lib/schemas/orders/order-item"
+import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { formatDeliveryDateRange } from "@/lib/utils/orders/format-delivery-date-range"
+import { getThankYouOrder } from "@/lib/utils/orders/get-thank-you-order"
 import { tz } from "@date-fns/tz"
 import {
   Alert,
@@ -20,7 +24,6 @@ import {
   CollapsibleTrigger,
 } from "@eurofit/ui/components/collapsible"
 import { Separator } from "@eurofit/ui/components/separator"
-import config from "@payload-config"
 import { format as formatDate } from "date-fns"
 import {
   Box,
@@ -32,8 +35,6 @@ import {
   MapPinIcon,
 } from "lucide-react"
 import { notFound, redirect } from "next/navigation"
-import { getPayload } from "payload"
-import * as z from "zod"
 
 type ThankYouPageProps = {
   params: Promise<{
@@ -56,76 +57,39 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
     redirect("/login" + "?next=/thank-you/" + orderId)
   }
 
-  const payload = await getPayload({
-    config,
-  })
+  const orderData = await getThankYouOrder({ orderId: orderIdNumber, user })
 
-  const { docs: orders } = await payload.find({
-    collection: "orders",
-    where: {
-      and: [
-        {
-          id: {
-            equals: orderIdNumber,
-          },
-        },
-        {
-          user: {
-            equals: user.id,
-          },
-        },
-      ],
-    },
-    select: {
-      items: {
-        productVariant: true,
-        quantity: true,
-        snapshot: true,
-      },
-      snapshot: true,
-      subtotal: true,
-      discountTotal: true,
-      deliveryFee: true,
-      total: true,
-      createdAt: true,
-      estimatedDelivery: {
-        minDate: true,
-        maxDate: true,
-      },
-      shipTogether: true,
-    },
-    overrideAccess: false,
-    user: user,
-    depth: 2,
-    limit: 1,
-    pagination: false,
-    showHiddenFields: false,
-  })
+  if (!orderData) notFound()
 
-  const order = orders[0]
-
-  if (!order) notFound()
-
-  const items = order.items.map(({ snapshot, ...item }) => ({
-    ...item,
-    ...(typeof snapshot === "object" ? snapshot : {}),
-    id:
-      typeof item.productVariant === "string"
-        ? item.productVariant
-        : item.productVariant.id,
-  }))
-
-  const itemSchema = orderItemSnapShotSchema.extend(
-    orderItem.pick({ id: true, quantity: true }).shape
-  )
-
-  const formattedItems = z.array(itemSchema).parse(items)
-
-  const shippingAddress = addressSchema.parse((order.snapshot as any)?.address)
+  const { order, formattedItems, shippingAddress } = orderData
 
   return (
     <>
-      {/* <pre>{JSON.stringify(order, null, 2)}</pre> */}
+      <GTMEventTracker
+        ecommerce
+        event={{
+          event: GTM_ECOMMERCE_EVENT.PURCHASE,
+          ecommerce: {
+            currency: GTM_ECOMMERCE_CURRENCY,
+            transaction_id: orderId,
+            value: order.total!,
+            shipping: order.deliveryFee!,
+            discount: order.discountTotal ?? 0,
+            items: toGTMItems(
+              formattedItems.map((item) => ({
+                sku: item.sku,
+                productTitle: item.product.title,
+                price: item.price,
+                discountedPrice: item.discount?.price ?? null,
+                brand: item.product.brand ?? null,
+                categories: item.product.categories,
+                variantLabel: item.variant,
+                quantity: item.quantity,
+              }))
+            ),
+          },
+        }}
+      />
       <main className="mx-auto flex max-w-lg flex-col items-center justify-center">
         <div className="relative flex w-full flex-col items-center justify-center gap-4">
           <div className="flex size-12 rounded-full bg-green-50 text-green-700">

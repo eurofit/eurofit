@@ -2,7 +2,10 @@
 
 import { ProductReviews } from "@/components/product-reviews/product-reviews"
 import { ProductImageGallery } from "@/components/product-variants/product-image-gallery"
-import { ProductInfo } from "@/components/product-variants/product-info"
+import {
+  ProductInfo,
+  type ProductInfoVariant,
+} from "@/components/product-variants/product-info"
 import { ProductDetail } from "@/lib/utils/product-variants/get-product-variant-by-slug"
 import {
   Breadcrumb,
@@ -34,6 +37,24 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
     ),
   ]
 
+  const productInfoVariant: ProductInfoVariant = {
+    id: product.id,
+    sku: product.sku,
+    slug: product.slug,
+    title: product.detailTitle ?? product.title,
+    productTitle: product.product?.title ?? product.title,
+    categories,
+    brand: product.product?.brand || null,
+    price: product.retailPrice ?? null,
+    discount: product.discount,
+    inStock: !product.isOutOfStock,
+    isBackorder: product.isBackorder,
+    stock: product.stock,
+    variant: product.variant ?? null,
+    averageRating: product.averageRating,
+    totalRatings: product.totalRatings,
+  }
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -63,23 +84,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
           />
 
           {/* Right Column - Info */}
-          <ProductInfo
-            id={product.id}
-            sku={product.sku}
-            title={product.detailTitle ?? product.title}
-            productTitle={product.product?.title ?? product.title}
-            variantSlug={product.slug}
-            categories={categories}
-            brand={product.product?.brand || null}
-            price={product.retailPrice}
-            discount={product.discount}
-            inStock={!product.isOutOfStock}
-            isBackorder={product.isBackorder}
-            stock={product.stock}
-            variant={product.variant}
-            averageRating={product.averageRating}
-            totalRatings={product.totalRatings}
-          />
+          <ProductInfo variant={productInfoVariant} />
         </div>
 
         <Separator className="my-10 md:my-14" />

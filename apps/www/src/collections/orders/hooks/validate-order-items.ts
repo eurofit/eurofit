@@ -46,7 +46,16 @@ export const validateOrderItems: CollectionBeforeChangeHook<Order> = async ({
       isOutOfStock: true,
       product: true,
     },
-    depth: 1,
+    populate: {
+      products: {
+        title: true,
+        slug: true,
+        supplierImageUrl: true,
+        brand: true,
+        categories: true,
+      },
+    },
+    depth: 2,
     pagination: false,
     user: userId,
     req,

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCart } from "@/hooks/use-cart"
+import { sendBeginCheckoutEvent } from "@/lib/analytics/ecommerce/begin-checkout"
 import { Button } from "@eurofit/ui/components/button"
 import {
   Card,
@@ -13,12 +14,14 @@ import {
 import { ChevronRight, ShoppingBasket } from "lucide-react"
 import Link from "next/link"
 import pluralize from "pluralize-esm"
+import { useRef } from "react"
 import { CartItem } from "./cart-item"
 import { Stepper, useStepper } from "./steps"
 
 export function CartStep() {
   const stepper = useStepper()
-  const { items, itemCount, isEmpty } = useCart()
+  const { items, itemCount, isEmpty, total } = useCart()
+  const didFireBeginCheckout = useRef(false)
 
   return (
     <Stepper.Content step="cart">
@@ -69,7 +72,16 @@ export function CartStep() {
           )}
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button onClick={() => stepper.next()} disabled={isEmpty}>
+          <Button
+            onClick={() => {
+              if (!didFireBeginCheckout.current) {
+                sendBeginCheckoutEvent({ items, value: total })
+                didFireBeginCheckout.current = true
+              }
+              stepper.next()
+            }}
+            disabled={isEmpty}
+          >
             Next: Address
           </Button>
         </CardFooter>

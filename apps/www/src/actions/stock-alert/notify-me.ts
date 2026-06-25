@@ -47,6 +47,20 @@ export async function createStockAlert(
       return { success: true, data: { isCreated: false } }
     }
 
+    const { totalDocs: existingCount } = await payload.count({
+      collection: "stock-alerts",
+      where: {
+        and: [
+          { user: { equals: user.id } },
+          { productVariant: { equals: productVariantId } },
+        ],
+      },
+    })
+
+    if (existingCount > 0) {
+      return { success: true, data: { isCreated: true } }
+    }
+
     await payload.create({
       collection: "stock-alerts",
       data: {
