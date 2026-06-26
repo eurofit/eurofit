@@ -7,7 +7,6 @@ import {
   type ProductInfoVariant,
 } from "@/components/product-variants/product-info"
 import { ProductDetail } from "@/lib/utils/product-variants/get-product-variant-by-slug"
-import { Backlight } from "@eurofit/ui/components/backlight"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -134,14 +133,13 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
 
         {/* Youtube video  */}
         {product.youtubeId && (
-          <Backlight blur={40} className="w-full">
+          <div className="w-full overflow-hidden rounded-xl shadow-[0_0_0_1px_rgba(0,0,0,0.05),_0_8px_24px_-4px_rgba(0,0,0,0.15),_0_20px_48px_-12px_rgba(0,0,0,0.2)]">
             <YouTubeEmbed
               videoid={product.youtubeId}
               height={400}
               params="controls=0"
-              style="border-radius:6px"
             />
-          </Backlight>
+          </div>
         )}
 
         {/* PRODUCT REVIEWS  */}
