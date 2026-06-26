@@ -102,7 +102,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             <RichText
               converters={converters}
               data={product.description}
-              className="max-w-3xl"
+              className="max-w-180"
             />
           )}
         </section>
