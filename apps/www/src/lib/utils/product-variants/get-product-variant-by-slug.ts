@@ -35,6 +35,8 @@ export async function getProductVariantBySlug({ slug }: Args) {
       retailPrice: true,
       barcode: true,
       category: true,
+      servingSize: true,
+      servingSizePerContainer: true,
       product: true,
       discount: true,
       stock: true,
