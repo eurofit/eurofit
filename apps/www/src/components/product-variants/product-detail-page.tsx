@@ -113,7 +113,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             videoid={product.youtubeId}
             height={400}
             params="controls=0"
-            style="margin-bottom:"
+            style="border-radius:6px"
           />
         )}
 
