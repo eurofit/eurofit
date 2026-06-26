@@ -96,6 +96,11 @@ export const productVariants: CollectionConfig = {
           type: "richText",
           label: "Description",
         },
+        {
+          name: "youtubeId",
+          type: "text",
+          label: "Youtube Id",
+        },
 
         {
           type: "row",

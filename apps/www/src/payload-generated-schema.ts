@@ -731,6 +731,7 @@ export const product_variants = pgTable(
     title: varchar("title").notNull(),
     detailTitle: varchar("detail_title"),
     description: jsonb("description"),
+    youtubeId: varchar("youtube_id"),
     size: varchar("size"),
     flavorColor: varchar("flavor_color"),
     variant: varchar("variant"),

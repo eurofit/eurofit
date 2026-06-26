@@ -417,6 +417,7 @@ export interface ProductVariant {
     };
     [k: string]: unknown;
   } | null;
+  youtubeId?: string | null;
   /**
    * Package size, e.g. "900g".
    */
@@ -1607,6 +1608,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   title?: T;
   detailTitle?: T;
   description?: T;
+  youtubeId?: T;
   size?: T;
   flavorColor?: T;
   variant?: T;

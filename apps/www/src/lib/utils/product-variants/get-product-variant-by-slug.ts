@@ -28,6 +28,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
       title: true,
       detailTitle: true,
       description: true,
+      youtubeId: true,
       images: true,
       variant: true,
       flavorColor: true,
