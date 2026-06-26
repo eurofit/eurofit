@@ -16,6 +16,7 @@ import {
   BreadcrumbSeparator,
 } from "@eurofit/ui/components/breadcrumb"
 import { Separator } from "@eurofit/ui/components/separator"
+import { YouTubeEmbed } from "@next/third-parties/google"
 import { RichText } from "@payloadcms/richtext-lexical/react"
 import { converters } from "../rich-text/converters"
 
@@ -59,7 +60,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-10 px-4 sm:px-6 md:space-y-14 lg:px-8">
         <div className="py-4 md:py-6">
           <Breadcrumb>
             <BreadcrumbList>
@@ -89,10 +90,10 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
           <ProductInfo variant={productInfoVariant} />
         </div>
 
-        <Separator className="my-10 md:my-14" />
+        <Separator />
 
         {/* PRODUCT DESCRIPTION  */}
-        <section className="mb-10 space-y-4 md:mb-14">
+        <section className="space-y-4">
           <h2 className="text-xl font-semibold md:text-2xl">
             Product Description
           </h2>
@@ -105,6 +106,16 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             />
           )}
         </section>
+
+        {/* Youtube video  */}
+        {product.youtubeId && (
+          <YouTubeEmbed
+            videoid={product.youtubeId}
+            height={400}
+            params="controls=0"
+            style="margin-bottom:"
+          />
+        )}
 
         {/* PRODUCT REVIEWS  */}
         <ProductReviews
