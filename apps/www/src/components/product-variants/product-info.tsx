@@ -109,37 +109,14 @@ export function ProductInfo({ variant }: ProductInfoProps) {
         }}
       />
       <div className="flex flex-col justify-start gap-6">
-        {/* Header with Wishlist */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            {labels.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                {labels.map((label) => {
-                  const Icon = label.icon
-                    ? (LucideIcons[
-                        label.icon as keyof typeof LucideIcons
-                      ] as LucideIcon)
-                    : null
-                  return (
-                    <Badge
-                      key={label.title}
-                      style={{
-                        ...(label.bg ? { backgroundColor: label.bg } : {}),
-                        ...(label.fg ? { color: label.fg } : {}),
-                      }}
-                    >
-                      {Icon && <Icon className="fill-current" />}
-                      {label.title}
-                    </Badge>
-                  )
-                })}
-              </div>
-            )}
+        {/* Header with Title + Wishlist */}
+        <div className="space-y-3">
+          <div className="flex items-start gap-4">
+            <h1 className="flex-1 text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
+              {title}
+            </h1>
             <WishlistButton variantId={id} gtmItem={gtmItem} />
           </div>
-          <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
-            {title}
-          </h1>
           {/* Brand */}
           {brand && (
             <Link
@@ -148,6 +125,30 @@ export function ProductInfo({ variant }: ProductInfoProps) {
             >
               Visit the {brand.title} store
             </Link>
+          )}
+          {/* Labels */}
+          {labels.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {labels.map((label) => {
+                const Icon = label.icon
+                  ? (LucideIcons[
+                      label.icon as keyof typeof LucideIcons
+                    ] as LucideIcon)
+                  : null
+                return (
+                  <Badge
+                    key={label.title}
+                    style={{
+                      ...(label.bg ? { backgroundColor: label.bg } : {}),
+                      ...(label.fg ? { color: label.fg } : {}),
+                    }}
+                  >
+                    {Icon && <Icon className="fill-current" />}
+                    {label.title}
+                  </Badge>
+                )
+              })}
+            </div>
           )}
         </div>
 
