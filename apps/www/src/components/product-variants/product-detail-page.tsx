@@ -7,6 +7,7 @@ import {
   type ProductInfoVariant,
 } from "@/components/product-variants/product-info"
 import { ProductDetail } from "@/lib/utils/product-variants/get-product-variant-by-slug"
+import { Backlight } from "@eurofit/ui/components/backlight"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -40,6 +41,29 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
     ),
   ]
 
+  const labels = (product.labels?.docs ?? [])
+    .filter(
+      (l): l is NonNullable<typeof l> & object =>
+        typeof l === "object" &&
+        l !== null &&
+        "isActive" in l &&
+        Boolean(l.isActive)
+    )
+    .map((l) => {
+      const label = l as {
+        title: string
+        icon?: string | null
+        fg?: string | null
+        bg?: string | null
+      }
+      return {
+        title: label.title,
+        icon: label.icon ?? null,
+        fg: label.fg ?? null,
+        bg: label.bg ?? null,
+      }
+    })
+
   const productInfoVariant: ProductInfoVariant = {
     id: product.id,
     sku: product.sku,
@@ -56,6 +80,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
     variant: product.variant ?? null,
     averageRating: product.averageRating,
     totalRatings: product.totalRatings,
+    labels,
   }
 
   return (
@@ -102,19 +127,21 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             <RichText
               converters={converters}
               data={product.description}
-              className="max-w-3xl"
+              className="max-w-180"
             />
           )}
         </section>
 
         {/* Youtube video  */}
         {product.youtubeId && (
-          <YouTubeEmbed
-            videoid={product.youtubeId}
-            height={400}
-            params="controls=0"
-            style="margin-bottom:"
-          />
+          <Backlight blur={40} className="w-full">
+            <YouTubeEmbed
+              videoid={product.youtubeId}
+              height={400}
+              params="controls=0"
+              style="border-radius:6px"
+            />
+          </Backlight>
         )}
 
         {/* PRODUCT REVIEWS  */}

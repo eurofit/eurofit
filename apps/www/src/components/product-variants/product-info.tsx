@@ -21,7 +21,9 @@ import type { VariantDiscount } from "@/types/product-variant"
 import { Badge } from "@eurofit/ui/components/badge"
 import { Button } from "@eurofit/ui/components/button"
 import { Separator } from "@eurofit/ui/components/separator"
-import { Flame, ShieldCheck, Star } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import * as LucideIcons from "lucide-react"
+import { ShieldCheck, Star } from "lucide-react"
 import Link from "next/link"
 import pluralize from "pluralize-esm"
 import { ProductDetailCartActions } from "./product-detail-cart-actions"
@@ -44,6 +46,12 @@ export type ProductInfoVariant = {
   variant: string | null
   averageRating: number
   totalRatings: number
+  labels: {
+    title: string
+    icon: string | null
+    fg: string | null
+    bg: string | null
+  }[]
 }
 
 interface ProductInfoProps {
@@ -67,6 +75,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
     variant: variantLabel,
     averageRating,
     totalRatings,
+    labels,
   } = variant
 
   const gtmItem = toGTMItem({
@@ -102,13 +111,29 @@ export function ProductInfo({ variant }: ProductInfoProps) {
       {/* Header with Wishlist */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge>
-              <Flame className="fill-current" />
-              Trending
-            </Badge>
-            <Badge variant="secondary">Best seller</Badge>
-          </div>
+          {labels.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {labels.map((label) => {
+                const Icon = label.icon
+                  ? (LucideIcons[
+                      label.icon as keyof typeof LucideIcons
+                    ] as LucideIcon)
+                  : null
+                return (
+                  <Badge
+                    key={label.title}
+                    style={{
+                      ...(label.bg ? { backgroundColor: label.bg } : {}),
+                      ...(label.fg ? { color: label.fg } : {}),
+                    }}
+                  >
+                    {Icon && <Icon className="fill-current" />}
+                    {label.title}
+                  </Badge>
+                )
+              })}
+            </div>
+          )}
           <WishlistButton variantId={id} gtmItem={gtmItem} />
         </div>
         <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">

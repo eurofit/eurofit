@@ -45,6 +45,7 @@ export async function getProductVariantBySlug({ slug }: Args) {
       isBackorder: true,
       isLowStock: true,
       isOutOfStock: true,
+      labels: true,
       meta: true,
     },
     populate: {
