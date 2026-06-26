@@ -111,21 +111,6 @@ export function ProductInfo({ variant }: ProductInfoProps) {
       <div className="flex flex-col justify-start gap-6">
         {/* Header with Title + Wishlist */}
         <div className="space-y-3">
-          <div className="flex items-start gap-4">
-            <h1 className="flex-1 text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
-              {title}
-            </h1>
-            <WishlistButton variantId={id} gtmItem={gtmItem} />
-          </div>
-          {/* Brand */}
-          {brand && (
-            <Link
-              href={`/brands/${brand.slug}`}
-              className="inline-block text-sm text-primary underline-offset-4 hover:underline"
-            >
-              Visit the {brand.title} store
-            </Link>
-          )}
           {/* Labels */}
           {labels.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
@@ -149,6 +134,21 @@ export function ProductInfo({ variant }: ProductInfoProps) {
                 )
               })}
             </div>
+          )}
+          <div className="flex items-start gap-4">
+            <h1 className="flex-1 text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
+              {title}
+            </h1>
+            <WishlistButton variantId={id} gtmItem={gtmItem} />
+          </div>
+          {/* Brand */}
+          {brand && (
+            <Link
+              href={`/brands/${brand.slug}`}
+              className="inline-block text-sm text-primary underline-offset-4 hover:underline"
+            >
+              Visit the {brand.title} store
+            </Link>
           )}
         </div>
 
