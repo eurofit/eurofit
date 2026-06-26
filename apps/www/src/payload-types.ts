@@ -402,6 +402,21 @@ export interface ProductVariant {
    * Longer descriptive title used on the product detail page
    */
   detailTitle?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Package size, e.g. "900g".
    */
@@ -1591,6 +1606,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   sku?: T;
   title?: T;
   detailTitle?: T;
+  description?: T;
   size?: T;
   flavorColor?: T;
   variant?: T;

@@ -22,85 +22,87 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
   if (operation !== "create") {
     return
   }
+
   const isOrderPopulated =
     typeof transaction.order === "object" && transaction.order !== null
-  const orderId =
-    typeof transaction.order === "number"
-      ? transaction.order
-      : transaction.order.id
-
-  let order: Order
-
-  if (isOrderPopulated) {
-    order = transaction.order as Order
-  } else if (context.order) {
-    order = context.order as Order
-  } else {
-    order = await req.payload.findByID({
-      id: orderId,
-      collection: "orders",
-      req,
-    })
-  }
-
-  let orderUser: User
-
-  if (typeof order.user === "object" && order.user !== null) {
-    orderUser = order.user as User
-  } else {
-    orderUser = await req.payload.findByID({
-      collection: "users",
-      id: order.user,
-      req,
-    })
-  }
-
-  const items = order.items.map(({ snapshot, ...item }) => ({
-    ...item,
-    ...(typeof snapshot === "object" ? snapshot : {}),
-    id:
-      typeof item.productVariant === "string"
-        ? item.productVariant
-        : item.productVariant.id,
-  }))
-
-  const itemSchema = orderItemSnapShotSchema.extend(
-    orderItem.pick({ id: true, quantity: true }).shape
-  )
-
-  const formattedItems = z.array(itemSchema).parse(items)
-
-  const invoice = orderToInvoice({
-    ...order,
-    user: orderUser,
-  })
-  const invoiceBuffer = invoice ? await getInvoiceBuffer(invoice) : null
-
-  const emailProps = {
-    orderUrl: site.url + `order/${order.id}`,
-    siteUrl: site.url,
-    customer: {
-      name: orderUser.firstName,
-    },
-    order: {
-      id: order.id.toString(),
-      items: formattedItems.map((item) => ({
-        quantity: item.quantity,
-        price: item.price,
-        variant: item.variant,
-        product: {
-          title: item.product.title,
-          image: item.product.image,
-        },
-      })),
-      total: order.total!,
-      subtotal: order.subtotal!,
-      discountTotal: order.discountTotal ?? 0,
-      deliveryFee: order.deliveryFee!,
-    },
-  }
+  const orderId = isOrderPopulated
+    ? (transaction.order as Order).id
+    : (transaction.order as number)
 
   try {
+    let order: Order
+
+    if (isOrderPopulated) {
+      order = transaction.order as Order
+    } else if (context.order) {
+      order = context.order as Order
+    } else {
+      order = await req.payload.findByID({
+        id: orderId,
+        collection: "orders",
+        req,
+      })
+    }
+
+    let orderUser: User
+
+    if (typeof order.user === "object" && order.user !== null) {
+      orderUser = order.user as User
+    } else {
+      orderUser = await req.payload.findByID({
+        collection: "users",
+        id: order.user as string,
+        req,
+      })
+    }
+
+    const items = order.items.map(({ snapshot, ...item }) => ({
+      ...item,
+      ...(typeof snapshot === "object" ? snapshot : {}),
+      id:
+        typeof item.productVariant === "string"
+          ? item.productVariant
+          : item.productVariant.id,
+    }))
+
+    const itemSchema = orderItemSnapShotSchema.extend(
+      orderItem.pick({ id: true, quantity: true }).shape
+    )
+
+    const formattedItems = z.array(itemSchema).parse(items)
+
+    const invoice = orderToInvoice({
+      ...order,
+      user: orderUser,
+    })
+    const invoiceBuffer = invoice ? await getInvoiceBuffer(invoice) : null
+
+    const emailProps = {
+      orderUrl: `${site.url}/order/${order.id}`,
+      siteUrl: site.url,
+      customer: {
+        name: orderUser.firstName,
+      },
+      order: {
+        id: order.id.toString(),
+        items: formattedItems.map((item) => ({
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.variant,
+          product: {
+            title: item.product.title,
+            image: item.product.image,
+          },
+        })),
+        total: order.total!,
+        subtotal: order.subtotal!,
+        discountTotal: order.discountTotal ?? 0,
+        deliveryFee: order.deliveryFee!,
+      },
+    }
+
+    // The order is already paid; a failed confirmation email must not roll it
+    // back, but it has to be visible so it can be resent (TODOS H-03).
     await req.payload.sendEmail({
       to: orderUser.email,
       subject: "Order Placed",
@@ -124,12 +126,9 @@ export const sendOrderConfimationEmail: CollectionAfterChangeHook<
       ].filter(Boolean),
     })
   } catch (error) {
-    // The order is already paid; a failed confirmation email must not roll it
-    // back, but it has to be visible so it can be resent (TODOS H-03).
     captureError(error, {
       scope: "order-confirmation-email",
-      tags: { order_id: order.id },
-      user: { id: orderUser.id, email: orderUser.email },
+      tags: { order_id: orderId },
     })
   }
 

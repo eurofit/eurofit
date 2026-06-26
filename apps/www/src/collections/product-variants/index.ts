@@ -91,6 +91,11 @@ export const productVariants: CollectionConfig = {
               "Longer descriptive title used on the product detail page",
           },
         },
+        {
+          name: "description",
+          type: "richText",
+          label: "Description",
+        },
 
         {
           type: "row",

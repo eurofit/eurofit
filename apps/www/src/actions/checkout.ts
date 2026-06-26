@@ -169,6 +169,7 @@ async function runCheckout(
 
     // Build the gateway snapshot from the server-priced order items so the metadata
     // records exactly what was charged (original + discounted unit price).
+    // slug is the stable identifier — id/sku can change if product data is re-scraped.
     const metadataItems = order.items.map((item) => {
       const snapshot = item.snapshot as OrderItemSnapshot
       return {
@@ -176,6 +177,9 @@ async function runCheckout(
           typeof item.productVariant === "string"
             ? item.productVariant
             : item.productVariant.id,
+        sku: snapshot.sku,
+        slug: snapshot.product.slug,
+        title: snapshot.title,
         quantity: item.quantity,
         price: snapshot.price,
         discountedPrice: snapshot.discount?.price ?? snapshot.price,

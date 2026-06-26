@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/json-ld"
 import { ProductDetailPage } from "@/components/product-variants/product-detail-page"
 import { site } from "@/const/site"
+import { buildProductVariantDescription } from "@/lib/utils/product-variants/build-product-variant-description"
 import { getProductVariantBySlug } from "@/lib/utils/product-variants/get-product-variant-by-slug"
 import { getProductVariantJsonLd } from "@/lib/utils/product-variants/get-product-variant-json-ld"
 import { Metadata } from "next"
@@ -24,7 +25,9 @@ export async function generateMetadata({
   }
 
   const title = productVarint.meta?.title || productVarint.title
-  const description = productVarint.meta?.description || undefined
+  const description =
+    productVarint.meta?.description ||
+    buildProductVariantDescription(productVarint)
   const image = productVarint.meta?.image ?? productVarint.images[0]
   const canonicalUrl = `${site.url}/product-variants/${productVarint.slug}`
 
