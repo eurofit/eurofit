@@ -3,6 +3,7 @@ import { brands } from "./brands"
 import { carts } from "./carts"
 import { categories } from "./categories"
 import { discounts } from "./discounts"
+import { labels } from "./labels"
 import { media } from "./media"
 import { orders } from "./orders"
 import { orderStatus } from "./orders/order-status"
@@ -31,6 +32,7 @@ export const collections = [
   productVariants,
   productReviews,
   stockAlerts,
+  labels,
   tags,
   wishlists,
   carts,

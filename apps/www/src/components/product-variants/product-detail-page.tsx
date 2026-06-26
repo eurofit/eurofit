@@ -41,6 +41,29 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
     ),
   ]
 
+  const labels = (product.labels?.docs ?? [])
+    .filter(
+      (l): l is NonNullable<typeof l> & object =>
+        typeof l === "object" &&
+        l !== null &&
+        "isActive" in l &&
+        Boolean(l.isActive)
+    )
+    .map((l) => {
+      const label = l as {
+        title: string
+        icon?: string | null
+        fg?: string | null
+        bg?: string | null
+      }
+      return {
+        title: label.title,
+        icon: label.icon ?? null,
+        fg: label.fg ?? null,
+        bg: label.bg ?? null,
+      }
+    })
+
   const productInfoVariant: ProductInfoVariant = {
     id: product.id,
     sku: product.sku,
@@ -57,6 +80,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
     variant: product.variant ?? null,
     averageRating: product.averageRating,
     totalRatings: product.totalRatings,
+    labels,
   }
 
   return (

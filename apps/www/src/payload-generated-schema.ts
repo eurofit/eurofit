@@ -915,6 +915,65 @@ export const stock_alerts = pgTable(
   ]
 )
 
+export const labels = pgTable(
+  "labels",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    isActive: boolean("is_active").notNull().default(true),
+    title: varchar("title").notNull(),
+    icon: varchar("icon"),
+    fg: varchar("fg"),
+    bg: varchar("bg"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("labels_updated_at_idx").on(columns.updatedAt),
+    index("labels_created_at_idx").on(columns.createdAt),
+  ]
+)
+
+export const labels_rels = pgTable(
+  "labels_rels",
+  {
+    id: serial("id").primaryKey(),
+    order: integer("order"),
+    parent: uuid("parent_id").notNull(),
+    path: varchar("path").notNull(),
+    "product-variantsID": uuid("product_variants_id"),
+  },
+  (columns) => [
+    index("labels_rels_order_idx").on(columns.order),
+    index("labels_rels_parent_idx").on(columns.parent),
+    index("labels_rels_path_idx").on(columns.path),
+    index("labels_rels_product_variants_id_idx").on(
+      columns["product-variantsID"]
+    ),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [labels.id],
+      name: "labels_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["product-variantsID"]],
+      foreignColumns: [product_variants.id],
+      name: "labels_rels_product_variants_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
 export const tags = pgTable(
   "tags",
   {
@@ -1797,6 +1856,7 @@ export const payload_locked_documents_rels = pgTable(
     "product-variantsID": uuid("product_variants_id"),
     "product-reviewsID": uuid("product_reviews_id"),
     "stock-alertsID": uuid("stock_alerts_id"),
+    labelsID: uuid("labels_id"),
     tagsID: uuid("tags_id"),
     wishlistsID: uuid("wishlists_id"),
     cartsID: uuid("carts_id"),
@@ -1839,6 +1899,7 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_stock_alerts_id_idx").on(
       columns["stock-alertsID"]
     ),
+    index("payload_locked_documents_rels_labels_id_idx").on(columns.labelsID),
     index("payload_locked_documents_rels_tags_id_idx").on(columns.tagsID),
     index("payload_locked_documents_rels_wishlists_id_idx").on(
       columns.wishlistsID
@@ -1922,6 +1983,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["stock-alertsID"]],
       foreignColumns: [stock_alerts.id],
       name: "payload_locked_documents_rels_stock_alerts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["labelsID"]],
+      foreignColumns: [labels.id],
+      name: "payload_locked_documents_rels_labels_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["tagsID"]],
@@ -2458,6 +2524,23 @@ export const relations_stock_alerts = relations(stock_alerts, ({ one }) => ({
     relationName: "productVariant",
   }),
 }))
+export const relations_labels_rels = relations(labels_rels, ({ one }) => ({
+  parent: one(labels, {
+    fields: [labels_rels.parent],
+    references: [labels.id],
+    relationName: "_rels",
+  }),
+  "product-variantsID": one(product_variants, {
+    fields: [labels_rels["product-variantsID"]],
+    references: [product_variants.id],
+    relationName: "product-variants",
+  }),
+}))
+export const relations_labels = relations(labels, ({ many }) => ({
+  _rels: many(labels_rels, {
+    relationName: "_rels",
+  }),
+}))
 export const relations_tags_rels = relations(tags_rels, ({ one }) => ({
   parent: one(tags, {
     fields: [tags_rels.parent],
@@ -2842,6 +2925,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [stock_alerts.id],
       relationName: "stock-alerts",
     }),
+    labelsID: one(labels, {
+      fields: [payload_locked_documents_rels.labelsID],
+      references: [labels.id],
+      relationName: "labels",
+    }),
     tagsID: one(tags, {
       fields: [payload_locked_documents_rels.tagsID],
       references: [tags.id],
@@ -3032,6 +3120,8 @@ type DatabaseSchema = {
   product_variants_rels: typeof product_variants_rels
   product_reviews: typeof product_reviews
   stock_alerts: typeof stock_alerts
+  labels: typeof labels
+  labels_rels: typeof labels_rels
   tags: typeof tags
   tags_rels: typeof tags_rels
   wishlists: typeof wishlists
@@ -3096,6 +3186,8 @@ type DatabaseSchema = {
   relations_product_variants: typeof relations_product_variants
   relations_product_reviews: typeof relations_product_reviews
   relations_stock_alerts: typeof relations_stock_alerts
+  relations_labels_rels: typeof relations_labels_rels
+  relations_labels: typeof relations_labels
   relations_tags_rels: typeof relations_tags_rels
   relations_tags: typeof relations_tags
   relations_wishlists: typeof relations_wishlists

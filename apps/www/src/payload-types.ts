@@ -84,6 +84,7 @@ export interface Config {
     'product-variants': ProductVariant;
     'product-reviews': ProductReview;
     'stock-alerts': StockAlert;
+    labels: Label;
     tags: Tag;
     wishlists: Wishlist;
     carts: Cart;
@@ -112,6 +113,7 @@ export interface Config {
     };
     'product-variants': {
       tags: 'tags';
+      labels: 'labels';
     };
     orders: {
       transactions: 'transactions';
@@ -130,6 +132,7 @@ export interface Config {
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     'product-reviews': ProductReviewsSelect<false> | ProductReviewsSelect<true>;
     'stock-alerts': StockAlertsSelect<false> | StockAlertsSelect<true>;
+    labels: LabelsSelect<false> | LabelsSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
@@ -540,6 +543,11 @@ export interface ProductVariant {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  labels?: {
+    docs?: (string | Label)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -677,6 +685,27 @@ export interface Address {
    * Set this as the user’s default delivery address.
    */
   isDefault: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "labels".
+ */
+export interface Label {
+  id: string;
+  isActive: boolean;
+  title: string;
+  icon?: string | null;
+  /**
+   * Text/icon color, e.g. #ffffff or hsl(0 0% 100%)
+   */
+  fg?: string | null;
+  /**
+   * Badge background color, e.g. #ef4444 or hsl(0 84% 60%)
+   */
+  bg?: string | null;
+  productVariants?: (string | ProductVariant)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1329,6 +1358,10 @@ export interface PayloadLockedDocument {
         value: string | StockAlert;
       } | null)
     | ({
+        relationTo: 'labels';
+        value: string | Label;
+      } | null)
+    | ({
         relationTo: 'tags';
         value: string | Tag;
       } | null)
@@ -1645,6 +1678,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
         endDate?: T;
       };
   tags?: T;
+  labels?: T;
   meta?:
     | T
     | {
@@ -1675,6 +1709,20 @@ export interface ProductReviewsSelect<T extends boolean = true> {
 export interface StockAlertsSelect<T extends boolean = true> {
   user?: T;
   productVariant?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "labels_select".
+ */
+export interface LabelsSelect<T extends boolean = true> {
+  isActive?: T;
+  title?: T;
+  icon?: T;
+  fg?: T;
+  bg?: T;
+  productVariants?: T;
   updatedAt?: T;
   createdAt?: T;
 }

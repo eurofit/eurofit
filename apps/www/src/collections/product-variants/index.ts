@@ -482,6 +482,12 @@ export const productVariants: CollectionConfig = {
       collection: "tags",
       on: "productVariants",
     },
+    {
+      name: "labels",
+      type: "join",
+      collection: "labels",
+      on: "productVariants",
+    },
   ],
   hooks: {
     afterChange: [revalidateProductVariantTag],
