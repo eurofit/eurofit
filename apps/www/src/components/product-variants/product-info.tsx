@@ -96,7 +96,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
   }
 
   return (
-    <div className="flex flex-col justify-start gap-6">
+    <>
       <GTMEventTracker
         ecommerce
         event={{
@@ -108,202 +108,204 @@ export function ProductInfo({ variant }: ProductInfoProps) {
           },
         }}
       />
-      {/* Header with Wishlist */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          {labels.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {labels.map((label) => {
-                const Icon = label.icon
-                  ? (LucideIcons[
-                      label.icon as keyof typeof LucideIcons
-                    ] as LucideIcon)
-                  : null
-                return (
-                  <Badge
-                    key={label.title}
-                    style={{
-                      ...(label.bg ? { backgroundColor: label.bg } : {}),
-                      ...(label.fg ? { color: label.fg } : {}),
-                    }}
-                  >
-                    {Icon && <Icon className="fill-current" />}
-                    {label.title}
-                  </Badge>
-                )
-              })}
-            </div>
-          )}
-          <WishlistButton variantId={id} gtmItem={gtmItem} />
-        </div>
-        <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
-          {title}
-        </h1>
-        {/* Brand */}
-        {brand && (
-          <Link
-            href={`/brands/${brand.slug}`}
-            className="inline-block text-sm text-primary underline-offset-4 hover:underline"
-          >
-            Visit the {brand.title} store
-          </Link>
-        )}
-      </div>
-
-      {/* Rating and Stock */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`size-4 ${
-                  i < Math.round(averageRating)
-                    ? "fill-orange-400 text-orange-400"
-                    : "text-muted-foreground"
-                }`}
-              />
-            ))}
+      <div className="flex flex-col justify-start gap-6">
+        {/* Header with Wishlist */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            {labels.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {labels.map((label) => {
+                  const Icon = label.icon
+                    ? (LucideIcons[
+                        label.icon as keyof typeof LucideIcons
+                      ] as LucideIcon)
+                    : null
+                  return (
+                    <Badge
+                      key={label.title}
+                      style={{
+                        ...(label.bg ? { backgroundColor: label.bg } : {}),
+                        ...(label.fg ? { color: label.fg } : {}),
+                      }}
+                    >
+                      {Icon && <Icon className="fill-current" />}
+                      {label.title}
+                    </Badge>
+                  )
+                })}
+              </div>
+            )}
+            <WishlistButton variantId={id} gtmItem={gtmItem} />
           </div>
-          <span className="text-xs text-muted-foreground">
-            {totalRatings > 0
-              ? `${averageRating.toFixed(1)} (${totalRatings} verified ${pluralize("rating", totalRatings)})`
-              : "No ratings yet"}
+          <h1 className="text-xl font-bold text-pretty text-foreground md:text-3xl md:leading-9 md:text-balance">
+            {title}
+          </h1>
+          {/* Brand */}
+          {brand && (
+            <Link
+              href={`/brands/${brand.slug}`}
+              className="inline-block text-sm text-primary underline-offset-4 hover:underline"
+            >
+              Visit the {brand.title} store
+            </Link>
+          )}
+        </div>
+
+        {/* Rating and Stock */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`size-4 ${
+                    i < Math.round(averageRating)
+                      ? "fill-orange-400 text-orange-400"
+                      : "text-muted-foreground"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {totalRatings > 0
+                ? `${averageRating.toFixed(1)} (${totalRatings} verified ${pluralize("rating", totalRatings)})`
+                : "No ratings yet"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm font-medium">
+            {inStock ? (
+              <>
+                <span className="size-2 rounded-full bg-green-600" />
+                <span className="text-green-700 dark:text-green-500">
+                  {formatWithCommas(stock)} in stock
+                  {isBackorder && (
+                    <span className="font-normal text-muted-foreground">
+                      &nbsp;(backorder)
+                    </span>
+                  )}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="size-2 rounded-full bg-destructive" />
+                <span className="text-destructive">Out of stock</span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Pricing Section */}
+        {price != null && (
+          <div className="space-y-3">
+            <VariantPrice price={price} discount={discount} size="lg" />
+            {discount?.endDate && (
+              <CountdownTimerBlock endDate={discount.endDate} />
+            )}
+          </div>
+        )}
+
+        {/* Variation Selector */}
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-muted-foreground">
+            Variation
           </span>
+          <Badge variant="secondary">{variantLabel}</Badge>
         </div>
 
-        <div className="flex items-center gap-2 text-sm font-medium">
-          {inStock ? (
-            <>
-              <span className="size-2 rounded-full bg-green-600" />
-              <span className="text-green-700 dark:text-green-500">
-                {formatWithCommas(stock)} in stock
-                {isBackorder && (
-                  <span className="font-normal text-muted-foreground">
-                    &nbsp;(backorder)
-                  </span>
-                )}
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="size-2 rounded-full bg-destructive" />
-              <span className="text-destructive">Out of stock</span>
-            </>
-          )}
+        {/* Add to Cart Button */}
+        <ProductAnalyticsProvider brand={brand?.title} categories={categories}>
+          <ProductDetailCartActions
+            variant={{
+              id,
+              stock,
+              sku,
+              slug,
+              title,
+              variant: variantLabel,
+              price,
+            }}
+            inStock={inStock}
+          />
+        </ProductAnalyticsProvider>
+
+        {/* Trust */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <ShieldCheck className="size-4" aria-hidden="true" />
+          Fast &amp; secure payments
         </div>
-      </div>
 
-      {/* Pricing Section */}
-      {price != null && (
-        <div className="space-y-3">
-          <VariantPrice price={price} discount={discount} size="lg" />
-          {discount?.endDate && (
-            <CountdownTimerBlock endDate={discount.endDate} />
-          )}
-        </div>
-      )}
+        <Separator />
 
-      {/* Variation Selector */}
-      <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-muted-foreground">
-          Variation
-        </span>
-        <Badge variant="secondary">{variantLabel}</Badge>
-      </div>
-
-      {/* Add to Cart Button */}
-      <ProductAnalyticsProvider brand={brand?.title} categories={categories}>
-        <ProductDetailCartActions
-          variant={{
-            id,
-            stock,
-            sku,
-            slug,
-            title,
-            variant: variantLabel,
-            price,
-          }}
-          inStock={inStock}
-        />
-      </ProductAnalyticsProvider>
-
-      {/* Trust */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <ShieldCheck className="size-4" aria-hidden="true" />
-        Fast &amp; secure payments
-      </div>
-
-      <Separator />
-
-      {/* Share */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Share this product
-        </h2>
-        <ul className="flex items-center gap-2">
-          <li>
-            <Button
-              variant="outline"
-              size="icon-lg"
-              className="rounded-full"
-              asChild
-            >
-              <a
-                href={shareUrls.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() =>
-                  sendShareEvent({ method: "Facebook", itemId: sku })
-                }
+        {/* Share */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">
+            Share this product
+          </h2>
+          <ul className="flex items-center gap-2">
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
               >
-                <Facebook />
-                <span className="sr-only">Share on Facebook</span>
-              </a>
-            </Button>
-          </li>
-          <li>
-            <Button
-              variant="outline"
-              size="icon-lg"
-              className="rounded-full"
-              asChild
-            >
-              <a
-                href={shareUrls.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() =>
-                  sendShareEvent({ method: "Twitter", itemId: sku })
-                }
+                <a
+                  href={shareUrls.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "Facebook", itemId: sku })
+                  }
+                >
+                  <Facebook />
+                  <span className="sr-only">Share on Facebook</span>
+                </a>
+              </Button>
+            </li>
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
               >
-                <Twitter />
-                <span className="sr-only">Share on Twitter</span>
-              </a>
-            </Button>
-          </li>
-          <li>
-            <Button
-              variant="outline"
-              size="icon-lg"
-              className="rounded-full"
-              asChild
-            >
-              <a
-                href={shareUrls.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() =>
-                  sendShareEvent({ method: "WhatsApp", itemId: sku })
-                }
+                <a
+                  href={shareUrls.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "Twitter", itemId: sku })
+                  }
+                >
+                  <Twitter />
+                  <span className="sr-only">Share on Twitter</span>
+                </a>
+              </Button>
+            </li>
+            <li>
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="rounded-full"
+                asChild
               >
-                <Whatsapp />
-                <span className="sr-only">Share on WhatsApp</span>
-              </a>
-            </Button>
-          </li>
-        </ul>
-      </section>
-    </div>
+                <a
+                  href={shareUrls.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendShareEvent({ method: "WhatsApp", itemId: sku })
+                  }
+                >
+                  <Whatsapp />
+                  <span className="sr-only">Share on WhatsApp</span>
+                </a>
+              </Button>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </>
   )
 }
