@@ -4,3 +4,88 @@
 
 /* Support Payload’s dark mode toggle by adding a custom variant */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* ──────────────────────────────────────────────────────────────────────────
+   shadcn theme for the Payload admin panel.
+
+   Payload builds the entire admin UI from the --color-base-0 … --color-base-1000
+   grayscale ramp (see @payloadcms/ui/dist/scss/colors.scss): every elevation,
+   --theme-bg, --theme-text, --theme-input-bg, all borders, and the primary
+   button (--theme-elevation-800) resolve from this ramp in BOTH light and dark
+   mode — dark simply re-points elevations at different rungs of the same ramp.
+   So overriding this one neutral ramp (plus radius and font) remaps the whole
+   panel to the storefront shadcn tokens in packages/ui/src/styles/globals.css,
+   for both themes, with no per-component overrides.
+
+   These rules are intentionally unlayered so they win over Payload's own
+   `@layer payload-default` declarations regardless of import order.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Neutral grayscale ramp — oklch, chroma 0 — mirroring shadcn's
+     --background (white) → --foreground (near-black). Named rungs are anchored
+     to real shadcn tokens so the mapping is self-documenting:
+       0   = --background        150 = --border / --input
+       100 = --muted / secondary 350 = --ring
+       500 = --muted-foreground  800 = --primary (light) / dark muted
+       900 = --background (dark) */
+  --color-base-0: oklch(1 0 0);
+  --color-base-50: oklch(0.985 0 0);
+  --color-base-100: oklch(0.97 0 0);
+  --color-base-150: oklch(0.922 0 0);
+  --color-base-200: oklch(0.87 0 0);
+  --color-base-250: oklch(0.82 0 0);
+  --color-base-300: oklch(0.77 0 0);
+  --color-base-350: oklch(0.708 0 0);
+  --color-base-400: oklch(0.66 0 0);
+  --color-base-450: oklch(0.61 0 0);
+  --color-base-500: oklch(0.556 0 0);
+  --color-base-550: oklch(0.5 0 0);
+  --color-base-600: oklch(0.44 0 0);
+  --color-base-650: oklch(0.39 0 0);
+  --color-base-700: oklch(0.34 0 0);
+  --color-base-750: oklch(0.27 0 0);
+  --color-base-800: oklch(0.205 0 0);
+  --color-base-850: oklch(0.18 0 0);
+  --color-base-900: oklch(0.145 0 0);
+  --color-base-950: oklch(0.115 0 0);
+  --color-base-1000: oklch(0.09 0 0);
+
+  /* Neutralize Payload's brand/accent (success) ramp so active nav items,
+     links, and input focus rings render as shadcn's monochrome primary
+     instead of Payload blue. Aliased to the neutral base ramp above, this
+     also inverts correctly in dark mode via Payload's own dark remap.
+     Error (red) and warning (amber) ramps are left intact so genuine
+     status states stay meaningful. */
+  --color-success-50: var(--color-base-50);
+  --color-success-100: var(--color-base-100);
+  --color-success-150: var(--color-base-150);
+  --color-success-200: var(--color-base-200);
+  --color-success-250: var(--color-base-250);
+  --color-success-300: var(--color-base-300);
+  --color-success-350: var(--color-base-350);
+  --color-success-400: var(--color-base-400);
+  --color-success-450: var(--color-base-450);
+  --color-success-500: var(--color-base-500);
+  --color-success-550: var(--color-base-550);
+  --color-success-600: var(--color-base-600);
+  --color-success-650: var(--color-base-650);
+  --color-success-700: var(--color-base-700);
+  --color-success-750: var(--color-base-750);
+  --color-success-800: var(--color-base-800);
+  --color-success-850: var(--color-base-850);
+  --color-success-900: var(--color-base-900);
+  --color-success-950: var(--color-base-950);
+
+  /* Border radius — tied to the storefront's --radius (0.625rem). Buttons and
+     inputs use --style-radius-s; cards/popups use --style-radius-l. */
+  --style-radius-s: 0.375rem;
+  --style-radius-m: 0.5rem;
+  --style-radius-l: 0.625rem;
+
+  /* Match the storefront body font. --font-sans (DM Sans) is used when it is in
+     scope; the system stack is the fallback inside the auto-generated admin
+     layout, which doesn't inject the next/font variable. */
+  --font-body:
+    var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
