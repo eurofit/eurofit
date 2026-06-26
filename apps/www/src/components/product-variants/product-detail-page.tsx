@@ -16,6 +16,8 @@ import {
   BreadcrumbSeparator,
 } from "@eurofit/ui/components/breadcrumb"
 import { Separator } from "@eurofit/ui/components/separator"
+import { RichText } from "@payloadcms/richtext-lexical/react"
+import { converters } from "../rich-text/converters"
 
 interface ProductDetailPageProps {
   product: ProductDetail
@@ -90,43 +92,18 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
         <Separator className="my-10 md:my-14" />
 
         {/* PRODUCT DESCRIPTION  */}
-        <section className="space-y-4">
+        <section className="mb-10 space-y-4 md:mb-14">
           <h2 className="text-xl font-semibold md:text-2xl">
             Product Description
           </h2>
-          <div className="max-w-prose space-y-4 leading-relaxed text-muted-foreground">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Accusantium aliquam eaque, labore fugiat ea voluptatibus assumenda
-              repellat necessitatibus dignissimos sit voluptates exercitationem
-              sequi adipisci porro, quisquam facere quaerat repudiandae
-              blanditiis.
-            </p>
-            <p>
-              Blanditiis rerum vitae, quis placeat adipisci dolorum id
-              cupiditate laborum recusandae nam at. Odio neque tempore
-              repellendus, voluptas minima corrupti laboriosam aliquid veniam at
-              culpa cupiditate omnis, asperiores iste voluptatum.
-            </p>
-            <p>
-              Officiis totam quis incidunt nemo tempora? Eius facilis sed qui
-              impedit quibusdam harum distinctio, reprehenderit ullam dicta
-              minus saepe ex in nemo, incidunt, delectus iusto officia sint?
-              Distinctio, iusto aliquid.
-            </p>
-            <p>
-              Omnis voluptate minus autem repudiandae, suscipit, veritatis
-              architecto, maxime iste nam doloremque sed. Odit architecto
-              delectus veritatis. Non qui at expedita exercitationem molestias
-              doloribus, aliquam vero pariatur consequatur. Similique, amet?
-            </p>
-            <p>
-              Dolores nisi nemo at corporis a odit quis sequi harum autem odio
-              perferendis perspiciatis, quisquam tempore, quae deleniti. Minus
-              cupiditate architecto minima laudantium vitae quis. Quam impedit
-              ab ipsa sequi.
-            </p>
-          </div>
+          {!product.description && <p>N/A</p>}
+          {product.description && (
+            <RichText
+              converters={converters}
+              data={product.description}
+              className="max-w-3xl"
+            />
+          )}
         </section>
 
         {/* PRODUCT REVIEWS  */}
