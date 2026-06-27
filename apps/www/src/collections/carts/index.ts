@@ -48,7 +48,10 @@ export const carts: CollectionConfig = {
       name: "items",
       type: "array",
       required: true,
-      minRows: 1,
+      // Empty carts are intentionally kept (never deleted on last-item removal),
+      // so an empty `items` array is valid.
+      minRows: 0,
+      maxRows: 100,
       admin: {
         initCollapsed: true,
       },

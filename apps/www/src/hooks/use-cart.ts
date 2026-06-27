@@ -1,11 +1,14 @@
 "use client"
 
 import { addCartItem } from "@/actions/cart/add-cart-item"
-import { createCart } from "@/actions/cart/create-cart"
-import { deleteCart } from "@/actions/cart/delete-cart"
+import { clearCart } from "@/actions/cart/clear-cart"
 import { removeCartItem } from "@/actions/cart/remove-cart-item"
 import { updateCartItemQuantity } from "@/actions/cart/update-cart-item-quantity"
-import { CART_QUERY_KEY } from "@/const/cart"
+import {
+  CART_MUTATION_KEY,
+  CART_MUTATION_SCOPE,
+  CART_QUERY_KEY,
+} from "@/const/cart"
 import { sendAddToCartEvent } from "@/lib/analytics/ecommerce/add-to-cart"
 import { sendRemoveFromCartEvent } from "@/lib/analytics/ecommerce/remove-from-cart"
 import { fetchCart } from "@/lib/api/cart/get-cart"
@@ -13,6 +16,7 @@ import { computeCartTotals } from "@/lib/utils/cart/cart-totals"
 import { formatCartItem } from "@/lib/utils/cart/formatCartItem"
 import {
   applyAddToCart,
+  applyClearCart,
   applyRemoveItem,
   applySetQuantity,
   CartItemPreview,
@@ -44,10 +48,10 @@ function formatLine(cart: Cart | null, productVariantId: string) {
 }
 
 /**
- * Client cart state + mutations. Mutations orchestrate the single-purpose server
- * actions from the current cart snapshot and apply optimistic cache updates with
- * rollback, then reconcile via an `onSettled` refetch (strict cascades like
- * deleting an emptied cart are enforced server-side).
+ * Client cart state + mutations. Mutations apply optimistic cache updates with
+ * rollback and are serialized (shared `scope`) so fast interactions apply in
+ * order, then reconcile via a single `onSettled` refetch once the queue drains.
+ * The cart always exists server-side (find-or-create, never deleted on empty).
  */
 export function useCart() {
   const queryClient = useQueryClient()
@@ -68,9 +72,14 @@ export function useCart() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const isEmpty = itemCount === 0
 
+  // A shared `scope` makes TanStack run cart mutations strictly one at a time, so
+  // fast add→remove→add apply in order; the shared `mutationKey` lets `onSettled`
+  // count in-flight writes and refetch only once the queue has drained.
   const withOptimisticCart = <TInput>(
     applyOptimistic: (cart: Cart | null, input: TInput) => Cart | null
   ) => ({
+    mutationKey: CART_MUTATION_KEY,
+    scope: { id: CART_MUTATION_SCOPE },
     onMutate: async (input: TInput): Promise<CartRollback> => {
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
       const previousCart =
@@ -88,20 +97,20 @@ export function useCart() {
     ) => {
       queryClient.setQueryData(CART_QUERY_KEY, rollback?.previousCart ?? null)
     },
+    // `<= 1` because the settling mutation is still counted as pending here, so
+    // this is the last one only when no other cart write is queued behind it.
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY })
+      if (queryClient.isMutating({ mutationKey: CART_MUTATION_KEY }) <= 1) {
+        queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY })
+      }
     },
   })
 
-  // `addCartItem` already increments an existing line server-side, so adding only
-  // needs to branch on whether a cart exists yet.
+  // `addCartItem` find-or-creates the cart and increments an existing line
+  // server-side, so adding is a single call regardless of whether a cart exists.
   const addToCartMutation = useMutation({
     mutationFn: async ({ productVariantId, quantity }: AddToCart) =>
-      unwrapActionResult(
-        cart
-          ? await addCartItem({ productVariantId, quantity })
-          : await createCart({ productVariantId, quantity })
-      ),
+      unwrapActionResult(await addCartItem({ productVariantId, quantity })),
     ...withOptimisticCart<AddToCart>(
       (currentCart, { productVariantId, quantity, optimisticItem }) =>
         applyAddToCart({
@@ -164,8 +173,8 @@ export function useCart() {
   })
 
   const clearCartMutation = useMutation({
-    mutationFn: async () => unwrapActionResult(await deleteCart()),
-    ...withOptimisticCart<void>(() => null),
+    mutationFn: async () => unwrapActionResult(await clearCart()),
+    ...withOptimisticCart<void>((currentCart) => applyClearCart(currentCart)),
   })
 
   return {
@@ -197,7 +206,7 @@ export function useCart() {
     /** Set a variant's quantity exactly; `0` or less removes the line. */
     setQuantity: ({ productVariantId, quantity }: SetQuantity) =>
       setQuantityMutation.mutateAsync({ productVariantId, quantity }),
-    /** Remove a variant; the server deletes the cart when it was the last item. */
+    /** Remove a variant; the cart is kept (empty) when it was the last item. */
     removeItem: (productVariantId: string) =>
       removeItemMutation.mutateAsync(productVariantId),
     /** Delete the entire cart. */

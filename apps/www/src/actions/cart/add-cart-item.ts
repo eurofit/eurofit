@@ -1,25 +1,16 @@
 "use server"
 
 import { NewCartItem, addCartItemSchema } from "@/lib/schemas/cart/add-item"
-import {
-  invalidCartInput,
-  toCartActionError,
-} from "@/lib/utils/cart/cart-action-error"
+import { invalidCartInput } from "@/lib/utils/cart/cart-action-error"
 import { addItem } from "@/lib/utils/cart/cart-items"
-import {
-  CART_DETAIL_DEPTH,
-  CART_DETAIL_POPULATE,
-  findCartByIdentity,
-} from "@/lib/utils/cart/get-cart"
-import { getCurrentIdentity } from "@/lib/utils/get-current-identity"
 import { Cart } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
-import config from "@payload-config"
-import { getPayload } from "payload"
+import { mutateOwnerCart } from "./mutate-cart"
 
 /**
- * Adds an item to the owner's existing cart, incrementing the line when the
- * variant is already present.
+ * Adds an item to the owner's cart, incrementing the line when the variant is
+ * already present. Find-or-creates the cart, so adding to a brand-new cart needs
+ * no separate create path.
  */
 export async function addCartItem(
   input: NewCartItem
@@ -29,28 +20,7 @@ export async function addCartItem(
 
   const { productVariantId, quantity } = parsed.data
 
-  try {
-    const cart = await findCartByIdentity(await getCurrentIdentity())
-
-    if (!cart) {
-      return { success: false, code: 404, message: "Cart not found." }
-    }
-
-    const payload = await getPayload({ config })
-
-    const updatedCart = await payload.update({
-      collection: "carts",
-      id: cart.id,
-      data: {
-        items: addItem({ items: cart.items, productVariantId, quantity }),
-        lastActiveAt: new Date().toISOString(),
-      },
-      depth: CART_DETAIL_DEPTH,
-      populate: CART_DETAIL_POPULATE,
-    })
-
-    return { success: true, data: updatedCart }
-  } catch (error) {
-    return toCartActionError(error)
-  }
+  return mutateOwnerCart((items) =>
+    addItem({ items, productVariantId, quantity })
+  )
 }

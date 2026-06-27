@@ -90,7 +90,11 @@ export function applySetQuantity({
   })
 }
 
-/** Optimistic cart after removing a variant; `null` when it empties the cart. */
+/**
+ * Optimistic cart after removing a variant. Keeps the cart object with an empty
+ * `items` array when the last line leaves — the server keeps the row too, so the
+ * UI's empty state (driven by item count) renders without flipping to `null`.
+ */
 export function applyRemoveItem({
   cart,
   productVariantId,
@@ -104,7 +108,12 @@ export function applyRemoveItem({
     (item) => getItemVariantId(item) !== productVariantId
   )
 
-  if (items.length === 0) return null
-
   return withTotal({ ...cart, items })
+}
+
+/** Optimistic cart after clearing every line, keeping the (empty) cart object. */
+export function applyClearCart(cart: Cart | null): Cart | null {
+  if (!cart) return cart
+
+  return withTotal({ ...cart, items: [] })
 }
