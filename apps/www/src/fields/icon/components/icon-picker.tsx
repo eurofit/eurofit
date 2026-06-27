@@ -42,11 +42,25 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
     <div className="field-type text">
       <FieldLabel label={field?.label} path={path} required={field?.required} />
 
-      <div className="flex items-center gap-2">
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}
-          className="flex w-full max-w-xs items-center gap-2 rounded border border-gray-300 px-3 py-2 text-left text-sm hover:bg-gray-50"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            flex: 1,
+            maxWidth: "20rem",
+            padding: "0.375rem 0.75rem",
+            background: "var(--theme-input-bg)",
+            border: "1px solid var(--theme-border-color)",
+            borderRadius: "var(--style-radius-m)",
+            color: "var(--theme-text)",
+            fontSize: "var(--font-body-size)",
+            textAlign: "left",
+            cursor: "pointer",
+          }}
         >
           {SelectedIcon ? (
             <>
@@ -54,9 +68,12 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
               <span>{value}</span>
             </>
           ) : (
-            <span className="text-gray-400">Select an icon…</span>
+            <span style={{ color: "var(--theme-text-dim)" }}>
+              Select an icon…
+            </span>
           )}
         </button>
+
         {value && (
           <button
             type="button"
@@ -65,32 +82,51 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
               setValue("")
               setSearch("")
             }}
-            className="rounded p-1 hover:bg-gray-100"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.375rem",
+              background: "var(--theme-input-bg)",
+              border: "1px solid var(--theme-border-color)",
+              borderRadius: "var(--style-radius-m)",
+              color: "var(--theme-text)",
+              cursor: "pointer",
+            }}
           >
             <X size={14} />
           </button>
         )}
       </div>
 
-      {SelectedIcon && (
-        <div className="mt-2 flex items-center gap-4 text-gray-500">
-          <SelectedIcon size={16} />
-          <SelectedIcon size={24} />
-          <SelectedIcon size={32} />
-        </div>
-      )}
-
       {isOpen && (
-        <div className="mt-2 max-w-xs rounded border border-gray-200 bg-white p-3 shadow-sm">
+        <div
+          style={{
+            marginTop: "0.5rem",
+            maxWidth: "20rem",
+            padding: "0.75rem",
+            background: "var(--theme-elevation-100)",
+            border: "1px solid var(--theme-border-color)",
+            borderRadius: "var(--style-radius-m)",
+            boxShadow: "var(--theme-shadow-m)",
+          }}
+        >
           <input
             autoFocus
             type="search"
             placeholder="Search icons…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="mb-2 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+            className="field__input"
+            style={{ marginBottom: "0.5rem", width: "100%" }}
           />
-          <div className="grid grid-cols-8 gap-1">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(8, 1fr)",
+              gap: "0.25rem",
+            }}
+          >
             {filtered.map((name) => {
               const Icon = icons[name as keyof typeof icons] as LucideIcon
               return (
@@ -99,9 +135,23 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
                   type="button"
                   title={name}
                   onClick={() => handleSelect(name)}
-                  className={`flex items-center justify-center rounded p-1.5 hover:bg-gray-100 ${
-                    value === name ? "bg-blue-50 ring-2 ring-blue-500" : ""
-                  }`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.375rem",
+                    borderRadius: "var(--style-radius-s)",
+                    background:
+                      value === name
+                        ? "var(--theme-success-100)"
+                        : "transparent",
+                    border:
+                      value === name
+                        ? "2px solid var(--theme-success)"
+                        : "2px solid transparent",
+                    color: "var(--theme-text)",
+                    cursor: "pointer",
+                  }}
                 >
                   <Icon size={18} />
                 </button>
@@ -109,7 +159,13 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
             })}
           </div>
           {totalMatches > MAX_VISIBLE && (
-            <p className="mt-2 text-xs text-gray-400">
+            <p
+              style={{
+                marginTop: "0.5rem",
+                fontSize: "0.75rem",
+                color: "var(--theme-text-dim)",
+              }}
+            >
               Showing first 20 — type to narrow results
             </p>
           )}

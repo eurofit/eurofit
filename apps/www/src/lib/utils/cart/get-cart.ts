@@ -80,3 +80,40 @@ export async function getCart(): Promise<Cart | null> {
     populate: CART_DETAIL_POPULATE,
   })
 }
+
+/**
+ * Returns the owner's cart, creating an empty one when none exists yet, so every
+ * cart write operates on a guaranteed row (no "cart not found"). Must be called
+ * inside {@link withCartLock} — the lock closes the create race; the catch that
+ * re-reads on a unique-constraint violation is defense in depth.
+ */
+export async function findOrCreateCart(identity: Identity): Promise<Cart> {
+  const existing = await findCartByIdentity(identity, {
+    depth: CART_DETAIL_DEPTH,
+    populate: CART_DETAIL_POPULATE,
+  })
+  if (existing) return existing
+
+  const payload = await getPayload({ config })
+
+  try {
+    return await payload.create({
+      collection: "carts",
+      data: {
+        ...buildCartOwner(identity),
+        items: [],
+        lastActiveAt: new Date().toISOString(),
+      },
+      depth: CART_DETAIL_DEPTH,
+      populate: CART_DETAIL_POPULATE,
+    })
+  } catch (error) {
+    // Lost the create race — the row now exists, so read it back.
+    const cart = await findCartByIdentity(identity, {
+      depth: CART_DETAIL_DEPTH,
+      populate: CART_DETAIL_POPULATE,
+    })
+    if (cart) return cart
+    throw error
+  }
+}

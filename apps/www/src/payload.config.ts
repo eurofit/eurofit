@@ -29,6 +29,9 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     dateFormat: "dd MMMM yyyy hh:mm",
+    components: {
+      providers: ["@/components/admin/font-provider"],
+    },
   },
   routes: {
     api: "/payload/api",

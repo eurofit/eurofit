@@ -52,15 +52,15 @@ export function CreateAddressForm({
 }: CreateAddressFormProps) {
   const stepper = useStepper()
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const { mutate: createAddress, isPending: isCreatingAddress } = useMutation({
     mutationKey: ["create-address"],
     mutationFn: async (values: Address) =>
       unwrapActionResult(
-        await createAddressAction(values, turnstileToken ?? "")
+        await createAddressAction(
+          values,
+          turnstileRef.current?.getResponse() ?? ""
+        )
       ),
     onMutate: () => {
       onPending(true)
@@ -73,7 +73,6 @@ export function CreateAddressForm({
       stepper.next()
     },
     onError: () => {
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error("Failed to create address. Please try again.")
     },
@@ -522,9 +521,6 @@ export function CreateAddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
-          onSuccess={(token) => setTurnstileToken(token)}
-          onError={() => setTurnstileToken(null)}
-          onExpire={() => setTurnstileToken(null)}
         />
         <Field orientation="horizontal" className="flex justify-end">
           <div className="flex gap-2">
@@ -534,7 +530,7 @@ export function CreateAddressForm({
             <Button
               type="submit"
               className="ml-auto"
-              disabled={!turnstileToken || isCreatingAddress}
+              disabled={isCreatingAddress}
             >
               {isCreatingAddress && <Spinner />}
               {isCreatingAddress ? "Saving Address..." : "Save Address"}

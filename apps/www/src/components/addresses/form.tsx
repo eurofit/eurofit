@@ -55,9 +55,6 @@ export function AddressForm({
 }: AddressFormProps) {
   const isEditing = !!address
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const form = useForm<Address>({
     resolver: zodResolver(addressSchema),
@@ -89,19 +86,21 @@ export function AddressForm({
         return unwrapActionResult(
           await updateAddressAction(
             { ...values, id: address.id } as AddressWithId,
-            turnstileToken ?? ""
+            turnstileRef.current?.getResponse() ?? ""
           )
         )
       }
       return unwrapActionResult(
-        await createAddressAction(values, turnstileToken ?? "")
+        await createAddressAction(
+          values,
+          turnstileRef.current?.getResponse() ?? ""
+        )
       )
     },
     onSuccess: (data) => {
       onSuccess(data as AddressDoc)
     },
     onError: () => {
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
     },
   })
@@ -526,9 +525,6 @@ export function AddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
-          onSuccess={(token) => setTurnstileToken(token)}
-          onError={() => setTurnstileToken(null)}
-          onExpire={() => setTurnstileToken(null)}
         />
 
         <Field orientation="horizontal" className="flex justify-end">
@@ -536,7 +532,7 @@ export function AddressForm({
             <Button type="button" variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!turnstileToken || isPending}>
+            <Button type="submit" disabled={isPending}>
               {isPending && <Spinner />}
               {isPending
                 ? isEditing

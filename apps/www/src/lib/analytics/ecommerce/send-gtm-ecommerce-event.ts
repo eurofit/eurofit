@@ -21,6 +21,10 @@ export type GTMUserData = {
  * merge into this one, then forwards the event. Use this only for ecommerce
  * events; non-ecommerce events (login, sign_up, …) call `sendGTMEvent` directly.
  *
+ * Also mirrors `data.ecommerce` as `eventModel` so Meta Pixel tags configured
+ * with "Use GA4 dataLayer Integration" can read the ecommerce parameters
+ * without additional GTM variable setup.
+ *
  * @param data - the ecommerce dataLayer payload; `event` must be a GA4 ecommerce name.
  * @param userData - optional user identity data for Enhanced Conversions; defaults to `{}`.
  * @param dataLayerName - optional non-default dataLayer name, forwarded to GTM.
@@ -31,5 +35,8 @@ export function sendGTMEcommerceEvent(
   dataLayerName?: string
 ): void {
   sendGTMEvent({ ecommerce: null }, dataLayerName)
-  sendGTMEvent({ ...data, user: userData ?? {} }, dataLayerName)
+  sendGTMEvent(
+    { ...data, eventModel: data.ecommerce, user: userData ?? {} },
+    dataLayerName
+  )
 }

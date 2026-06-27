@@ -57,15 +57,15 @@ export function UpdateAddressForm({
 }: UpdateAddressFormProps) {
   const stepper = useStepper()
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const { mutate: updateAddress, isPending: isUpdatingAddress } = useMutation({
     mutationKey: ["update-address"],
     mutationFn: async (values: AddressWithId) =>
       unwrapActionResult(
-        await updateAddressAction(values, turnstileToken ?? "")
+        await updateAddressAction(
+          values,
+          turnstileRef.current?.getResponse() ?? ""
+        )
       ),
     onMutate: () => {
       onPending(true)
@@ -77,7 +77,6 @@ export function UpdateAddressForm({
       onClose()
     },
     onError: () => {
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error("Failed to update address. Please try again.")
     },
@@ -527,9 +526,6 @@ export function UpdateAddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
-          onSuccess={(token) => setTurnstileToken(token)}
-          onError={() => setTurnstileToken(null)}
-          onExpire={() => setTurnstileToken(null)}
         />
         <Field orientation="horizontal" className="flex justify-end">
           <div className="flex gap-2">
@@ -539,7 +535,7 @@ export function UpdateAddressForm({
             <Button
               type="submit"
               className="ml-auto"
-              disabled={!turnstileToken || isUpdatingAddress}
+              disabled={isUpdatingAddress}
             >
               {isUpdatingAddress && <Spinner />}
               {isUpdatingAddress ? "Updating Address..." : "Update Address"}

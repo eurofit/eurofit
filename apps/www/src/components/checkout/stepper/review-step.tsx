@@ -48,18 +48,10 @@ export function ReviewStep() {
   const [shipTogether, setShipTogether] = React.useState(true)
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const handleCheckout = () => {
     if (!address) {
       toast.info("Please provide delivery Address")
-      return
-    }
-
-    if (!turnstileToken) {
-      toast.error("Security check is still loading. Please wait a moment.")
       return
     }
 
@@ -80,10 +72,9 @@ export function ReviewStep() {
         addressId: address.id,
         shipTogether,
       },
-      turnstileToken,
+      turnstileToken: turnstileRef.current?.getResponse() ?? "",
     })
 
-    setTurnstileToken(null)
     turnstileRef.current?.reset()
   }
 
@@ -147,7 +138,6 @@ export function ReviewStep() {
         <CardFooter className="hidden flex-col gap-2 md:flex">
           <PlaceOrderAction
             isCheckingout={isCheckingout}
-            isReady={Boolean(turnstileToken)}
             onCheckout={handleCheckout}
           />
         </CardFooter>
@@ -159,9 +149,6 @@ export function ReviewStep() {
         siteKey={
           process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
         }
-        onSuccess={(token) => setTurnstileToken(token)}
-        onError={() => setTurnstileToken(null)}
-        onExpire={() => setTurnstileToken(null)}
       />
 
       {/* mobile sticky  */}
@@ -174,7 +161,6 @@ export function ReviewStep() {
         </div>
         <PlaceOrderAction
           isCheckingout={isCheckingout}
-          isReady={Boolean(turnstileToken)}
           onCheckout={handleCheckout}
         />
       </div>
@@ -184,13 +170,11 @@ export function ReviewStep() {
 
 type PlaceOrderActionProps = {
   isCheckingout: boolean
-  isReady: boolean
   onCheckout: () => void
 }
 
 function PlaceOrderAction({
   isCheckingout,
-  isReady,
   onCheckout,
 }: PlaceOrderActionProps) {
   return (
@@ -199,7 +183,7 @@ function PlaceOrderAction({
         size="lg"
         className="h-12 w-full px-6 text-base font-semibold"
         onClick={onCheckout}
-        disabled={isCheckingout || !isReady}
+        disabled={isCheckingout}
       >
         {isCheckingout && (
           <>

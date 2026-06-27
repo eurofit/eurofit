@@ -31,9 +31,6 @@ type AccountFormProps = {
 
 export function AccountForm({ user }: AccountFormProps) {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const form = useForm<UpdateProfile>({
     resolver: zodResolver(updateProfileSchema),
@@ -46,9 +43,10 @@ export function AccountForm({ user }: AccountFormProps) {
   const { mutate: saveProfile, isPending } = useMutation({
     mutationKey: ["update-profile"],
     mutationFn: async (values: UpdateProfile) =>
-      unwrapActionResult(await updateProfile(values, turnstileToken ?? "")),
+      unwrapActionResult(
+        await updateProfile(values, turnstileRef.current?.getResponse() ?? "")
+      ),
     onError: () => {
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
     },
   })
@@ -135,13 +133,10 @@ export function AccountForm({ user }: AccountFormProps) {
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
-          onSuccess={(token) => setTurnstileToken(token)}
-          onError={() => setTurnstileToken(null)}
-          onExpire={() => setTurnstileToken(null)}
         />
 
         <Field orientation="horizontal" className="flex justify-end">
-          <Button type="submit" disabled={!turnstileToken || isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending && <Spinner />}
             {isPending ? "Saving..." : "Save Changes"}
           </Button>

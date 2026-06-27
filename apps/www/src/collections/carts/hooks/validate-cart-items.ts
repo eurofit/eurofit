@@ -13,11 +13,10 @@ export const validateCartItems: CollectionBeforeChangeHook<Cart> = async ({
         : item.productVariant.id
     ) ?? []
 
+  // An empty cart is valid — the row persists with no lines after the last item
+  // is removed. Nothing to validate against stock/price.
   if (!productVariantIds.length) {
-    throw new APIError(
-      "Cart must have at least one item with a valid product.",
-      400
-    )
+    return data
   }
 
   // find the corrosponding product line, inorder to verify prices and stocks
