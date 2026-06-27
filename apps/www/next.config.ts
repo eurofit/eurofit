@@ -25,6 +25,19 @@ const nextConfig: NextConfig = {
         { key: "Cache-Control", value: "no-store, no-cache, no-transform" },
       ],
     },
+    {
+      source: "/((?!_next/static|_next/image|admin|payload).*)",
+      headers: [
+        {
+          key: "Link",
+          value: [
+            `<${publicUrl}/sitemap.xml>; rel="sitemap"`,
+            `<${publicUrl}/.well-known/api-catalog>; rel="api-catalog"`,
+          ].join(", "),
+        },
+        { key: "Vary", value: "Accept" },
+      ],
+    },
   ],
   images: {
     qualities: [85],
