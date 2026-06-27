@@ -133,19 +133,34 @@ pnpm --filter www payload migrate              # run pending migrations
 
 ### Route Groups
 
-| Group                     | Contents                                                                    |
-| ------------------------- | --------------------------------------------------------------------------- |
-| `app/(frontend)/(bare)/`  | Unauthenticated auth pages: login, sign-up, forgot-password, reset-password |
-| `app/(frontend)/(store)/` | Storefront + `verify-email` (requires store shell)                          |
-| `app/(payload)/`          | Payload CMS admin — auto-generated, do not edit                             |
+| Group                     | Contents                                                                                                                          |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `app/(frontend)/(bare)/`  | Pages rendered without the store shell: auth (login, sign-up, forgot/reset-password, resend-verification), `checkout`, `sitemaps` |
+| `app/(frontend)/(store)/` | Storefront + `verify-email`, `thank-you` (requires store shell)                                                                   |
+| `app/(payload)/`          | Payload CMS admin — auto-generated, do not edit                                                                                   |
+
+### Agent-Ready / SEO Endpoints
+
+The app exposes machine-readable surfaces for agents and crawlers: `src/app/.well-known/{api-catalog,oauth-authorization-server,oauth-protected-resource}/route.ts`, static `public/.well-known/{mcp,agent-skills}`, and `src/app/auth.md/route.ts`. When changing auth, the public API, or available skills, keep these in sync.
 
 ### Collections
 
-All registered collections (in `src/collections/index.ts`): `users`, `addresses`, `media`, `packages`, `serviceAreas`, `brands`, `categories`, `products`, `productVariants`, `stockAlerts`, `wishlists`, `carts`, `orders`, `orderStatus`, `transactions`.
+All registered collections (in `src/collections/index.ts`): `users`, `addresses`, `media`, `pages`, `packages`, `serviceAreas`, `brands`, `categories`, `products`, `productVariants`, `productReviews`, `stockAlerts`, `labels`, `tags`, `wishlists`, `carts`, `orders`, `orderStatus`, `transactions`, `discounts`.
 
 ### Globals
 
 Three globals (`src/globals/`): `nav`, `footer`, `settings`. Fetched server-side via actions in `src/actions/get-nav.ts` etc.
+
+### Layout Blocks
+
+`pages` builds layouts from Payload blocks. Each block in `src/blocks/<name>/` pairs a config (`index.tsx`, the Payload block definition) with a `component.tsx` (the frontend renderer). Registered blocks (`src/blocks/index.ts`): `slider`, `productList`, `faq`, `richText`. When adding a block: define the config, write the renderer, register it in `index.ts`, then run `payload generate:types`.
+
+### API Routes vs Server Actions
+
+- Payload's own REST/GraphQL API is mounted at `/payload/api`.
+- App-level data routes live under `src/app/api/` (e.g. `products`, `brands/search`, `cart`, `reviews`, `delivery`, `wishlist`) — these back client-side queries, per the "server actions for mutations, API routes for client reads" rule.
+- `src/app/api/crons/**` are cron endpoints (e.g. guest abandoned-cart cleanup), guarded by the `CRON_SECRET` bearer token.
+- `src/app/api/webhooks/paystack` handles `charge.success`; `src/app/api/healthz` is the health check.
 
 ### Middleware / Guest Session
 
@@ -204,14 +219,16 @@ Cart is identified by **either** `userId` (authenticated) or the `guestSessionId
 
 Validated at startup via `@t3-oss/env-nextjs` in `src/env.mjs`.
 
-| Group     | Variables                                                                                                               |
-| --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Database  | `DATABASE_URI`, `PAYLOAD_SECRET`                                                                                        |
-| Email     | `RESEND_API_KEY`, `SMTP_*`                                                                                              |
-| Storage   | `SUPABASE_S3_*` (bucket, access key, secret, region, endpoint)                                                          |
-| Payments  | `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`                                                                            |
-| Turnstile | `CLOUDFLARE_TURNSTILE_SECRET_KEY`(Managed Turnstile), `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                       |
-| Public    | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY` |
+| Group         | Variables                                                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Database      | `DATABASE_URI`, `PAYLOAD_SECRET`                                                                                        |
+| Email         | `RESEND_API_KEY`, `SMTP_*`                                                                                              |
+| Storage       | `SUPABASE_S3_*` (bucket, access key, secret, region, endpoint)                                                          |
+| Payments      | `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`                                                                            |
+| Turnstile     | `CLOUDFLARE_TURNSTILE_SECRET_KEY`(Managed Turnstile), `CLOUDFLARE_TURNSTILE_INVISIBLE_SECRET_KEY`                       |
+| Cron          | `CRON_SECRET` (bearer token guarding `src/app/api/crons/**`)                                                            |
+| Observability | `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_GTM_ID`                                                                          |
+| Public        | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY`, `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY` |
 
 ### Email Templates
 
@@ -228,11 +245,15 @@ Defined in `src/const/user-roles.ts`: `admin` and `customer`. Roles are stored i
 
 ### Known Open Issues
 
-`TODOS.md` tracks three deliberate deferred gaps — do not close them without the prescribed fix:
+`TODOS.md` tracks deliberate deferred gaps — do not close them without the prescribed fix:
 
-- **C-01 (CRITICAL)** — Stock oversell race condition in `validateOrderItems` (`src/collections/orders/hooks/validate-order-items.ts`): stock is read but never atomically decremented/locked.
-- **H-03 (HIGH)** — No error tracking service wired up; payment webhook failures currently log to `console.error` only.
-- **M-08 (MEDIUM)** — No orphan-reconciliation cron: if a Paystack webhook is never delivered, the customer is charged but their order stays `paymentStatus = "unpaid"`.
+- **C-01 (CRITICAL, open)** — Stock oversell race condition in `validateOrderItems` (`src/collections/orders/hooks/validate-order-items.ts`): stock is read but never atomically decremented/locked.
+- **H-03 (RESOLVED)** — Error tracking is now wired via Sentry (see Observability below). Kept in `TODOS.md` only to track configuring Sentry alerts on the `paystack-webhook` / `order-confirmation-email` scopes.
+- **M-08 (MEDIUM, open)** — No orphan-reconciliation cron: if a Paystack webhook is never delivered, the customer is charged but their order stays `paymentStatus = "unpaid"`. Orphans are now observable (a `Sentry.logger.warn` fires) but auto-recovery is still missing.
+
+### Observability
+
+Sentry is wired across `apps/www` (`instrumentation.ts`, `instrumentation-client.ts`, `sentry.*.config`). Do not swallow errors with bare `console.error` — route caught/swallowed errors through the shared `captureError()` helper in `src/lib/observability/`, passing a `scope` tag. Payment and email pipelines are traced with `Sentry.startSpan`.
 
 ### UI Components
 

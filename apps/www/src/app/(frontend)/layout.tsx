@@ -22,9 +22,18 @@ export const metadata: Metadata = {
   description: site.description,
   openGraph: {
     siteName: "EUROFIT - Supplements & Sports Nutrition",
+    images: [
+      {
+        url: "/opengraph-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "EUROFIT – Sports Nutrition, Supplements & Vitamins in Kenya",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    images: ["/twitter-image.jpg"],
   },
   other: {
     "apple-mobile-web-app-title": site.name,
