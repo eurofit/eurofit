@@ -1,6 +1,5 @@
 import { PayloadIcon } from "@/components/payload-icon"
 import { savingsLabel } from "@/components/product-variants/variant-price"
-import { Countdown } from "@/components/timer/countdown"
 import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import {
@@ -10,10 +9,10 @@ import {
 } from "@/payload-types"
 import { AspectRatio } from "@eurofit/ui/components/aspect-ratio"
 import { Badge } from "@eurofit/ui/components/badge"
-import { isFuture } from "date-fns"
 import { ChevronRight, ImageOff } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { ProductListTimer } from "./product-list-timer"
 
 export function ProductList({
   icon,
@@ -50,13 +49,7 @@ export function ProductList({
           <PayloadIcon name={icon} size={20} />
           {title}
         </h2>
-        {timer && isFuture(timer) && (
-          <div className="mx-auto tracking-tight">
-            <span className="capitalize">Time left</span>
-            &nbsp;
-            <Countdown endDate={timer} />
-          </div>
-        )}
+        {timer && <ProductListTimer timer={timer} />}
         {link && (
           <Link href={link.href} className="ml-auto flex items-center gap-2">
             <span>{link.label}</span>
