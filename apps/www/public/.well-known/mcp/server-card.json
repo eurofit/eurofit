@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "serverInfo": {
+    "name": "EUROFIT",
+    "version": "1.0.0",
+    "description": "EUROFIT is Kenya's leading supplier of authentic European sports nutrition, supplements, and vitamins for retail and wholesale customers."
+  },
+  "transport": [
+    {
+      "type": "http",
+      "url": "https://www.eurofit.co.ke/api/mcp"
+    }
+  ],
+  "capabilities": {
+    "tools": {},
+    "resources": {}
+  },
+  "contact": {
+    "url": "https://www.eurofit.co.ke/contact-us",
+    "email": "info@eurofit.co.ke"
+  }
+}

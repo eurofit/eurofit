@@ -1,0 +1,29 @@
+{
+  "$schema": "https://agentskills.io/schema/v0.2.0/index.json",
+  "skills": [
+    {
+      "name": "search-products",
+      "type": "browser",
+      "description": "Search EUROFIT's catalog of sports nutrition products, supplements, and vitamins available in Kenya",
+      "url": "https://www.eurofit.co.ke/search"
+    },
+    {
+      "name": "browse-categories",
+      "type": "browser",
+      "description": "Browse all product categories available at EUROFIT including protein, amino acids, pre-workout, vitamins, and accessories",
+      "url": "https://www.eurofit.co.ke/categories"
+    },
+    {
+      "name": "browse-brands",
+      "type": "browser",
+      "description": "Browse all authentic European supplement brands stocked at EUROFIT",
+      "url": "https://www.eurofit.co.ke/brands"
+    },
+    {
+      "name": "contact-store",
+      "type": "browser",
+      "description": "Get EUROFIT store contact details, location, and opening hours",
+      "url": "https://www.eurofit.co.ke/contact-us"
+    }
+  ]
+}
