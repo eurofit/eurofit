@@ -1,19 +1,36 @@
 "use client"
 
-import { Countdown } from "@/components/timer/countdown"
-import { isFuture } from "date-fns"
+import { useEffect, useState } from "react"
+import { useTimer } from "react-timer-hook"
+
+const pad = (n: number) => n.toString().padStart(2, "0")
 
 type ProductListTimerProps = {
   timer: string
 }
 
 export function ProductListTimer({ timer }: ProductListTimerProps) {
-  if (!isFuture(timer)) return null
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const { days, hours, minutes, seconds, isRunning } = useTimer({
+    expiryTimestamp: new Date(timer),
+  })
+
+  if (!isMounted || !isRunning) return null
+
+  const timeString =
+    days > 0
+      ? `${days}d : ${pad(hours)}h : ${pad(minutes)}m`
+      : `${pad(hours)}h : ${pad(minutes)}m : ${pad(seconds)}s`
+
   return (
-    <div className="mx-auto tracking-tight">
-      <span className="capitalize">Time left</span>
-      &nbsp;
-      <Countdown endDate={timer} />
+    <div className="text-center tracking-tight">
+      <span>Time Left: </span>
+      <span className="font-bold tabular-nums">{timeString}</span>
     </div>
   )
 }

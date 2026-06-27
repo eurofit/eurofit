@@ -6,6 +6,7 @@ import type { Discount } from "@/payload-types"
 import type { CollectionConfig, NumberFieldValidation } from "payload"
 
 import { addStaff } from "./hooks/add-staff"
+import { revalidateEligibleVariants } from "./hooks/revalidate-eligible-variants"
 
 const DISCOUNT_TARGETS = [
   { label: "Product", value: "product" },
@@ -394,5 +395,6 @@ export const discounts: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [addStaff],
+    afterChange: [revalidateEligibleVariants],
   },
 }

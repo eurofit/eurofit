@@ -16,6 +16,7 @@ import { ProductListTimer } from "./product-list-timer"
 
 export function ProductList({
   icon,
+  iconFillColor,
   title,
   products,
   styles,
@@ -39,23 +40,27 @@ export function ProductList({
       }}
     >
       <div
-        className="border-t-md flex items-center justify-between p-2"
+        className="grid grid-cols-3 items-center gap-2 p-2 px-4"
         style={{
           backgroundColor: styles?.headerBg ?? undefined,
           color: styles?.headerFg ?? undefined,
         }}
       >
         <h2 className="flex scroll-m-20 items-center gap-2 text-lg font-bold">
-          <PayloadIcon name={icon} size={20} />
+          <PayloadIcon name={icon} size={20} fill={iconFillColor} />
           {title}
         </h2>
-        {timer && <ProductListTimer timer={timer} />}
-        {link && (
-          <Link href={link.href} className="ml-auto flex items-center gap-2">
-            <span>{link.label}</span>
-            <ChevronRight className="size-4" />
-          </Link>
-        )}
+        <div className="text-center">
+          {timer && <ProductListTimer timer={timer} />}
+        </div>
+        <div className="flex items-center justify-end">
+          {link?.href && (
+            <Link href={link.href} className="flex items-center gap-1">
+              <span>{link.label ?? "View more"}</span>
+              <ChevronRight className="size-4" />
+            </Link>
+          )}
+        </div>
       </div>
       <div className="grid gap-6 py-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {formattedVariants.map((variant) => (
@@ -100,7 +105,7 @@ function ProductCard({ variant }: ProductCardProps) {
 
   return (
     <Link
-      href={`/products/${slug}`}
+      href={`/product-variants/${slug}`}
       className="relative space-y-2 rounded-lg bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md"
     >
       <AspectRatio
