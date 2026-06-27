@@ -5,6 +5,7 @@ import { updateAddress as updateAddressAction } from "@/actions/addresses/update
 import { CityCommand } from "@/components/checkout/city-command"
 import { titles } from "@/const/titles"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   Address,
   AddressWithId,
@@ -35,10 +36,8 @@ import {
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { Textarea } from "@eurofit/ui/components/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation } from "@tanstack/react-query"
-import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -54,7 +53,12 @@ export function AddressForm({
   onCancel,
 }: AddressFormProps) {
   const isEditing = !!address
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
   const form = useForm<Address>({
     resolver: zodResolver(addressSchema),
@@ -82,26 +86,22 @@ export function AddressForm({
   const { mutate: saveAddress, isPending } = useMutation({
     mutationKey: [isEditing ? "update-address" : "create-address", address?.id],
     mutationFn: async (values: Address) => {
+      const token = await getToken()
       if (isEditing) {
         return unwrapActionResult(
           await updateAddressAction(
             { ...values, id: address.id } as AddressWithId,
-            turnstileRef.current?.getResponse() ?? ""
+            token
           )
         )
       }
-      return unwrapActionResult(
-        await createAddressAction(
-          values,
-          turnstileRef.current?.getResponse() ?? ""
-        )
-      )
+      return unwrapActionResult(await createAddressAction(values, token))
     },
     onSuccess: (data) => {
       onSuccess(data as AddressDoc)
     },
     onError: () => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
     },
   })
 
@@ -525,6 +525,7 @@ export function AddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
+          {...turnstileProps}
         />
 
         <Field orientation="horizontal" className="flex justify-end">

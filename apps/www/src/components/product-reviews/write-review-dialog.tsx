@@ -3,6 +3,7 @@
 import { createReview } from "@/actions/reviews/create-review"
 import { reviewKeys } from "@/const/reviews"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   CreateReview,
   createReviewSchema,
@@ -26,7 +27,6 @@ import {
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { Textarea } from "@eurofit/ui/components/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import * as React from "react"
@@ -42,7 +42,12 @@ export function WriteReviewDialog({
   productVariantId,
 }: WriteReviewDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false)
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
   const queryClient = useQueryClient()
 
   const form = useForm<CreateReview>({
@@ -56,14 +61,12 @@ export function WriteReviewDialog({
 
   const { mutate: submitReview, isPending } = useMutation({
     mutationFn: async (values: CreateReview) =>
-      unwrapActionResult(
-        await createReview(values, turnstileRef.current?.getResponse() ?? "")
-      ),
+      unwrapActionResult(await createReview(values, await getToken())),
     onSuccess: () => {
       toast.success("Thanks! Your review has been published.")
       setIsOpen(false)
       form.reset()
-      turnstileRef.current?.reset()
+      resetTurnstile()
       queryClient.invalidateQueries({
         queryKey: reviewKeys.stats(productVariantId),
       })
@@ -75,7 +78,7 @@ export function WriteReviewDialog({
       })
     },
     onError: (error) => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       toast.error(error.message ?? "Failed to submit your review.")
     },
   })
@@ -143,6 +146,7 @@ export function WriteReviewDialog({
               ref={turnstileRef}
               siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
               options={{ size: "invisible" }}
+              {...turnstileProps}
             />
 
             <Button type="submit" className="w-full" disabled={isPending}>

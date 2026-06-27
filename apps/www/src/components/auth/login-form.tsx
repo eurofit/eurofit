@@ -3,6 +3,7 @@
 import { login as loginAction } from "@/actions/auth/login"
 import { PasswordInput } from "@/components/password-input"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
 import { isSafeRedirect } from "@/lib/utils/is-safe-redirect"
 import { Button } from "@eurofit/ui/components/button"
@@ -24,7 +25,6 @@ import { Input } from "@eurofit/ui/components/input"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { cn } from "@eurofit/ui/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { useMutation } from "@tanstack/react-query"
@@ -39,17 +39,19 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get("next")
 
   const { mutate: login, isPending: isLoggingIn } = useMutation({
     mutationFn: async (data: LoginData) => {
-      const result = await loginAction(
-        data,
-        turnstileRef.current?.getResponse() ?? ""
-      )
+      const result = await loginAction(data, await getToken())
       if (!result.success) throw new Error(result.message)
       return result.data
     },
@@ -62,7 +64,7 @@ export function LoginForm({
       })
     },
     onError: (error: unknown) => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       toast.error(
         error instanceof Error ? error.message : "An unexpected error occurred."
       )
@@ -151,6 +153,7 @@ export function LoginForm({
                     env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY
                   }
                   options={{ size: "invisible" }}
+                  {...turnstileProps}
                 />
                 <Button type="submit" className="w-full" disabled={isLoggingIn}>
                   {isLoggingIn && <Spinner aria-hidden="true" />}
