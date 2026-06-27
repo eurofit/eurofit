@@ -3,6 +3,7 @@
 import { createAddress as createAddressAction } from "@/actions/addresses/create-address"
 import { titles } from "@/const/titles"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import { Address, addressSchema } from "@/lib/schemas/addresses/address"
 import { unwrapActionResult } from "@/lib/utils/unwrap-action-result"
 import { Button } from "@eurofit/ui/components/button"
@@ -28,10 +29,8 @@ import {
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { Textarea } from "@eurofit/ui/components/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation } from "@tanstack/react-query"
-import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { CityCommand } from "./city-command"
@@ -51,17 +50,17 @@ export function CreateAddressForm({
   onPending,
 }: CreateAddressFormProps) {
   const stepper = useStepper()
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
   const { mutate: createAddress, isPending: isCreatingAddress } = useMutation({
     mutationKey: ["create-address"],
     mutationFn: async (values: Address) =>
-      unwrapActionResult(
-        await createAddressAction(
-          values,
-          turnstileRef.current?.getResponse() ?? ""
-        )
-      ),
+      unwrapActionResult(await createAddressAction(values, await getToken())),
     onMutate: () => {
       onPending(true)
       stepper.data.set("address", { isCreatingAddress: true })
@@ -73,7 +72,7 @@ export function CreateAddressForm({
       stepper.next()
     },
     onError: () => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       toast.error("Failed to create address. Please try again.")
     },
     onSettled: () => {
@@ -521,6 +520,7 @@ export function CreateAddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
+          {...turnstileProps}
         />
         <Field orientation="horizontal" className="flex justify-end">
           <div className="flex gap-2">

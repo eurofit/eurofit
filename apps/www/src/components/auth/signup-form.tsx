@@ -3,6 +3,7 @@
 import { signUp as signUpAction } from "@/actions/auth/sign-up"
 import { PasswordInput } from "@/components/password-input"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import { SignupData, SignUpSchema } from "@/lib/schemas/auth/signup"
 import { Button } from "@eurofit/ui/components/button"
 import {
@@ -27,7 +28,6 @@ import { Input } from "@eurofit/ui/components/input"
 import { RadioGroup, RadioGroupItem } from "@eurofit/ui/components/radio-group"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { useMutation } from "@tanstack/react-query"
@@ -38,13 +38,17 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
   const router = useRouter()
 
   const { mutate: signup, isPending: isSigningUp } = useMutation({
     mutationFn: async (data: SignupData) => {
-      const token = turnstileRef.current?.getResponse() ?? ""
-      const result = await signUpAction(data, token)
+      const result = await signUpAction(data, await getToken())
       if (!result.success) throw new Error(result.message)
       return result.data
     },
@@ -60,7 +64,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       })
     },
     onError: (error) => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       if (error.message === "Email already exists") {
         form.setError("email", {
           message: "An account with this email already exists.",
@@ -282,6 +286,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY}
               className="w-full"
               options={{ size: "flexible", theme: "light" }}
+              {...turnstileProps}
             />
             <Button type="submit" className="w-full" disabled={isSigningUp}>
               {isSigningUp && <Spinner />}

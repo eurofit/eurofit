@@ -3,6 +3,7 @@
 import { resetPassword } from "@/actions/auth/reset-password"
 import { PasswordInput } from "@/components/password-input"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   ResetPasswordData,
   resetPasswordSchema,
@@ -24,7 +25,6 @@ import {
 import { Input } from "@eurofit/ui/components/input"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { CheckCircle } from "lucide-react"
 import { useSearchParams } from "next/navigation"
@@ -35,7 +35,12 @@ import { toast } from "sonner"
 
 export function ResetPassword() {
   const [showPassword, setShowPassword] = React.useState(false)
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get("token")
@@ -46,13 +51,10 @@ export function ResetPassword() {
   })
 
   const onSubmit = async (data: ResetPasswordData) => {
-    const result = await resetPassword(
-      data,
-      turnstileRef.current?.getResponse() ?? ""
-    )
+    const result = await resetPassword(data, await getToken())
 
     if (!result.success) {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       toast.error(result.message)
       return
     }
@@ -137,6 +139,7 @@ export function ResetPassword() {
             ref={turnstileRef}
             siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
             options={{ size: "invisible" }}
+            {...turnstileProps}
           />
           <Button
             type="submit"

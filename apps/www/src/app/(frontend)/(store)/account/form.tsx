@@ -3,6 +3,7 @@
 import { updateProfile } from "@/actions/account/update-profile"
 import type { CurrentUser } from "@/actions/auth/get-current-user"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   updateProfileSchema,
   type UpdateProfile,
@@ -18,10 +19,8 @@ import {
 import { Input } from "@eurofit/ui/components/input"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation } from "@tanstack/react-query"
-import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -30,7 +29,12 @@ type AccountFormProps = {
 }
 
 export function AccountForm({ user }: AccountFormProps) {
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
   const form = useForm<UpdateProfile>({
     resolver: zodResolver(updateProfileSchema),
@@ -43,11 +47,9 @@ export function AccountForm({ user }: AccountFormProps) {
   const { mutate: saveProfile, isPending } = useMutation({
     mutationKey: ["update-profile"],
     mutationFn: async (values: UpdateProfile) =>
-      unwrapActionResult(
-        await updateProfile(values, turnstileRef.current?.getResponse() ?? "")
-      ),
+      unwrapActionResult(await updateProfile(values, await getToken())),
     onError: () => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
     },
   })
 
@@ -133,6 +135,7 @@ export function AccountForm({ user }: AccountFormProps) {
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
+          {...turnstileProps}
         />
 
         <Field orientation="horizontal" className="flex justify-end">

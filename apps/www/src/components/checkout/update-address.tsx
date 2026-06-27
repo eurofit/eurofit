@@ -3,6 +3,7 @@
 import { updateAddress as updateAddressAction } from "@/actions/addresses/update-address"
 import { titles } from "@/const/titles"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   Address,
   AddressWithId,
@@ -33,10 +34,8 @@ import {
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { Textarea } from "@eurofit/ui/components/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation } from "@tanstack/react-query"
-import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { CityCommand } from "./city-command"
@@ -56,17 +55,17 @@ export function UpdateAddressForm({
   onPending,
 }: UpdateAddressFormProps) {
   const stepper = useStepper()
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
   const { mutate: updateAddress, isPending: isUpdatingAddress } = useMutation({
     mutationKey: ["update-address"],
     mutationFn: async (values: AddressWithId) =>
-      unwrapActionResult(
-        await updateAddressAction(
-          values,
-          turnstileRef.current?.getResponse() ?? ""
-        )
-      ),
+      unwrapActionResult(await updateAddressAction(values, await getToken())),
     onMutate: () => {
       onPending(true)
       stepper.data.set("address", { isUpdatingAddress: true })
@@ -77,7 +76,7 @@ export function UpdateAddressForm({
       onClose()
     },
     onError: () => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
       toast.error("Failed to update address. Please try again.")
     },
     onSettled: () => {
@@ -526,6 +525,7 @@ export function UpdateAddressForm({
           ref={turnstileRef}
           siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
           options={{ size: "invisible" }}
+          {...turnstileProps}
         />
         <Field orientation="horizontal" className="flex justify-end">
           <div className="flex gap-2">

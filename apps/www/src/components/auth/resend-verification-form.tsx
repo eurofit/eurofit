@@ -2,6 +2,7 @@
 
 import { resendVerificationEmailByEmail } from "@/actions/auth/resend-verification-email-by-email"
 import { env } from "@/env.mjs"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import {
   ResendVerificationData,
   resendVerificationSchema,
@@ -24,23 +25,26 @@ import {
 import { Input } from "@eurofit/ui/components/input"
 import { Spinner } from "@eurofit/ui/components/spinner"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useMutation } from "@tanstack/react-query"
 import { MailCheck } from "lucide-react"
 import Link from "next/link"
-import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 export function ResendVerificationForm() {
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
   const { mutate, isPending, data } = useMutation({
     mutationFn: async (data: ResendVerificationData) => {
       const result = await resendVerificationEmailByEmail(
         data,
-        turnstileRef.current?.getResponse() ?? ""
+        await getToken()
       )
       if (!result.success) throw new Error(result.message)
       return result.data
@@ -49,7 +53,7 @@ export function ResendVerificationForm() {
       toast.error(error.message)
     },
     onSettled: () => {
-      turnstileRef.current?.reset()
+      resetTurnstile()
     },
   })
 
@@ -131,6 +135,7 @@ export function ResendVerificationForm() {
                 ref={turnstileRef}
                 siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
+                {...turnstileProps}
               />
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Spinner aria-hidden />}

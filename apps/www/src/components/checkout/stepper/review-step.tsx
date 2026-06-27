@@ -3,6 +3,7 @@
 import { DELIVERY_FEE } from "@/const/delivery"
 import { useCart } from "@/hooks/use-cart"
 import { useCheckout } from "@/hooks/use-checkout"
+import { useTurnstileToken } from "@/hooks/use-turnstile-token"
 import { getBackorderAvailabilityDate } from "@/lib/utils/feeds/get-backorder-availability-date"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
 import { Address } from "@/payload-types"
@@ -16,7 +17,6 @@ import {
   CardTitle,
 } from "@eurofit/ui/components/card"
 import { Spinner } from "@eurofit/ui/components/spinner"
-import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { ChevronRight, Lock } from "lucide-react"
 import React from "react"
@@ -47,9 +47,14 @@ export function ReviewStep() {
 
   const [shipTogether, setShipTogether] = React.useState(true)
 
-  const turnstileRef = React.useRef<TurnstileInstance | null>(null)
+  const {
+    turnstileRef,
+    getToken,
+    reset: resetTurnstile,
+    turnstileProps,
+  } = useTurnstileToken()
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!address) {
       toast.info("Please provide delivery Address")
       return
@@ -72,10 +77,10 @@ export function ReviewStep() {
         addressId: address.id,
         shipTogether,
       },
-      turnstileToken: turnstileRef.current?.getResponse() ?? "",
+      turnstileToken: await getToken(),
     })
 
-    turnstileRef.current?.reset()
+    resetTurnstile()
   }
 
   return (
@@ -149,6 +154,7 @@ export function ReviewStep() {
         siteKey={
           process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY!
         }
+        {...turnstileProps}
       />
 
       {/* mobile sticky  */}
