@@ -1,14 +1,17 @@
 "use server"
 
+import { COOKIE_KEYS } from "@/const/keys"
 import { env } from "@/env.mjs"
 import { captureError } from "@/lib/observability/capture-error"
 import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
 import { mergeCart } from "@/lib/utils/cart/merge-cart"
+import { readGuestSessionId } from "@/lib/utils/read-guest-session-id"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
 import { User } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
 import { login as payloadLogin } from "@payloadcms/next/auth"
+import { cookies } from "next/headers"
 import { after } from "next/server"
 import { APIError, AuthenticationError, UnverifiedEmail } from "payload"
 
@@ -54,6 +57,18 @@ export async function login(
         code: 401,
         message: "Login failed.",
       }
+    }
+
+    // Signal the cart-merge toast before the response is sent (after() cannot set cookies).
+    const guestSessionId = await readGuestSessionId()
+    if (guestSessionId) {
+      const cookieStore = await cookies()
+      cookieStore.set(COOKIE_KEYS.CART_MERGE_NOTICE, "1", {
+        maxAge: 60 * 5,
+        httpOnly: false,
+        sameSite: "lax",
+        path: "/",
+      })
     }
 
     // merge the guest cart into the user account without blocking the response

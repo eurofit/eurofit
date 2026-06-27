@@ -1,3 +1,4 @@
+import { CartMergeNotice } from "@/components/cart/cart-merge-notice"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { CartHydrator } from "@/providers/cart"
@@ -13,6 +14,7 @@ export default function StoreLayout({ children }: StoreLayoutProps) {
       <React.Suspense fallback={null}>
         <CartHydrator />
       </React.Suspense>
+      <CartMergeNotice />
       <div className="container mx-auto">
         <Header />
         <div className="relative min-h-[calc(100vh-7rem)] p-4 md:min-h-[calc(100vh-4rem)] md:p-6">
