@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "EUROFIT - Supplements & Sports Nutrition",
   },
+  twitter: {
+    card: "summary_large_image",
+  },
   other: {
     "apple-mobile-web-app-title": site.name,
   },
