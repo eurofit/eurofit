@@ -31,6 +31,10 @@ export default buildConfig({
     dateFormat: "dd MMMM yyyy hh:mm",
     components: {
       providers: ["@/components/admin/font-provider"],
+      graphics: {
+        Logo: "@/components/admin/logo",
+        Icon: "@/components/admin/icon",
+      },
     },
   },
   routes: {
