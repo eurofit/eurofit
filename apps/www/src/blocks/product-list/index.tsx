@@ -1,3 +1,4 @@
+import { iconField } from "@/fields/icon"
 import { Block } from "payload"
 
 export const productList: Block = {
@@ -8,6 +9,7 @@ export const productList: Block = {
   },
   interfaceName: "ProductListBlock",
   fields: [
+    iconField(),
     {
       name: "title",
       label: "Title",
@@ -22,7 +24,32 @@ export const productList: Block = {
         {
           name: "product",
           type: "relationship",
-          relationTo: "products",
+          relationTo: "product-variants",
+        },
+      ],
+    },
+    {
+      name: "timer",
+      type: "date",
+      label: "Timer",
+    },
+    {
+      name: "link",
+      type: "group",
+      label: "Link",
+      fields: [
+        {
+          name: "href",
+          type: "text",
+          label: "URL",
+          required: true,
+        },
+        {
+          name: "label",
+          type: "text",
+          label: "Label",
+          required: true,
+          defaultValue: "View more",
         },
       ],
     },

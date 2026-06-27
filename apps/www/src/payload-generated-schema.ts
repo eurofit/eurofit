@@ -403,6 +403,64 @@ export const pages_blocks_faq = pgTable(
   ]
 )
 
+export const pages_blocks_product_list_products = pgTable(
+  "pages_blocks_product_list_products",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    product: uuid("product_id").references(() => product_variants.id, {
+      onDelete: "set null",
+    }),
+  },
+  (columns) => [
+    index("pages_blocks_product_list_products_order_idx").on(columns._order),
+    index("pages_blocks_product_list_products_parent_id_idx").on(
+      columns._parentID
+    ),
+    index("pages_blocks_product_list_products_product_idx").on(columns.product),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_product_list.id],
+      name: "pages_blocks_product_list_products_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
+export const pages_blocks_product_list = pgTable(
+  "pages_blocks_product_list",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: uuid("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    icon: varchar("icon"),
+    title: varchar("title").notNull(),
+    timer: timestamp("timer", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    link_href: varchar("link_href").notNull(),
+    link_label: varchar("link_label").notNull().default("View more"),
+    styles_headerBg: varchar("styles_header_bg"),
+    styles_headerFg: varchar("styles_header_fg"),
+    styles_contentBg: varchar("styles_content_bg"),
+    styles_contentFg: varchar("styles_content_fg"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_product_list_order_idx").on(columns._order),
+    index("pages_blocks_product_list_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_product_list_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_product_list_parent_id_fk",
+    }).onDelete("cascade"),
+  ]
+)
+
 export const pages_blocks_rich_text = pgTable(
   "pages_blocks_rich_text",
   {
@@ -2368,6 +2426,34 @@ export const relations_pages_blocks_faq = relations(
     }),
   })
 )
+export const relations_pages_blocks_product_list_products = relations(
+  pages_blocks_product_list_products,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_product_list, {
+      fields: [pages_blocks_product_list_products._parentID],
+      references: [pages_blocks_product_list.id],
+      relationName: "products",
+    }),
+    product: one(product_variants, {
+      fields: [pages_blocks_product_list_products.product],
+      references: [product_variants.id],
+      relationName: "product",
+    }),
+  })
+)
+export const relations_pages_blocks_product_list = relations(
+  pages_blocks_product_list,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_product_list._parentID],
+      references: [pages.id],
+      relationName: "_blocks_productList",
+    }),
+    products: many(pages_blocks_product_list_products, {
+      relationName: "products",
+    }),
+  })
+)
 export const relations_pages_blocks_rich_text = relations(
   pages_blocks_rich_text,
   ({ one }) => ({
@@ -2384,6 +2470,9 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
   }),
   _blocks_faq: many(pages_blocks_faq, {
     relationName: "_blocks_faq",
+  }),
+  _blocks_productList: many(pages_blocks_product_list, {
+    relationName: "_blocks_productList",
   }),
   _blocks_richText: many(pages_blocks_rich_text, {
     relationName: "_blocks_richText",
@@ -3106,6 +3195,8 @@ type DatabaseSchema = {
   pages_blocks_slider: typeof pages_blocks_slider
   pages_blocks_faq_faqs: typeof pages_blocks_faq_faqs
   pages_blocks_faq: typeof pages_blocks_faq
+  pages_blocks_product_list_products: typeof pages_blocks_product_list_products
+  pages_blocks_product_list: typeof pages_blocks_product_list
   pages_blocks_rich_text: typeof pages_blocks_rich_text
   pages: typeof pages
   packages: typeof packages
@@ -3172,6 +3263,8 @@ type DatabaseSchema = {
   relations_pages_blocks_slider: typeof relations_pages_blocks_slider
   relations_pages_blocks_faq_faqs: typeof relations_pages_blocks_faq_faqs
   relations_pages_blocks_faq: typeof relations_pages_blocks_faq
+  relations_pages_blocks_product_list_products: typeof relations_pages_blocks_product_list_products
+  relations_pages_blocks_product_list: typeof relations_pages_blocks_product_list
   relations_pages_blocks_rich_text: typeof relations_pages_blocks_rich_text
   relations_pages: typeof relations_pages
   relations_packages: typeof relations_packages

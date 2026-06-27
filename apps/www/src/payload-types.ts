@@ -244,13 +244,19 @@ export interface Media {
  * via the `definition` "ProductListBlock".
  */
 export interface ProductListBlock {
+  icon?: string | null;
   title: string;
   products?:
     | {
-        product?: (string | null) | Product;
+        product?: (string | null) | ProductVariant;
         id?: string | null;
       }[]
     | null;
+  timer?: string | null;
+  link: {
+    href: string;
+    label: string;
+  };
   styles?: {
     headerBg?: string | null;
     headerFg?: string | null;
@@ -260,126 +266,6 @@ export interface ProductListBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'productList';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
-export interface Product {
-  id: string;
-  isActive: boolean;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  /**
-   * A descriptive title for the product, used for display purposes.
-   */
-  title: string;
-  /**
-   * Select the brand associated with this product.
-   */
-  brand: string | Brand;
-  /**
-   * Specify the origin of the product, such as country or region.
-   */
-  origin?: string | null;
-  images?: (string | Media)[] | null;
-  /**
-   * Enter the URL of the product image provided by the supplier or your source.
-   */
-  supplierImageUrl?: string | null;
-  /**
-   * Provide detailed information about the product, including features, specifications, and usage instructions.
-   */
-  productInformation?: string | null;
-  /**
-   * Provide nutritional information for the product.
-   */
-  nutritionalInformation?: string | null;
-  /**
-   * Enter the URL of the product page on the supplier's website.
-   */
-  supplierUrl?: string | null;
-  /**
-   * Select categories that this product belongs to.
-   */
-  categories?: (string | Category)[] | null;
-  productVariants: {
-    docs?: (string | ProductVariant)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  tags?: {
-    docs?: (string | Tag)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Manage brands associated with products in the store.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brands".
- */
-export interface Brand {
-  id: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  isActive: boolean;
-  /**
-   * The name of the brand, used for display and identification.
-   */
-  title: string;
-  /**
-   * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
-   */
-  supplierImageUrl?: string | null;
-  /**
-   * The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.
-   */
-  logo?: (string | null) | Media;
-  products?: {
-    docs?: (string | Product)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  isActive: boolean;
-  /**
-   * Enter the name of the category.
-   */
-  title: string;
-  type?: ('product' | 'post')[] | null;
-  /**
-   * Provide a brief description of the category.
-   */
-  description?: string | null;
-  /**
-   * This is the URL of the supplier's page for this category.
-   */
-  srcUrl?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -556,6 +442,126 @@ export interface ProductVariant {
      */
     image?: (string | null) | Media;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  isActive: boolean;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * A descriptive title for the product, used for display purposes.
+   */
+  title: string;
+  /**
+   * Select the brand associated with this product.
+   */
+  brand: string | Brand;
+  /**
+   * Specify the origin of the product, such as country or region.
+   */
+  origin?: string | null;
+  images?: (string | Media)[] | null;
+  /**
+   * Enter the URL of the product image provided by the supplier or your source.
+   */
+  supplierImageUrl?: string | null;
+  /**
+   * Provide detailed information about the product, including features, specifications, and usage instructions.
+   */
+  productInformation?: string | null;
+  /**
+   * Provide nutritional information for the product.
+   */
+  nutritionalInformation?: string | null;
+  /**
+   * Enter the URL of the product page on the supplier's website.
+   */
+  supplierUrl?: string | null;
+  /**
+   * Select categories that this product belongs to.
+   */
+  categories?: (string | Category)[] | null;
+  productVariants: {
+    docs?: (string | ProductVariant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  tags?: {
+    docs?: (string | Tag)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage brands associated with products in the store.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
+  /**
+   * The name of the brand, used for display and identification.
+   */
+  title: string;
+  /**
+   * The main image like logo of the brand. This is used as the primary image for the brand. If you have specified the image, this will be used as a fallback.
+   */
+  supplierImageUrl?: string | null;
+  /**
+   * The logo of the brand. If you have specified the supplierImageUrl, this will be used first and the supplierImageUrl will be used as a fallback.
+   */
+  logo?: (string | null) | Media;
+  products?: {
+    docs?: (string | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  isActive: boolean;
+  /**
+   * Enter the name of the category.
+   */
+  title: string;
+  type?: ('product' | 'post')[] | null;
+  /**
+   * Provide a brief description of the category.
+   */
+  description?: string | null;
+  /**
+   * This is the URL of the supplier's page for this category.
+   */
+  srcUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -775,7 +781,7 @@ export interface Page {
   generateSlug?: boolean | null;
   slug: string;
   isActive: boolean;
-  layout: (SliderBlock | FAQBlock | RichTextBlock)[];
+  layout: (SliderBlock | FAQBlock | ProductListBlock | RichTextBlock)[];
   meta?: {
     title?: string | null;
     description?: string | null;
