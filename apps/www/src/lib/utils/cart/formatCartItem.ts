@@ -22,8 +22,11 @@ export function formatCartItem(item: CartItem) {
       : undefined
 
   const categories = (product.categories ?? [])
-    .filter((category): category is Category => typeof category === "object")
-    .map((category) => category.title)
+    .filter(
+      (category: string | Category): category is Category =>
+        typeof category === "object"
+    )
+    .map((category: Category) => category.title)
 
   return {
     product: {

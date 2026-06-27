@@ -1,3 +1,3 @@
 import { Cart } from "@/payload-types"
 
-export type CartItem = Cart["items"][number]
+export type CartItem = NonNullable<Cart["items"]>[number]

@@ -897,19 +897,21 @@ export interface Cart {
    * Identifier for guest customer sessions. Programmatically generated.
    */
   guestSessionId?: string | null;
-  items: {
-    productVariant: string | ProductVariant;
-    quantity: number;
-    /**
-     * A snapshot of the product variant at the time it was added to the cart.
-     */
-    snapshot?: {
-      retailPrice?: number | null;
-      inventoryStock?: number | null;
-      supplierStock?: number | null;
-    };
-    id?: string | null;
-  }[];
+  items?:
+    | {
+        productVariant: string | ProductVariant;
+        quantity: number;
+        /**
+         * A snapshot of the product variant at the time it was added to the cart.
+         */
+        snapshot?: {
+          retailPrice?: number | null;
+          inventoryStock?: number | null;
+          supplierStock?: number | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
   total?: number | null;
   /**
    * Timestamp of the last activity on this cart by its owner.

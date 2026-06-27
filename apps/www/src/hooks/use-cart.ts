@@ -66,7 +66,7 @@ export function useCart() {
     queryFn: fetchCart,
   })
 
-  const items = cart?.items.map(formatCartItem) ?? []
+  const items = (cart?.items ?? []).map(formatCartItem)
   const { subtotal, discountTotal } = computeCartTotals(items)
   const total = subtotal
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
