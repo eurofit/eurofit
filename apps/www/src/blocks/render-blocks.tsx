@@ -1,5 +1,6 @@
 import { Page } from "@/payload-types"
 import { Faq } from "./faq/component"
+import { ProductList } from "./product-list/components/product-list"
 import { RichText } from "./rich-text/component"
 import { Slider } from "./slider/component"
 
@@ -22,6 +23,8 @@ export function RenderBlocks({ blocks }: RenderBlocksProps) {
             return <RichText key={id} {...block} />
           case "faq":
             return <Faq key={id} {...block} />
+          case "productList":
+            return <ProductList key={id} {...block} />
           default:
             return null
         }
