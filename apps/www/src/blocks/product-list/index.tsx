@@ -9,7 +9,21 @@ export const productList: Block = {
   },
   interfaceName: "ProductListBlock",
   fields: [
-    iconField(),
+    {
+      type: "row",
+      fields: [
+        iconField(),
+        {
+          name: "iconFillColor",
+          type: "text",
+          label: "Icon Fill Color",
+          admin: {
+            description:
+              "CSS color value for the icon (e.g. #ffffff or white).",
+          },
+        },
+      ],
+    },
     {
       name: "title",
       label: "Title",
@@ -42,13 +56,11 @@ export const productList: Block = {
           name: "href",
           type: "text",
           label: "URL",
-          required: true,
         },
         {
           name: "label",
           type: "text",
           label: "Label",
-          required: true,
           defaultValue: "View more",
         },
       ],

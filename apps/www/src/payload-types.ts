@@ -245,6 +245,10 @@ export interface Media {
  */
 export interface ProductListBlock {
   icon?: string | null;
+  /**
+   * CSS color value for the icon (e.g. #ffffff or white).
+   */
+  iconFillColor?: string | null;
   title: string;
   products?:
     | {
@@ -253,9 +257,9 @@ export interface ProductListBlock {
       }[]
     | null;
   timer?: string | null;
-  link: {
-    href: string;
-    label: string;
+  link?: {
+    href?: string | null;
+    label?: string | null;
   };
   styles?: {
     headerBg?: string | null;
