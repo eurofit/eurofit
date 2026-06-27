@@ -34,14 +34,14 @@ import { toast } from "sonner"
 
 export function ForgetPasswordForm() {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
   const router = useRouter()
 
   const { mutate: forgotPassword, isPending } = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
-      const result = await forgotPasswordAction(data, turnstileToken ?? "")
+      const result = await forgotPasswordAction(
+        data,
+        turnstileRef.current?.getResponse() ?? ""
+      )
       if (!result.success) throw new Error(result.message)
       return result.data
     },
@@ -52,9 +52,6 @@ export function ForgetPasswordForm() {
       router.push(`/reset-password`)
     },
     onError: () => {
-      // Clear the consumed token; the invisible widget re-solves and fires
-      // onSuccess again, which re-enables the submit button.
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error("Error", {
         description: "Something went wrong. Please try again",
@@ -119,15 +116,8 @@ export function ForgetPasswordForm() {
                 ref={turnstileRef}
                 siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setTurnstileToken(null)}
-                onExpire={() => setTurnstileToken(null)}
               />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={!turnstileToken || isPending}
-              >
+              <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="size-4 animate-spin" />}
                 {isPending ? "Sending…" : "Send Reset Link"}
               </Button>

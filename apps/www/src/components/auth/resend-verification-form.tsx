@@ -35,15 +35,12 @@ import { toast } from "sonner"
 
 export function ResendVerificationForm() {
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
 
   const { mutate, isPending, data } = useMutation({
     mutationFn: async (data: ResendVerificationData) => {
       const result = await resendVerificationEmailByEmail(
         data,
-        turnstileToken ?? ""
+        turnstileRef.current?.getResponse() ?? ""
       )
       if (!result.success) throw new Error(result.message)
       return result.data
@@ -52,9 +49,6 @@ export function ResendVerificationForm() {
       toast.error(error.message)
     },
     onSettled: () => {
-      // Clear the consumed token; the invisible widget re-solves and fires
-      // onSuccess again, which re-enables the submit button.
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
     },
   })
@@ -137,15 +131,8 @@ export function ResendVerificationForm() {
                 ref={turnstileRef}
                 siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
                 options={{ size: "invisible" }}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setTurnstileToken(null)}
-                onExpire={() => setTurnstileToken(null)}
               />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={!turnstileToken || isPending}
-              >
+              <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Spinner aria-hidden />}
                 {isPending ? "Sending…" : "Send Verification Link"}
               </Button>

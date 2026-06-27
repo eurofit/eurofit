@@ -36,9 +36,6 @@ import { toast } from "sonner"
 export function ResetPassword() {
   const [showPassword, setShowPassword] = React.useState(false)
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get("token")
@@ -49,12 +46,12 @@ export function ResetPassword() {
   })
 
   const onSubmit = async (data: ResetPasswordData) => {
-    const result = await resetPassword(data, turnstileToken ?? "")
+    const result = await resetPassword(
+      data,
+      turnstileRef.current?.getResponse() ?? ""
+    )
 
     if (!result.success) {
-      // Clear the consumed token; the invisible widget re-solves and fires
-      // onSuccess again, which re-enables the submit button.
-      setTurnstileToken(null)
       turnstileRef.current?.reset()
       toast.error(result.message)
       return
@@ -140,14 +137,11 @@ export function ResetPassword() {
             ref={turnstileRef}
             siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
             options={{ size: "invisible" }}
-            onSuccess={(token) => setTurnstileToken(token)}
-            onError={() => setTurnstileToken(null)}
-            onExpire={() => setTurnstileToken(null)}
           />
           <Button
             type="submit"
             className="w-full"
-            disabled={!turnstileToken || form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && <Spinner aria-hidden="true" />}
             {form.formState.isSubmitting ? "Resetting…" : "Reset Password"}

@@ -42,9 +42,6 @@ export function WriteReviewDialog({
   productVariantId,
 }: WriteReviewDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false)
-  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(
-    null
-  )
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
   const queryClient = useQueryClient()
 
@@ -59,13 +56,14 @@ export function WriteReviewDialog({
 
   const { mutate: submitReview, isPending } = useMutation({
     mutationFn: async (values: CreateReview) =>
-      unwrapActionResult(await createReview(values, turnstileToken ?? "")),
+      unwrapActionResult(
+        await createReview(values, turnstileRef.current?.getResponse() ?? "")
+      ),
     onSuccess: () => {
       toast.success("Thanks! Your review has been published.")
       setIsOpen(false)
       form.reset()
       turnstileRef.current?.reset()
-      setTurnstileToken(null)
       queryClient.invalidateQueries({
         queryKey: reviewKeys.stats(productVariantId),
       })
@@ -78,7 +76,6 @@ export function WriteReviewDialog({
     },
     onError: (error) => {
       turnstileRef.current?.reset()
-      setTurnstileToken(null)
       toast.error(error.message ?? "Failed to submit your review.")
     },
   })
@@ -146,16 +143,9 @@ export function WriteReviewDialog({
               ref={turnstileRef}
               siteKey={env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_INVISIBLE_SITEKEY}
               options={{ size: "invisible" }}
-              onSuccess={(token) => setTurnstileToken(token)}
-              onError={() => setTurnstileToken(null)}
-              onExpire={() => setTurnstileToken(null)}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!turnstileToken || isPending}
-            >
+            <Button type="submit" className="w-full" disabled={isPending}>
               {isPending && <Spinner aria-hidden="true" />}
               {isPending ? "Submitting…" : "Submit review"}
             </Button>
