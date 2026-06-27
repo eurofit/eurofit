@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
     },
   ],
   images: {
-    qualities: [100],
+    qualities: [85],
     remotePatterns: [
       ...[publicUrl, TROPICANA_URL, UNSPLASH_URL].map((item) => {
         const url = new URL(item)
