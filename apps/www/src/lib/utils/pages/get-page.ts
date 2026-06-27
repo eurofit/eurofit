@@ -18,9 +18,18 @@ export const getPage = async (slug: string) => {
     collection: "pages",
     where: { slug: { equals: slug } },
     populate: {
+      "product-variants": {
+        slug: true,
+        title: true,
+        images: true,
+        retailPrice: true,
+        discount: true,
+        product: true,
+      },
       products: {
         slug: true,
         title: true,
+        images: true,
         supplierImageUrl: true,
       },
     },

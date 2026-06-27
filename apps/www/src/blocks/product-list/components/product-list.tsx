@@ -1,6 +1,13 @@
 import { PayloadIcon } from "@/components/payload-icon"
+import { savingsLabel } from "@/components/product-variants/variant-price"
 import { Countdown } from "@/components/timer/countdown"
-import { type Product, type ProductListBlock } from "@/payload-types"
+import { normalizeVariantDiscount } from "@/lib/utils/discounts/normalize-variant-discount"
+import { formatWithCommas } from "@/lib/utils/format-with-commas"
+import {
+  type Media,
+  type ProductListBlock,
+  type ProductVariant,
+} from "@/payload-types"
 import { AspectRatio } from "@eurofit/ui/components/aspect-ratio"
 import { Badge } from "@eurofit/ui/components/badge"
 import { isFuture } from "date-fns"
@@ -16,10 +23,13 @@ export function ProductList({
   timer,
   link,
 }: ProductListBlock) {
-  const formattedProducts =
+  const formattedVariants =
     products
       ?.map((p) => p.product)
-      .filter((product) => !!product && typeof product === "object") ?? []
+      .filter(
+        (variant): variant is ProductVariant =>
+          typeof variant === "object" && variant !== null
+      ) ?? []
 
   return (
     <section
@@ -55,24 +65,50 @@ export function ProductList({
         )}
       </div>
       <div className="grid gap-6 py-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {formattedProducts.map((product, index) => (
-          <Product key={index} product={product} />
+        {formattedVariants.map((variant) => (
+          <ProductCard key={variant.id} variant={variant} />
         ))}
       </div>
     </section>
   )
 }
 
-type ProductProps = {
-  product: Product
+/**
+ * Resolves the card image with the fallback chain: variant images first, then the
+ * parent product's images, then the parent product's supplier image URL.
+ */
+function resolveCardImage(variant: ProductVariant): string | null {
+  const firstUploadedUrl = (
+    images: (string | Media)[] | null | undefined
+  ): string | null => {
+    const url = images?.find(
+      (image): image is Media =>
+        typeof image === "object" && image !== null && !!image.url
+    )?.url
+    return url ?? null
+  }
+
+  const variantImage = firstUploadedUrl(variant.images)
+  if (variantImage) return variantImage
+
+  const product = typeof variant.product === "object" ? variant.product : null
+
+  return firstUploadedUrl(product?.images) ?? product?.supplierImageUrl ?? null
 }
 
-function Product({ product }: ProductProps) {
-  const { slug, title, image } = product
+type ProductCardProps = {
+  variant: ProductVariant
+}
+
+function ProductCard({ variant }: ProductCardProps) {
+  const { slug, title, retailPrice } = variant
+  const image = resolveCardImage(variant)
+  const discount = normalizeVariantDiscount(variant.discount)
+
   return (
     <Link
       href={`/products/${slug}`}
-      className="relative space-y-2 rounded-lg bg-card text-card-foreground shadow-sm"
+      className="relative space-y-2 rounded-lg bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md"
     >
       <AspectRatio
         ratio={4 / 3}
@@ -90,18 +126,32 @@ function Product({ product }: ProductProps) {
           <ImageOff className="m-auto size-12 text-muted-foreground" />
         )}
       </AspectRatio>
-      <div className="space-y-2 px-2">
-        <h3 className="leading-tight font-medium">{title}</h3>
-        <div className="flex items-center space-x-2">
-          <ins className="font-bold no-underline">Ksh 11,650</ins>
-          <del className="before relative text-sm no-underline before:absolute before:top-1/2 before:right-0 before:left-0 before:-translate-y-1/2 before:rotate-5 before:border-t before:border-t-red-700 before:content-['']">
-            Ksh 11,650
-          </del>
-        </div>
+      <div className="space-y-2 px-2 pb-2">
+        <h3 className="line-clamp-2 leading-tight font-medium">{title}</h3>
+        {retailPrice != null &&
+          (discount ? (
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-lg font-bold text-destructive tabular-nums">
+                Ksh {formatWithCommas(discount.price)}
+              </span>
+              <span className="text-sm text-muted-foreground tabular-nums line-through">
+                Ksh {formatWithCommas(retailPrice)}
+              </span>
+            </div>
+          ) : (
+            <span className="text-lg font-bold text-foreground tabular-nums">
+              Ksh {formatWithCommas(retailPrice)}
+            </span>
+          ))}
       </div>
-      <Badge className="absolute top-2 right-2 bg-destructive font-bold text-white">
-        56% OFF
-      </Badge>
+      {discount && (
+        <Badge
+          variant="destructive"
+          className="absolute top-2 right-2 text-xs font-bold"
+        >
+          {savingsLabel(discount)}
+        </Badge>
+      )}
     </Link>
   )
 }
