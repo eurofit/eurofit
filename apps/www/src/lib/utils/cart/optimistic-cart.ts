@@ -8,7 +8,7 @@ const OPTIMISTIC_CART_ID = "optimistic"
 
 /** Sums `snapshot.retailPrice × quantity` across items. */
 export function recomputeTotal(items: Cart["items"]): number {
-  return items.reduce((sum, item) => {
+  return (items ?? []).reduce((sum, item) => {
     const retailPrice = item.snapshot?.retailPrice ?? 0
 
     return sum + retailPrice * item.quantity
@@ -51,7 +51,7 @@ export function applyAddToCart({
   if (cart && hasVariant({ items: cart.items, productVariantId })) {
     return withTotal({
       ...cart,
-      items: cart.items.map((item) =>
+      items: (cart.items ?? []).map((item) =>
         getItemVariantId(item) === productVariantId
           ? { ...item, quantity: item.quantity + quantity }
           : item
@@ -67,7 +67,7 @@ export function applyAddToCart({
     return makeOptimisticCart([newItem])
   }
 
-  return withTotal({ ...cart, items: [...cart.items, newItem] })
+  return withTotal({ ...cart, items: [...(cart.items ?? []), newItem] })
 }
 
 /** Optimistic cart after setting a variant's quantity to an exact value. */
@@ -84,7 +84,7 @@ export function applySetQuantity({
 
   return withTotal({
     ...cart,
-    items: cart.items.map((item) =>
+    items: (cart.items ?? []).map((item) =>
       getItemVariantId(item) === productVariantId ? { ...item, quantity } : item
     ),
   })
@@ -104,7 +104,7 @@ export function applyRemoveItem({
 }): Cart | null {
   if (!cart) return cart
 
-  const items = cart.items.filter(
+  const items = (cart.items ?? []).filter(
     (item) => getItemVariantId(item) !== productVariantId
   )
 

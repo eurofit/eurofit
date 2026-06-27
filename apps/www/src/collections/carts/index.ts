@@ -47,9 +47,9 @@ export const carts: CollectionConfig = {
     {
       name: "items",
       type: "array",
-      required: true,
-      // Empty carts are intentionally kept (never deleted on last-item removal),
-      // so an empty `items` array is valid.
+      // `required: true` on Payload array fields validates `value.length > 0`,
+      // which conflicts with intentionally-empty carts. `minRows: 0` is the
+      // correct constraint — the field is always present, never deleted.
       minRows: 0,
       maxRows: 100,
       admin: {

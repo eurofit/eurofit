@@ -1,6 +1,6 @@
 import { Cart } from "@/payload-types"
 
-export type CartItem = Cart["items"][number]
+export type CartItem = NonNullable<Cart["items"]>[number]
 
 /**
  * The shape Payload accepts when writing cart items back. The relationship is
@@ -23,7 +23,7 @@ export function getItemVariantId(item: CartItem): string {
 
 /** Normalizes populated cart items into the writable shape Payload expects. */
 export function toWritableItems(items: Cart["items"]): WritableCartItem[] {
-  return items.map((item) => ({
+  return (items ?? []).map((item) => ({
     productVariant: getItemVariantId(item),
     quantity: item.quantity,
     snapshot: item.snapshot,
@@ -39,7 +39,9 @@ export function hasVariant({
   items: Cart["items"]
   productVariantId: string
 }): boolean {
-  return items.some((item) => getItemVariantId(item) === productVariantId)
+  return (items ?? []).some(
+    (item) => getItemVariantId(item) === productVariantId
+  )
 }
 
 /** Increments an existing line's quantity, or appends a new line. */

@@ -35,7 +35,7 @@ export async function mutateOwnerCart(
         collection: "carts",
         id: cart.id,
         data: {
-          items: apply(cart.items),
+          items: apply(cart.items ?? []),
           lastActiveAt: new Date().toISOString(),
         },
         depth: CART_DETAIL_DEPTH,
