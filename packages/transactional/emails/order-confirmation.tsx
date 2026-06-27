@@ -418,7 +418,7 @@ export default function OrderConfirmation({
                           <Img
                             alt="TikTok"
                             height="24"
-                            src={`${siteUrl}/logos/tiktok.png`}
+                            src={`${siteUrl}/icons/tiktok.png`}
                             width="24"
                           />
                         </Link>
@@ -428,7 +428,7 @@ export default function OrderConfirmation({
                           <Img
                             alt="Instagram"
                             height="24"
-                            src={`${siteUrl}/logos/instagram.png`}
+                            src={`${siteUrl}/icons/instagram.png`}
                             width="24"
                           />
                         </Link>
@@ -438,7 +438,7 @@ export default function OrderConfirmation({
                           <Img
                             alt="X"
                             height="24"
-                            src={`${siteUrl}/logos/x.png`}
+                            src={`${siteUrl}/icons/x.png`}
                             width="24"
                           />
                         </Link>
@@ -448,7 +448,7 @@ export default function OrderConfirmation({
                           <Img
                             alt="Facebook"
                             height="24"
-                            src={`${siteUrl}/logos/facebook.png`}
+                            src={`${siteUrl}/icons/facebook.png`}
                             width="24"
                           />
                         </Link>
