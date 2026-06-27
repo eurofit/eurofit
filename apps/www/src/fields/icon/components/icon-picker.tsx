@@ -105,7 +105,7 @@ export const IconPicker: TextFieldClientComponent = ({ path, field }) => {
             marginTop: "0.5rem",
             maxWidth: "20rem",
             padding: "0.75rem",
-            background: "var(--theme-elevation-1000)",
+            background: "var(--theme-elevation-100)",
             border: "1px solid var(--theme-border-color)",
             borderRadius: "var(--style-radius-m)",
             boxShadow: "var(--theme-shadow-m)",
