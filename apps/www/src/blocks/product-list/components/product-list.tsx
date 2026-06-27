@@ -40,29 +40,36 @@ export function ProductList({
       }}
     >
       <div
-        className="grid grid-cols-3 items-center gap-2 p-2 px-4"
+        className="p-2 px-4"
         style={{
           backgroundColor: styles?.headerBg ?? undefined,
           color: styles?.headerFg ?? undefined,
         }}
       >
-        <h2 className="flex scroll-m-20 items-center gap-2 text-lg font-bold">
-          <PayloadIcon name={icon} size={20} fill={iconFillColor} />
-          {title}
-        </h2>
-        <div className="text-center">
-          {timer && <ProductListTimer timer={timer} />}
+        <div className="flex items-center justify-between gap-2 md:grid md:grid-cols-3 md:items-center">
+          <h2 className="flex scroll-m-20 items-center gap-2 text-lg font-bold">
+            <PayloadIcon name={icon} size={20} fill={iconFillColor} />
+            {title}
+          </h2>
+          <div className="hidden text-center md:block">
+            {timer && <ProductListTimer timer={timer} />}
+          </div>
+          <div className="flex items-center justify-end">
+            {link?.href && (
+              <Link href={link.href} className="flex items-center gap-1">
+                <span>{link.label ?? "View more"}</span>
+                <ChevronRight className="size-4" />
+              </Link>
+            )}
+          </div>
         </div>
-        <div className="flex items-center justify-end">
-          {link?.href && (
-            <Link href={link.href} className="flex items-center gap-1">
-              <span>{link.label ?? "View more"}</span>
-              <ChevronRight className="size-4" />
-            </Link>
-          )}
-        </div>
+        {timer && (
+          <div className="mt-1 md:hidden">
+            <ProductListTimer timer={timer} />
+          </div>
+        )}
       </div>
-      <div className="grid gap-6 py-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 py-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
         {formattedVariants.map((variant) => (
           <ProductCard key={variant.id} variant={variant} />
         ))}
