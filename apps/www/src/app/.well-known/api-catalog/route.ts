@@ -1,42 +1,30 @@
 import { site } from "@/const/site"
 
+// RFC 9727 API Catalog — served as application/linkset+json (RFC 9264)
 export function GET() {
   return Response.json(
     {
-      apis: [
+      linkset: [
         {
-          id: "sitemap",
-          title: "EUROFIT Sitemap",
-          description:
-            "XML sitemap listing all product variants, categories, and brands available at EUROFIT",
-          url: `${site.url}/sitemap.xml`,
-          type: "sitemap",
-        },
-        {
-          id: "search",
-          title: "EUROFIT Product Search",
-          description:
-            "Search across sports nutrition products, supplements, and vitamins",
-          url: `${site.url}/search?q={query}`,
-          type: "search",
-        },
-        {
-          id: "categories",
-          title: "EUROFIT Categories",
-          description: "Browse all product categories",
-          url: `${site.url}/categories`,
-        },
-        {
-          id: "brands",
-          title: "EUROFIT Brands",
-          description: "Browse all available supplement brands",
-          url: `${site.url}/brands`,
+          anchor: site.url,
+          "service-desc": [
+            { href: `${site.url}/sitemap.xml`, type: "application/xml" },
+          ],
+          "service-doc": [
+            { href: `${site.url}/sitemap.xml`, type: "application/xml" },
+            {
+              href: `${site.url}/.well-known/agent-skills/index.json`,
+              type: "application/json",
+            },
+          ],
+          status: [{ href: `${site.url}/api/healthz` }],
+          search: [{ href: `${site.url}/search?q={query}`, type: "text/html" }],
         },
       ],
     },
     {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/linkset+json",
         "Cache-Control": "public, max-age=86400",
       },
     }

@@ -1,6 +1,7 @@
 import { CartMergeNotice } from "@/components/cart/cart-merge-notice"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { WebMCP } from "@/components/webmcp"
 import { CartHydrator } from "@/providers/cart"
 import * as React from "react"
 
@@ -11,6 +12,7 @@ type StoreLayoutProps = Readonly<{
 export default function StoreLayout({ children }: StoreLayoutProps) {
   return (
     <>
+      <WebMCP />
       <React.Suspense fallback={null}>
         <CartHydrator />
       </React.Suspense>
