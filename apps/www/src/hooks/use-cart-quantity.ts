@@ -1,6 +1,7 @@
 "use client"
 
 import { useCart } from "@/hooks/use-cart"
+import { getItemVariantId } from "@/lib/utils/cart/cart-items"
 import { ProductVariant } from "@/types/product-variant"
 import { clamp } from "lodash-es"
 import { useEffect, useState } from "react"
@@ -18,7 +19,7 @@ type UseCartQuantityInput = {
  */
 export function useCartQuantity({ variant }: UseCartQuantityInput) {
   const {
-    items,
+    cart,
     addToCart,
     setQuantity: setCartQuantity,
     removeItem,
@@ -27,8 +28,10 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
     isRemovingItem,
   } = useCart()
 
-  const line = items.find((item) => item.id === variant.id)
-  const cartQuantity = line?.quantity ?? 0
+  const rawLine = cart?.items?.find(
+    (item) => getItemVariantId(item) === variant.id
+  )
+  const cartQuantity = rawLine?.quantity ?? 0
   const isInCart = cartQuantity > 0
 
   const max = variant.stock
@@ -79,7 +82,11 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
       await commit(draft)
       return
     }
-    await addToCart({ productVariantId: variant.id, quantity: draft })
+    await addToCart({
+      productVariantId: variant.id,
+      quantity: draft,
+      optimisticItem: { productVariant: variant.id },
+    })
   }
 
   const remove = () => removeItem(variant.id)
