@@ -6,6 +6,7 @@ import {
   GTM_ECOMMERCE_CURRENCY,
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
+import { STORE } from "@/const/store"
 import { APP_TIME_ZONE } from "@/const/time"
 import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
@@ -69,6 +70,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
   if (!orderData) notFound()
 
   const { order, formattedItems, shippingAddress } = orderData
+  const isPickup = order.fulfillmentType === "pickup"
 
   return (
     <>
@@ -203,14 +205,23 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                       </dd>
                     </div>
                   )}
-                  <div className="flex items-start justify-between gap-2 py-1.5">
-                    <dt className="font-medium">Delivery Fee</dt>
-                    <dd className="text-right slashed-zero tabular-nums">
-                      <span className="text-muted-foreground">Ksh</span>
-                      &nbsp;
-                      <span>{formatWithCommas(order.deliveryFee!)}</span>
-                    </dd>
-                  </div>
+                  {isPickup ? (
+                    <div className="flex items-start justify-between gap-2 py-1.5">
+                      <dt className="font-medium">Store pickup</dt>
+                      <dd className="text-right font-medium text-green-600">
+                        Free
+                      </dd>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between gap-2 py-1.5">
+                      <dt className="font-medium">Delivery Fee</dt>
+                      <dd className="text-right slashed-zero tabular-nums">
+                        <span className="text-muted-foreground">Ksh</span>
+                        &nbsp;
+                        <span>{formatWithCommas(order.deliveryFee!)}</span>
+                      </dd>
+                    </div>
+                  )}
                   <Separator className="my-2" />
                   <div className="flex items-start justify-between gap-2 py-1.5 font-medium">
                     <dt className="uppercase">Total</dt>
@@ -231,75 +242,110 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                   size="lg"
                   className="group w-full data-[state=open]:rounded-b-none"
                 >
-                  Delivery Details
+                  {isPickup ? "Pickup Details" : "Delivery Details"}
                   <ChevronDownIcon className="ml-auto group-data-[state=open]:rotate-180" />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-6 rounded-b-lg border px-2.5 py-3">
-                <div className="flex items-start gap-2">
-                  <MapPinIcon className="size-5" />
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-medium text-pretty">
-                      Delivering to
-                    </h3>
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-medium capitalize">
-                        {shippingAddress?.title} {shippingAddress?.firstName}{" "}
-                        {shippingAddress?.lastName}
-                      </p>
-                      <div>
-                        <p>{shippingAddress?.line1},</p>
-                        {shippingAddress?.line2 && (
-                          <p>{shippingAddress?.line2},</p>
-                        )}
-                        <p>
-                          {shippingAddress?.area}, {shippingAddress?.postalCode}
-                        </p>
-
-                        <div className="flex gap-1.5">
-                          {shippingAddress?.city && (
-                            <p>{shippingAddress?.city},</p>
-                          )}
-                          {shippingAddress?.county && (
-                            <p>{shippingAddress?.county}</p>
-                          )}
+                {isPickup ? (
+                  <>
+                    <div className="flex items-start gap-2">
+                      <MapPinIcon className="size-5" />
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-medium text-pretty">
+                          Pick up at
+                        </h3>
+                        <div className="text-sm text-muted-foreground">
+                          <p className="font-medium">{STORE.name}</p>
+                          {STORE.addressLines.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
                         </div>
-
-                        {shippingAddress?.country && (
-                          <p>{shippingAddress?.country}</p>
-                        )}
-                        {shippingAddress?.phone && (
-                          <p>{shippingAddress?.phone}</p>
-                        )}
                       </div>
                     </div>
-                  </div>
-                </div>
-                <Alert>
-                  <Box />
-                  <div>
-                    <AlertTitle>Estimated Delivery</AlertTitle>
-                    <p>
-                      {order.estimatedDelivery?.minDate &&
-                      order.estimatedDelivery?.maxDate
-                        ? formatDeliveryDateRange(
-                            new Date(order.estimatedDelivery.minDate),
-                            new Date(order.estimatedDelivery.maxDate)
-                          )
-                        : "To be confirmed"}
-                    </p>
-                    {order.shipTogether === false && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        In-stock items shipped separately.
-                      </p>
-                    )}
-                  </div>
-                  <AlertDescription>
-                    We will send you a tracking number once your order has
-                    shipped. Delivery times may vary based on your location and
-                    the shipping method selected at checkout.
-                  </AlertDescription>
-                </Alert>
+                    <Alert>
+                      <Clock />
+                      <div>
+                        <AlertTitle>Store hours</AlertTitle>
+                        <p>{STORE.hours}</p>
+                      </div>
+                      <AlertDescription>
+                        We will email you when your order is ready for
+                        collection. Please bring your order number and a valid
+                        ID.
+                      </AlertDescription>
+                    </Alert>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-2">
+                      <MapPinIcon className="size-5" />
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-medium text-pretty">
+                          Delivering to
+                        </h3>
+                        <div className="text-sm text-muted-foreground">
+                          <p className="font-medium capitalize">
+                            {shippingAddress?.title}{" "}
+                            {shippingAddress?.firstName}{" "}
+                            {shippingAddress?.lastName}
+                          </p>
+                          <div>
+                            <p>{shippingAddress?.line1},</p>
+                            {shippingAddress?.line2 && (
+                              <p>{shippingAddress?.line2},</p>
+                            )}
+                            <p>
+                              {shippingAddress?.area},{" "}
+                              {shippingAddress?.postalCode}
+                            </p>
+
+                            <div className="flex gap-1.5">
+                              {shippingAddress?.city && (
+                                <p>{shippingAddress?.city},</p>
+                              )}
+                              {shippingAddress?.county && (
+                                <p>{shippingAddress?.county}</p>
+                              )}
+                            </div>
+
+                            {shippingAddress?.country && (
+                              <p>{shippingAddress?.country}</p>
+                            )}
+                            {shippingAddress?.phone && (
+                              <p>{shippingAddress?.phone}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Alert>
+                      <Box />
+                      <div>
+                        <AlertTitle>Estimated Delivery</AlertTitle>
+                        <p>
+                          {order.estimatedDelivery?.minDate &&
+                          order.estimatedDelivery?.maxDate
+                            ? formatDeliveryDateRange(
+                                new Date(order.estimatedDelivery.minDate),
+                                new Date(order.estimatedDelivery.maxDate)
+                              )
+                            : "To be confirmed"}
+                        </p>
+                        {order.shipTogether === false && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            In-stock items shipped separately.
+                          </p>
+                        )}
+                      </div>
+                      <AlertDescription>
+                        We will send you a tracking number once your order has
+                        shipped. Delivery times may vary based on your location
+                        and the shipping method selected at checkout.
+                      </AlertDescription>
+                    </Alert>
+                  </>
+                )}
               </CollapsibleContent>
             </Collapsible>
 

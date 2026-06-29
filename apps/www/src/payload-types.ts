@@ -939,7 +939,11 @@ export interface Cart {
 export interface Order {
   id: number;
   user: string | User;
-  deliveryAddress: string | Address;
+  /**
+   * How the customer receives the order: delivery or store pickup.
+   */
+  fulfillmentType: 'delivery' | 'pickup';
+  deliveryAddress?: (string | null) | Address;
   items: {
     productVariant: string | ProductVariant;
     quantity: number;
@@ -1798,6 +1802,7 @@ export interface CartsSelect<T extends boolean = true> {
 export interface OrdersSelect<T extends boolean = true> {
   id?: T;
   user?: T;
+  fulfillmentType?: T;
   deliveryAddress?: T;
   items?:
     | T

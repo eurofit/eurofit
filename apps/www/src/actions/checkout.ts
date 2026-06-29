@@ -11,7 +11,7 @@ import { orderSchema } from "@/lib/schemas/orders/order"
 import { getBackorderAvailabilityDate } from "@/lib/utils/feeds/get-backorder-availability-date"
 import { computeDeliveryDateRange } from "@/lib/utils/orders/compute-delivery-date-range"
 import { verifyTurnstile } from "@/lib/utils/verify-turnstile"
-import { Order } from "@/payload-types"
+import { Address, Order } from "@/payload-types"
 import { ActionResult } from "@/types/action-result"
 import config from "@payload-config"
 import * as Sentry from "@sentry/nextjs"
@@ -24,9 +24,18 @@ const checkoutSchema = orderSchema
     items: true,
   })
   .extend({
-    addressId: z.uuid("Address ID must be a valid UUID"),
+    // Pickup orders carry no address; delivery orders require one (enforced below).
+    addressId: z.uuid("Address ID must be a valid UUID").optional(),
+    fulfillmentType: z.enum(["delivery", "pickup"]).default("delivery"),
     shipTogether: z.boolean().default(true),
   })
+  .refine(
+    (data) => data.fulfillmentType !== "delivery" || Boolean(data.addressId),
+    {
+      path: ["addressId"],
+      message: "A delivery address is required for delivery orders.",
+    }
+  )
 
 type CheckoutArgs = z.infer<typeof checkoutSchema>
 
@@ -51,8 +60,10 @@ async function runCheckout(
     return { success: false, code: 400, message: "CAPTCHA validation failed." }
   }
 
-  const { items, addressId, shipTogether } =
+  const { items, addressId, fulfillmentType, shipTogether } =
     checkoutSchema.parse(unSafCheckoutData)
+
+  const isPickup = fulfillmentType === "pickup"
 
   const orderItems: Order["items"] = items.map(({ id, ...item }) => ({
     productVariant: id,
@@ -74,26 +85,29 @@ async function runCheckout(
 
   Sentry.setUser({ id: user.id, email: user.email })
 
-  // verify address ownership
-  const { docs: addresses } = await payload.find({
-    collection: "addresses",
-    where: {
-      id: { equals: addressId },
-      user: { equals: user.id },
-    },
-    user: user,
-    limit: 1,
-    depth: 0,
-    pagination: false,
-  })
+  // Delivery orders need a verified, owned address. Pickup orders skip this.
+  let address: Address | undefined
+  if (!isPickup) {
+    const { docs: addresses } = await payload.find({
+      collection: "addresses",
+      where: {
+        id: { equals: addressId },
+        user: { equals: user.id },
+      },
+      user: user,
+      limit: 1,
+      depth: 0,
+      pagination: false,
+    })
 
-  const address = addresses[0]
+    address = addresses[0]
 
-  if (!address) {
-    return {
-      success: false,
-      code: 404,
-      message: "Address not found or does not belong to your account.",
+    if (!address) {
+      return {
+        success: false,
+        code: 404,
+        message: "Address not found or does not belong to your account.",
+      }
     }
   }
 
@@ -104,22 +118,27 @@ async function runCheckout(
 
     // Compute estimated delivery server-side so the stored dates always match
     // what the user was shown (same function, same inputs, independent of client).
-    const variantIds = orderItems.map((i) => i.productVariant as string)
-    const { docs: variants } = await payload.find({
-      collection: "product-variants",
-      where: { id: { in: variantIds } },
-      depth: 0,
-      pagination: false,
-    })
-    const hasBackorderItems = variants.some((v) => v.isBackorder)
-    const deliveryStartDate = hasBackorderItems
-      ? getBackorderAvailabilityDate(new Date())
-      : new Date()
-    const deliveryRange = await computeDeliveryDateRange(
-      address.city,
-      deliveryStartDate,
-      payload
-    )
+    // Pickup orders are collected in-store, so there is no delivery window.
+    let deliveryRange: Awaited<ReturnType<typeof computeDeliveryDateRange>> =
+      null
+    if (address) {
+      const variantIds = orderItems.map((i) => i.productVariant as string)
+      const { docs: variants } = await payload.find({
+        collection: "product-variants",
+        where: { id: { in: variantIds } },
+        depth: 0,
+        pagination: false,
+      })
+      const hasBackorderItems = variants.some((v) => v.isBackorder)
+      const deliveryStartDate = hasBackorderItems
+        ? getBackorderAvailabilityDate(new Date())
+        : new Date()
+      deliveryRange = await computeDeliveryDateRange(
+        address.city,
+        deliveryStartDate,
+        payload
+      )
+    }
 
     // proceed to create order
     const order = await Sentry.startSpan(
@@ -129,7 +148,8 @@ async function runCheckout(
           collection: "orders",
           data: {
             user: user.id,
-            deliveryAddress: address.id,
+            fulfillmentType,
+            deliveryAddress: address?.id,
             items: orderItems,
             status: "pending",
             paymentStatus: "unpaid",
@@ -146,7 +166,7 @@ async function runCheckout(
                 fullName: `${user.firstName} ${user.lastName}`,
                 email: user.email,
               },
-              address: addressWithIdSchema.parse(address),
+              address: address ? addressWithIdSchema.parse(address) : undefined,
             },
           },
           draft: false,
@@ -202,6 +222,11 @@ async function runCheckout(
               order_id: order.id.toString(),
               custom_fields: [
                 {
+                  display_name: "Fulfillment",
+                  variable_name: "fulfillment",
+                  value: isPickup ? "Store Pickup" : "Delivery",
+                },
+                {
                   display_name: "Subtotal",
                   variable_name: "subtotal",
                   value: `KES ${order.subtotal ?? 0}`,
@@ -229,7 +254,9 @@ async function runCheckout(
                   fullName: user.fullName,
                   email: user.email,
                 },
-                address: addressWithIdSchema.parse(address),
+                address: address
+                  ? addressWithIdSchema.parse(address)
+                  : undefined,
               },
             },
           })

@@ -2,7 +2,7 @@ import { adminOnly } from "@/access/admin"
 import { adminOnlyFieldAccess } from "@/access/admin-field"
 import { isAdmin } from "@/access/is-admin"
 import { ownerOrAdmin } from "@/access/owner-or-admin"
-import { orderStatus, paymentStatus } from "@/const/orders"
+import { fulfillmentType, orderStatus, paymentStatus } from "@/const/orders"
 import { autoincrement } from "@/payload-hooks/auto-increment"
 import { CollectionConfig } from "payload"
 import { setOrderTotals } from "./hooks/set-order-totals"
@@ -48,10 +48,27 @@ export const orders: CollectionConfig = {
       },
     },
     {
+      name: "fulfillmentType",
+      type: "select",
+      options: fulfillmentType,
+      defaultValue: "delivery",
+      required: true,
+      admin: {
+        readOnly: true,
+        description:
+          "How the customer receives the order: delivery or store pickup.",
+      },
+      access: {
+        create: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
       name: "deliveryAddress",
       type: "relationship",
       relationTo: "addresses",
-      required: true,
+      // Not required: store-pickup orders have no delivery address.
+      required: false,
       access: {
         update: adminOnlyFieldAccess,
       },

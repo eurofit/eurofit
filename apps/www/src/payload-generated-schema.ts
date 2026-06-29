@@ -49,6 +49,10 @@ export const enum_tags_type = pgEnum("enum_tags_type", [
   "product-variant",
   "user",
 ])
+export const enum_orders_fulfillment_type = pgEnum(
+  "enum_orders_fulfillment_type",
+  ["delivery", "pickup"]
+)
 export const enum_orders_payment_status = pgEnum("enum_orders_payment_status", [
   "unpaid",
   "paid",
@@ -1251,11 +1255,15 @@ export const orders = pgTable(
       .references(() => users.id, {
         onDelete: "set null",
       }),
-    deliveryAddress: uuid("delivery_address_id")
+    fulfillmentType: enum_orders_fulfillment_type("fulfillment_type")
       .notNull()
-      .references(() => addresses.id, {
+      .default("delivery"),
+    deliveryAddress: uuid("delivery_address_id").references(
+      () => addresses.id,
+      {
         onDelete: "set null",
-      }),
+      }
+    ),
     subtotal: numeric("subtotal", { mode: "number" }).default(0),
     discountTotal: numeric("discount_total", { mode: "number" }).default(0),
     deliveryFee: numeric("delivery_fee", { mode: "number" }).default(0),
@@ -3177,6 +3185,7 @@ type DatabaseSchema = {
   enum_pages_blocks_slider_snaps: typeof enum_pages_blocks_slider_snaps
   enum_categories_type: typeof enum_categories_type
   enum_tags_type: typeof enum_tags_type
+  enum_orders_fulfillment_type: typeof enum_orders_fulfillment_type
   enum_orders_payment_status: typeof enum_orders_payment_status
   enum_order_statuses_status: typeof enum_order_statuses_status
   enum_discounts_discount_target: typeof enum_discounts_discount_target

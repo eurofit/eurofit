@@ -1,4 +1,5 @@
 import { site } from "@/const/site"
+import { STORE } from "@/const/store"
 import { APP_TIME_ZONE } from "@/const/time"
 import { Invoice } from "@/lib/schemas/invoice"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
@@ -113,31 +114,45 @@ export function InvoiceDoc({
         {/* ── DIVIDER ─────────────────────────────────────────────────────── */}
         <View style={styles.divider} />
 
-        {/* ── SHIPPING ADDRESS ──────────────────────────────────────────── */}
-        <View>
-          <Text style={styles.sectionLabel}>Shipping Address</Text>
-          <View style={styles.addressText}>
-            <Text>
-              {[
-                invoice.shippingAddress.title,
-                invoice.shippingAddress.firstName,
-                invoice.shippingAddress.lastName,
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            </Text>
-            <Text>{invoice.shippingAddress.line1}</Text>
-            {invoice.shippingAddress.line2 ? (
-              <Text>{invoice.shippingAddress.line2}</Text>
-            ) : null}
-            <Text>
-              {invoice.shippingAddress.city}, {invoice.shippingAddress.country}
-            </Text>
-            {invoice.shippingAddress.phone ? (
-              <Text>{invoice.shippingAddress.phone}</Text>
-            ) : null}
+        {/* ── SHIPPING / PICKUP ADDRESS ─────────────────────────────────── */}
+        {invoice.isPickup ? (
+          <View>
+            <Text style={styles.sectionLabel}>Pickup Location</Text>
+            <View style={styles.addressText}>
+              <Text>{STORE.name}</Text>
+              {STORE.addressLines.map((line) => (
+                <Text key={line}>{line}</Text>
+              ))}
+              <Text>{STORE.hours}</Text>
+            </View>
           </View>
-        </View>
+        ) : invoice.shippingAddress ? (
+          <View>
+            <Text style={styles.sectionLabel}>Shipping Address</Text>
+            <View style={styles.addressText}>
+              <Text>
+                {[
+                  invoice.shippingAddress.title,
+                  invoice.shippingAddress.firstName,
+                  invoice.shippingAddress.lastName,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              </Text>
+              <Text>{invoice.shippingAddress.line1}</Text>
+              {invoice.shippingAddress.line2 ? (
+                <Text>{invoice.shippingAddress.line2}</Text>
+              ) : null}
+              <Text>
+                {invoice.shippingAddress.city},{" "}
+                {invoice.shippingAddress.country}
+              </Text>
+              {invoice.shippingAddress.phone ? (
+                <Text>{invoice.shippingAddress.phone}</Text>
+              ) : null}
+            </View>
+          </View>
+        ) : null}
 
         {/* ── ITEMS TABLE ───────────────────────────────────────────────── */}
         <View style={styles.table}>

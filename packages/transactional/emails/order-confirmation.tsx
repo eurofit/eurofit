@@ -33,6 +33,7 @@ export type OrderConfirmationProps = {
     subtotal: number
     discountTotal: number
     deliveryFee: number
+    fulfillmentType: "delivery" | "pickup"
   }
   orderUrl: string
   siteUrl: string
@@ -43,6 +44,7 @@ export default function OrderConfirmation({
   orderUrl,
   siteUrl,
 }: OrderConfirmationProps) {
+  const isPickup = order.fulfillmentType === "pickup"
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Order",
@@ -260,11 +262,15 @@ export default function OrderConfirmation({
 
                 <Row className="mt-1">
                   <Column>
-                    <Text className="mt-0 py-0">Delivery Fee</Text>
+                    <Text className="mt-0 py-0">
+                      {isPickup ? "Store Pickup" : "Delivery Fee"}
+                    </Text>
                   </Column>
                   <Column align="right">
                     <Text className="mt-0 py-0">
-                      Ksh {order.deliveryFee.toLocaleString()}
+                      {isPickup
+                        ? "Free"
+                        : `Ksh ${order.deliveryFee.toLocaleString()}`}
                     </Text>
                   </Column>
                 </Row>
@@ -529,5 +535,6 @@ OrderConfirmation.PreviewProps = {
     subtotal: 52012,
     discountTotal: 3000,
     deliveryFee: 400,
+    fulfillmentType: "delivery",
   },
 }
