@@ -2,6 +2,7 @@ import { site } from "@/const/site"
 import { slugify } from "@/lib/utils/slugify"
 import config from "@payload-config"
 import { cacheLife, cacheTag } from "next/cache"
+import Image from "next/image"
 import Link from "next/link"
 import { getPayload } from "payload"
 import CurrentYear from "./current-year"
@@ -49,13 +50,17 @@ function MastercardIcon() {
 function MPesaIcon() {
   return (
     <div
-      className="flex h-8 w-16 items-center justify-center rounded-md border border-[#60BB46]/40 bg-white"
+      className="flex h-8 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-black"
       role="img"
       aria-label="M-PESA"
     >
-      <span className="text-[10px] font-black tracking-wider text-[#60BB46]">
-        M-PESA
-      </span>
+      <Image
+        src="/logos/mpesa.png"
+        alt="M-PESA"
+        width={56}
+        height={28}
+        className="h-full w-full object-contain"
+      />
     </div>
   )
 }
@@ -63,7 +68,7 @@ function MPesaIcon() {
 function BankTransferIcon() {
   return (
     <div
-      className="flex h-8 w-20 items-center justify-center gap-1 rounded-md border border-border bg-background"
+      className="flex h-8 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3"
       role="img"
       aria-label="Bank Transfer"
     >
@@ -189,12 +194,14 @@ export async function Footer() {
           </div>
 
           {/* Right: Payment methods */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-2">
             <span className="text-xs text-muted-foreground">We accept:</span>
-            <VisaIcon />
-            <MastercardIcon />
-            <MPesaIcon />
-            <BankTransferIcon />
+            <div className="flex flex-wrap items-center gap-2">
+              <VisaIcon />
+              <MastercardIcon />
+              <MPesaIcon />
+              <BankTransferIcon />
+            </div>
           </div>
         </div>
       </div>

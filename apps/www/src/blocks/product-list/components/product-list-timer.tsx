@@ -28,7 +28,7 @@ export function ProductListTimer({ timer }: ProductListTimerProps) {
       : `${pad(hours)}h : ${pad(minutes)}m : ${pad(seconds)}s`
 
   return (
-    <div className="text-center tracking-tight">
+    <div className="tracking-tight">
       <span>Time Left: </span>
       <span className="font-bold tabular-nums">{timeString}</span>
     </div>
