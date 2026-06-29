@@ -1,4 +1,3 @@
-import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { JsonLd } from "@/components/json-ld"
 import { localBusiness, organization, website } from "@/const/json-ld"
 import { site } from "@/const/site"
@@ -12,7 +11,6 @@ import { Toaster } from "@eurofit/ui/components//sonner"
 import "@eurofit/ui/globals.css"
 import { GoogleTagManager } from "@next/third-parties/google"
 import type { Metadata, Viewport } from "next"
-import { headers } from "next/headers"
 import NextTopLoader from "nextjs-toploader"
 
 export const metadata: Metadata = {
@@ -47,19 +45,15 @@ export const viewport: Viewport = {
   themeColor: "#FFFFFF",
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   const gtmId = env.NEXT_PUBLIC_GTM_ID
-  const [user, nonce] = await Promise.all([
-    getCurrentUser(),
-    headers().then((h) => h.get("x-nonce") ?? undefined),
-  ])
   return (
     <html lang="en" className="scrollbar-gutter-stable">
-      <GoogleTagManager gtmId={gtmId} nonce={nonce} />
+      <GoogleTagManager gtmId={gtmId} />
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
         {/* <!-- Google Tag Manager (noscript) --> */}
         <noscript>
@@ -89,9 +83,7 @@ export default async function RootLayout({
         />
         <JotaiProvider>
           <ReactQueryProvider>
-            <CurrentUserProvider userId={user?.id ?? null}>
-              {children}
-            </CurrentUserProvider>
+            <CurrentUserProvider>{children}</CurrentUserProvider>
           </ReactQueryProvider>
         </JotaiProvider>
       </body>
