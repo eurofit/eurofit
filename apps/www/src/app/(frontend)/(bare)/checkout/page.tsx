@@ -8,6 +8,8 @@ import {
 } from "@/components/checkout/stepper"
 import { redirect } from "next/navigation"
 
+export const dynamic = "force-dynamic"
+
 export default async function CheckoutPage() {
   const user = await getCurrentUser()
 
