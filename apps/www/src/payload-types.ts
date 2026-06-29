@@ -266,6 +266,8 @@ export interface ProductListBlock {
     headerFg?: string | null;
     contentBg?: string | null;
     contentFg?: string | null;
+    cardBg?: string | null;
+    cardFg?: string | null;
   };
   id?: string | null;
   blockName?: string | null;

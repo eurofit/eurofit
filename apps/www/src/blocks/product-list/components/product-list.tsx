@@ -69,9 +69,14 @@ export function ProductList({
           </div>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-3 py-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid gap-3 py-2 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
         {formattedVariants.map((variant) => (
-          <ProductCard key={variant.id} variant={variant} />
+          <ProductCard
+            key={variant.id}
+            variant={variant}
+            cardBg={styles?.cardBg ?? undefined}
+            cardFg={styles?.cardFg ?? undefined}
+          />
         ))}
       </div>
     </section>
@@ -103,9 +108,11 @@ function resolveCardImage(variant: ProductVariant): string | null {
 
 type ProductCardProps = {
   variant: ProductVariant
+  cardBg?: string
+  cardFg?: string
 }
 
-function ProductCard({ variant }: ProductCardProps) {
+function ProductCard({ variant, cardBg, cardFg }: ProductCardProps) {
   const { slug, title, retailPrice } = variant
   const image = resolveCardImage(variant)
   const discount = normalizeVariantDiscount(variant.discount)
@@ -114,6 +121,10 @@ function ProductCard({ variant }: ProductCardProps) {
     <Link
       href={`/product-variants/${slug}`}
       className="relative space-y-2 rounded-lg bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md"
+      style={{
+        backgroundColor: cardBg,
+        color: cardFg,
+      }}
     >
       <AspectRatio
         ratio={4 / 3}
