@@ -128,7 +128,10 @@ function ProductCard({ variant, cardBg, cardFg }: ProductCardProps) {
     >
       <AspectRatio
         ratio={4 / 3}
-        className="flex items-center justify-center rounded-t-lg bg-white"
+        className="flex items-center justify-center rounded-t-lg"
+        style={{
+          background: cardBg ?? "white",
+        }}
       >
         {image ? (
           <Image
