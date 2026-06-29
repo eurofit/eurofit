@@ -9,6 +9,7 @@ import {
   CART_MUTATION_SCOPE,
   CART_QUERY_KEY,
 } from "@/const/cart"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { sendAddToCartEvent } from "@/lib/analytics/ecommerce/add-to-cart"
 import { sendRemoveFromCartEvent } from "@/lib/analytics/ecommerce/remove-from-cart"
 import { fetchCart } from "@/lib/api/cart/get-cart"
@@ -55,6 +56,7 @@ function formatLine(cart: Cart | null, productVariantId: string) {
  */
 export function useCart() {
   const queryClient = useQueryClient()
+  const userId = useCurrentUserId()
 
   const {
     data: cart = null,
@@ -127,7 +129,7 @@ export function useCart() {
     onSuccess: (updatedCart, { productVariantId, quantity }) => {
       const line = formatLine(updatedCart, productVariantId)
       if (!line) return
-      sendAddToCartEvent({ items: [{ ...line, quantity }] })
+      sendAddToCartEvent({ items: [{ ...line, quantity }], userId })
     },
   })
 
@@ -152,9 +154,12 @@ export function useCart() {
       if (!line) return
       const delta = quantity - line.quantity
       if (delta > 0) {
-        sendAddToCartEvent({ items: [{ ...line, quantity: delta }] })
+        sendAddToCartEvent({ items: [{ ...line, quantity: delta }], userId })
       } else if (delta < 0) {
-        sendRemoveFromCartEvent({ items: [{ ...line, quantity: -delta }] })
+        sendRemoveFromCartEvent({
+          items: [{ ...line, quantity: -delta }],
+          userId,
+        })
       }
     },
   })
@@ -170,7 +175,7 @@ export function useCart() {
     onSuccess: (_updatedCart, productVariantId, context) => {
       const line = formatLine(context?.previousCart ?? null, productVariantId)
       if (!line) return
-      sendRemoveFromCartEvent({ items: [line] })
+      sendRemoveFromCartEvent({ items: [line], userId })
     },
   })
 

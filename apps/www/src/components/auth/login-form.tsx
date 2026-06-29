@@ -61,7 +61,7 @@ export function LoginForm({
       sendGTMEvent({
         event: "login",
         method: "email",
-        user_id: user.id,
+        user: { id: user.id },
       })
     },
     onError: (error: unknown) => {

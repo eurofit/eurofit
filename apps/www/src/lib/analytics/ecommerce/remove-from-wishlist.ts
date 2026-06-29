@@ -12,17 +12,22 @@ import {
 
 type SendRemoveFromWishlistEventInput = {
   item: GTMItem
+  userId?: string | null
 }
 
 export function sendRemoveFromWishlistEvent({
   item,
+  userId,
 }: SendRemoveFromWishlistEventInput): void {
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.REMOVE_FROM_WISHLIST,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMItemsValue([item]),
-      items: [item],
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.REMOVE_FROM_WISHLIST,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value: toGTMItemsValue([item]),
+        items: [item],
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

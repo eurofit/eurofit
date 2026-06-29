@@ -12,17 +12,22 @@ import {
 
 type SendAddToWishlistEventInput = {
   item: GTMItem
+  userId?: string | null
 }
 
 export function sendAddToWishlistEvent({
   item,
+  userId,
 }: SendAddToWishlistEventInput): void {
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.ADD_TO_WISHLIST,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMItemsValue([item]),
-      items: [item],
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.ADD_TO_WISHLIST,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value: toGTMItemsValue([item]),
+        items: [item],
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

@@ -95,6 +95,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {gtmItems.length > 0 && (
         <GTMEventTracker
           ecommerce
+          userData={{ id: user?.id ?? undefined }}
           event={{
             event: GTM_ECOMMERCE_EVENT.VIEW_ITEM_LIST,
             ecommerce: {

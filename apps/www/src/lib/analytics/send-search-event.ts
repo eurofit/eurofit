@@ -4,6 +4,7 @@ import { sendGTMEvent } from "@next/third-parties/google"
 
 type SendSearchEventInput = {
   searchTerm: string
+  userId?: string | null
 }
 
 /**
@@ -11,12 +12,16 @@ type SendSearchEventInput = {
  * pushed directly via `sendGTMEvent` rather than `sendGTMEcommerceEvent`.
  * No-ops on an empty term.
  */
-export function sendSearchEvent({ searchTerm }: SendSearchEventInput): void {
+export function sendSearchEvent({
+  searchTerm,
+  userId,
+}: SendSearchEventInput): void {
   const term = searchTerm.trim()
   if (!term) return
 
   sendGTMEvent({
     event: "search",
     search_term: term,
+    user: { id: userId ?? undefined },
   })
 }

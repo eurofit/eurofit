@@ -34,7 +34,7 @@ export function NotifyMeButton({
         return
       }
       if (result.data.isCreated && analytics) {
-        sendNotifyMeEvent(analytics)
+        sendNotifyMeEvent(analytics, userId)
       }
       toast.success("You will be notified when the product is back in stock!")
       setIsRequested(result.data.isCreated)

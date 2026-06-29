@@ -14,19 +14,24 @@ import type { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 type SendBeginCheckoutEventInput = {
   items: FormattedCartItem[]
   value: number
+  userId?: string | null
 }
 
 /** Fires the GA4 `begin_checkout` event when the user advances past cart review. */
 export function sendBeginCheckoutEvent({
   items,
   value,
+  userId,
 }: SendBeginCheckoutEventInput): void {
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.BEGIN_CHECKOUT,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value,
-      items: toGTMItems(items.map(formattedCartItemToGTMInput)),
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.BEGIN_CHECKOUT,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value,
+        items: toGTMItems(items.map(formattedCartItemToGTMInput)),
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

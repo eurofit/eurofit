@@ -15,6 +15,7 @@ import type { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 type SendAddToCartEventInput = {
   /** The lines added, each with `quantity` set to the amount added (the delta). */
   items: FormattedCartItem[]
+  userId?: string | null
 }
 
 /**
@@ -22,17 +23,23 @@ type SendAddToCartEventInput = {
  * added (the delta), not the resulting line total, so the reported `value`
  * reflects only what was added.
  */
-export function sendAddToCartEvent({ items }: SendAddToCartEventInput): void {
+export function sendAddToCartEvent({
+  items,
+  userId,
+}: SendAddToCartEventInput): void {
   if (items.length === 0) return
 
   const gtmItems = toGTMItems(items.map(formattedCartItemToGTMInput))
 
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.ADD_TO_CART,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMItemsValue(gtmItems),
-      items: gtmItems,
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.ADD_TO_CART,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value: toGTMItemsValue(gtmItems),
+        items: gtmItems,
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

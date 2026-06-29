@@ -1,6 +1,8 @@
+import { getCurrentUser } from "@/actions/auth/get-current-user"
 import { JsonLd } from "@/components/json-ld"
 import { localBusiness, organization, website } from "@/const/json-ld"
 import { site } from "@/const/site"
+import { CurrentUserProvider } from "@/contexts/current-user-context"
 import { env } from "@/env.mjs"
 import { dmSans } from "@/fonts/dm-sans"
 import { montserrat } from "@/fonts/montserrat"
@@ -51,7 +53,10 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const gtmId = env.NEXT_PUBLIC_GTM_ID
-  const nonce = (await headers()).get("x-nonce") ?? undefined
+  const [user, nonce] = await Promise.all([
+    getCurrentUser(),
+    headers().then((h) => h.get("x-nonce") ?? undefined),
+  ])
   return (
     <html lang="en" className="scrollbar-gutter-stable">
       <GoogleTagManager gtmId={gtmId} nonce={nonce} />
@@ -83,7 +88,11 @@ export default async function RootLayout({
           speed={200}
         />
         <JotaiProvider>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <CurrentUserProvider userId={user?.id ?? null}>
+              {children}
+            </CurrentUserProvider>
+          </ReactQueryProvider>
         </JotaiProvider>
       </body>
     </html>

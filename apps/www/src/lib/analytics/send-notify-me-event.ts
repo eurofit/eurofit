@@ -11,14 +11,20 @@ import {
   type GTMItemInput,
 } from "@/lib/analytics/ecommerce/to-gtm-item"
 
-export function sendNotifyMeEvent(input: GTMItemInput): void {
+export function sendNotifyMeEvent(
+  input: GTMItemInput,
+  userId?: string | null
+): void {
   const item = toGTMItem(input)
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.NOTIFY_ME,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMItemsValue([item]),
-      items: [item],
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.NOTIFY_ME,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value: toGTMItemsValue([item]),
+        items: [item],
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

@@ -16,19 +16,24 @@ const SHIPPING_TIER = "Standard Delivery"
 type SendAddShippingInfoEventInput = {
   items: FormattedCartItem[]
   value: number
+  userId?: string | null
 }
 
 export function sendAddShippingInfoEvent({
   items,
   value,
+  userId,
 }: SendAddShippingInfoEventInput): void {
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.ADD_SHIPPING_INFO,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value,
-      shipping_tier: SHIPPING_TIER,
-      items: toGTMItems(items.map(formattedCartItemToGTMInput)),
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.ADD_SHIPPING_INFO,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value,
+        shipping_tier: SHIPPING_TIER,
+        items: toGTMItems(items.map(formattedCartItemToGTMInput)),
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

@@ -77,6 +77,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
       <GTMEventTracker
         ecommerce
         userData={{
+          id: user.id,
           email: user.email,
           is_new_customer: isCustomerNew,
           customer_lifetime_value: clv,

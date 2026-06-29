@@ -1,5 +1,6 @@
 "use client"
 
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { useCart } from "@/hooks/use-cart"
 import { sendViewCartEvent } from "@/lib/analytics/ecommerce/view-cart"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
@@ -32,6 +33,7 @@ import { CartItem } from "./cart-item"
 export function Cart() {
   const { items, total, discountTotal, itemCount, isEmpty, isMutating } =
     useCart()
+  const userId = useCurrentUserId()
   const hasDiscount = discountTotal > 0
   const payableSubtotal = total - discountTotal
 
@@ -39,7 +41,7 @@ export function Cart() {
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen || isEmpty) return
 
-    sendViewCartEvent({ items, value: payableSubtotal })
+    sendViewCartEvent({ items, value: payableSubtotal, userId })
   }
 
   return (
