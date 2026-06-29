@@ -55,12 +55,13 @@ export function LoginForm({
       if (!result.success) throw new Error(result.message)
       return result.data
     },
-    onSuccess: () => {
+    onSuccess: ({ user }) => {
       router.push(isSafeRedirect(next) ? next : "/")
 
       sendGTMEvent({
         event: "login",
         method: "email",
+        user_id: user.id,
       })
     },
     onError: (error: unknown) => {
