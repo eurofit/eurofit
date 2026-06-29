@@ -10,6 +10,7 @@ import { Toaster } from "@eurofit/ui/components//sonner"
 import "@eurofit/ui/globals.css"
 import { GoogleTagManager } from "@next/third-parties/google"
 import type { Metadata, Viewport } from "next"
+import { headers } from "next/headers"
 import NextTopLoader from "nextjs-toploader"
 
 export const metadata: Metadata = {
@@ -44,15 +45,16 @@ export const viewport: Viewport = {
   themeColor: "#FFFFFF",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   const gtmId = env.NEXT_PUBLIC_GTM_ID
+  const nonce = (await headers()).get("x-nonce") ?? undefined
   return (
     <html lang="en" className="scrollbar-gutter-stable">
-      <GoogleTagManager gtmId={gtmId} />
+      <GoogleTagManager gtmId={gtmId} nonce={nonce} />
       <body className={`${dmSans.variable} ${montserrat.variable} antialiased`}>
         {/* <!-- Google Tag Manager (noscript) --> */}
         <noscript>
