@@ -70,20 +70,25 @@ export const productList: Block = {
       type: "group",
       fields: [
         {
-          name: "headerBg",
-          type: "text",
+          type: "row",
+          fields: [
+            { name: "headerBg", type: "text", label: "Header Background" },
+            { name: "headerFg", type: "text", label: "Header Foreground" },
+          ],
         },
         {
-          name: "headerFg",
-          type: "text",
+          type: "row",
+          fields: [
+            { name: "contentBg", type: "text", label: "Content Background" },
+            { name: "contentFg", type: "text", label: "Content Foreground" },
+          ],
         },
         {
-          name: "contentBg",
-          type: "text",
-        },
-        {
-          name: "contentFg",
-          type: "text",
+          type: "row",
+          fields: [
+            { name: "cardBg", type: "text", label: "Card Background" },
+            { name: "cardFg", type: "text", label: "Card Foreground" },
+          ],
         },
       ],
     },
