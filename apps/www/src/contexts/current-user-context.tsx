@@ -1,5 +1,7 @@
 "use client"
 
+import { payloadSDK } from "@/payload-sdk"
+import { PayloadSDKError } from "@payloadcms/sdk"
 import { useQuery } from "@tanstack/react-query"
 import * as React from "react"
 
@@ -13,10 +15,14 @@ export function CurrentUserProvider({
   const { data: userId = null } = useQuery<string | null>({
     queryKey: ["current-user-id"],
     queryFn: async () => {
-      const res = await fetch("/api/me")
-      if (!res.ok) return null
-      const data = (await res.json()) as { id: string | null }
-      return data.id
+      try {
+        const { user } = await payloadSDK.me({ collection: "users" })
+        return user?.id ?? null
+      } catch (error) {
+        if (error instanceof PayloadSDKError && error.status === 401)
+          return null
+        return null
+      }
     },
     staleTime: 1000 * 60 * 5,
   })
