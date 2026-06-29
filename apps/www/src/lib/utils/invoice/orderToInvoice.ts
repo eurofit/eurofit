@@ -2,14 +2,17 @@ import { Invoice, invoiceSchema } from "@/lib/schemas/invoice"
 import { Order } from "@/payload-types"
 
 export function orderToInvoice(order: Order): Invoice | null {
-  if (
-    typeof order.deliveryAddress !== "object" ||
-    order.deliveryAddress === null
-  ) {
+  if (typeof order.user !== "object" || order.user === null) {
     return null
   }
 
-  if (typeof order.user !== "object" || order.user === null) {
+  const isPickup = order.fulfillmentType === "pickup"
+
+  if (
+    !isPickup &&
+    (typeof order.deliveryAddress !== "object" ||
+      order.deliveryAddress === null)
+  ) {
     return null
   }
 
@@ -62,7 +65,8 @@ export function orderToInvoice(order: Order): Invoice | null {
     date: order.createdAt,
     dueDate: order.createdAt,
     status: order.paymentStatus,
-    shippingAddress: order.deliveryAddress,
+    isPickup,
+    shippingAddress: isPickup ? undefined : order.deliveryAddress,
     items,
     total: order.total,
     subtotal,

@@ -36,3 +36,13 @@ export const paymentStatus = [
 export const paymentStatusMap = new Map(
   paymentStatus.map((status) => [status.value, status])
 )
+
+// answers: "How does the customer receive the order?"
+export const fulfillmentType = [
+  { label: "Delivery", value: "delivery" as const },
+  { label: "Store Pickup", value: "pickup" as const },
+]
+
+export const fulfillmentTypeMap = new Map(
+  fulfillmentType.map((type) => [type.value, type])
+)

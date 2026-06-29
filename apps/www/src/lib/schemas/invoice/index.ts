@@ -17,7 +17,9 @@ export const invoiceSchema = z.object({
   date: z.string(),
   dueDate: z.string(),
   status: z.string(),
-  shippingAddress: addressSchema.omit({ isDefault: true }),
+  /** Undefined for store-pickup orders; the invoice shows pickup location instead. */
+  shippingAddress: addressSchema.omit({ isDefault: true }).optional(),
+  isPickup: z.boolean().optional(),
   items: z.array(
     orderItemSnapShotSchema
       .omit({ product: true })

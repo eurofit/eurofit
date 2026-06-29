@@ -7,5 +7,6 @@ export const orderSnapShotSchema = z.object({
     fullName: z.string().min(1, "User name is required"),
     email: z.email("User email must be valid"),
   }),
-  deliveryAddress: addressWithIdSchema,
+  // Store-pickup orders have no delivery address.
+  deliveryAddress: addressWithIdSchema.optional(),
 })

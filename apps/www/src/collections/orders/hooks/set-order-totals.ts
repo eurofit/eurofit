@@ -44,11 +44,14 @@ export const setOrderTotals: CollectionBeforeChangeHook<Order> = async ({
     return acc + (item.snapshot.price - effectivePrice) * item.quantity
   }, 0)
 
+  // Store-pickup orders are not delivered, so the delivery fee is waived.
+  const deliveryFee = data.fulfillmentType === "pickup" ? 0 : DELIVERY_FEE
+
   return {
     ...data,
     subtotal,
     discountTotal,
-    deliveryFee: DELIVERY_FEE,
-    total: subtotal - discountTotal + DELIVERY_FEE,
+    deliveryFee,
+    total: subtotal - discountTotal + deliveryFee,
   }
 }

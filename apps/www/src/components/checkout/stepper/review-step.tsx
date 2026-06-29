@@ -22,17 +22,24 @@ import { ChevronRight, Lock } from "lucide-react"
 import React from "react"
 import { toast } from "sonner"
 import { BackorderAvailabilityNotice } from "./backorder-availability-notice"
+import { FulfillmentMethod, FulfillmentSelector } from "./fulfillment-selector"
 import { OrderItem } from "./order-item"
 import { OrderSummary } from "./order-summary"
 import { ShippingSummary } from "./shipping-summary"
 import { Stepper, useStepper } from "./steps"
+import { StorePickupCard } from "./store-pickup-card"
 
 export function ReviewStep() {
   const stepper = useStepper()
   const address = stepper.data.get("address") as Address | undefined
   const { items, itemCount, total, discountTotal } = useCart()
   const { checkout, isCheckingout } = useCheckout()
-  const grandTotal = total - discountTotal + DELIVERY_FEE
+
+  const [fulfillmentType, setFulfillmentType] =
+    React.useState<FulfillmentMethod>("delivery")
+  const isPickup = fulfillmentType === "pickup"
+  const deliveryFee = isPickup ? 0 : DELIVERY_FEE
+  const grandTotal = total - discountTotal + deliveryFee
 
   const hasBackorderItems = items.some((i) => i.isBackorder)
   const hasInStockItems = items.some((i) => !i.isBackorder && !i.isOutOfStock)
@@ -55,7 +62,7 @@ export function ReviewStep() {
   } = useTurnstileToken()
 
   const handleCheckout = async () => {
-    if (!address) {
+    if (!isPickup && !address) {
       toast.info("Please provide delivery Address")
       return
     }
@@ -74,7 +81,8 @@ export function ReviewStep() {
             product: item.product,
           },
         })),
-        addressId: address.id,
+        fulfillmentType,
+        addressId: isPickup ? undefined : address?.id,
         shipTogether,
       },
       turnstileToken: await getToken(),
@@ -92,10 +100,19 @@ export function ReviewStep() {
         </CardHeader>
         <CardContent className="mt-4">
           <div className="space-y-6">
-            <ShippingSummary
-              address={address}
-              onChange={() => stepper.goTo("address")}
+            <FulfillmentSelector
+              value={fulfillmentType}
+              onValueChange={setFulfillmentType}
             />
+
+            {isPickup ? (
+              <StorePickupCard />
+            ) : (
+              <ShippingSummary
+                address={address}
+                onChange={() => stepper.goTo("address")}
+              />
+            )}
 
             <div className="space-y-4 rounded-md border bg-muted/50 p-4">
               <div className="flex items-center gap-2.5">
@@ -127,7 +144,7 @@ export function ReviewStep() {
               </div>
             </div>
 
-            {hasBackorderItems && address && (
+            {!isPickup && hasBackorderItems && address && (
               <BackorderAvailabilityNotice
                 city={address.city}
                 startDate={backorderStartDate}
@@ -137,7 +154,11 @@ export function ReviewStep() {
               />
             )}
 
-            <OrderSummary subtotal={total} discountTotal={discountTotal} />
+            <OrderSummary
+              subtotal={total}
+              discountTotal={discountTotal}
+              deliveryFee={deliveryFee}
+            />
           </div>
         </CardContent>
         <CardFooter className="hidden flex-col gap-2 md:flex">

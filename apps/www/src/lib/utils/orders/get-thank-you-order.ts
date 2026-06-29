@@ -24,7 +24,8 @@ type OrderDoc = NonNullable<Awaited<ReturnType<typeof fetchOrder>>>
 export type ThankYouOrderData = {
   order: OrderDoc
   formattedItems: z.infer<typeof itemSchema>[]
-  shippingAddress: z.infer<typeof addressSchema>
+  /** Undefined for store-pickup orders, which have no delivery address. */
+  shippingAddress: z.infer<typeof addressSchema> | undefined
 }
 
 async function fetchOrder(orderId: number, user: User) {
@@ -42,6 +43,7 @@ async function fetchOrder(orderId: number, user: User) {
         snapshot: true,
       },
       snapshot: true,
+      fulfillmentType: true,
       subtotal: true,
       discountTotal: true,
       deliveryFee: true,
@@ -85,9 +87,11 @@ export async function getThankYouOrder(args: {
     }))
 
     const formattedItems = z.array(itemSchema).parse(items)
-    const shippingAddress = addressSchema.parse(
-      (order.snapshot as any)?.address
-    )
+    // Store-pickup orders carry no address in their snapshot.
+    const snapshotAddress = (order.snapshot as any)?.address
+    const shippingAddress = snapshotAddress
+      ? addressSchema.parse(snapshotAddress)
+      : undefined
 
     return { order, formattedItems, shippingAddress }
   } catch (error) {
