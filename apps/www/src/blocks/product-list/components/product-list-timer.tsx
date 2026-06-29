@@ -12,13 +12,22 @@ type ProductListTimerProps = {
 export function ProductListTimer({ timer }: ProductListTimerProps) {
   const [isMounted, setIsMounted] = useState(false)
 
+  const { days, hours, minutes, seconds, isRunning, restart } = useTimer({
+    expiryTimestamp: new Date(timer),
+  })
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  const { days, hours, minutes, seconds, isRunning } = useTimer({
-    expiryTimestamp: new Date(timer),
-  })
+  // useTimer ignores expiryTimestamp changes after initialization.
+  // Manually restart whenever the deadline prop changes (e.g. after cache invalidation).
+  useEffect(() => {
+    const deadline = new Date(timer)
+    if (deadline > new Date()) {
+      restart(deadline)
+    }
+  }, [timer, restart])
 
   if (!isMounted || !isRunning) return null
 
