@@ -1,5 +1,4 @@
 import { site } from "@/const/site"
-import { STORE } from "@/const/store"
 import { APP_TIME_ZONE } from "@/const/time"
 import { Invoice } from "@/lib/schemas/invoice"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
@@ -119,11 +118,8 @@ export function InvoiceDoc({
           <View>
             <Text style={styles.sectionLabel}>Pickup Location</Text>
             <View style={styles.addressText}>
-              <Text>{STORE.name}</Text>
-              {STORE.addressLines.map((line) => (
-                <Text key={line}>{line}</Text>
-              ))}
-              <Text>{STORE.hours}</Text>
+              <Text>{site.name}</Text>
+              <Text>{site.address.fullAddress}</Text>
             </View>
           </View>
         ) : invoice.shippingAddress ? (
