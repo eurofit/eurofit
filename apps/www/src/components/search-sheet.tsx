@@ -111,7 +111,7 @@ export function SearchSheet() {
   }
 
   return (
-    <search className="md:hidden">
+    <search className="w-full md:hidden">
       <Button
         variant="secondary"
         size="lg"
