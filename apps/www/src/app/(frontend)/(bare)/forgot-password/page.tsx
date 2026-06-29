@@ -1,6 +1,7 @@
 import { ForgetPasswordForm } from "@/components/auth/forgot-password-form"
 import { Logo } from "@/components/logo"
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Forgot Password",
@@ -14,7 +15,9 @@ export default function ForgotPasswordPage() {
         <div className="flex items-center justify-center">
           <Logo className="text-xl" />
         </div>
-        <ForgetPasswordForm />
+        <Suspense>
+          <ForgetPasswordForm />
+        </Suspense>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ import { getProductVariantBySlug } from "@/lib/utils/product-variants/get-produc
 import { getProductVariantJsonLd } from "@/lib/utils/product-variants/get-product-variant-json-ld"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { Suspense } from "react"
 
 type ProductPageProps = {
   params: Promise<{
@@ -66,7 +67,9 @@ export default async function ProductVariantPage({ params }: ProductPageProps) {
   return (
     <>
       <JsonLd jsonLd={getProductVariantJsonLd(productVariant)} />
-      <ProductDetailPage product={productVariant} />
+      <Suspense>
+        <ProductDetailPage product={productVariant} />
+      </Suspense>
     </>
   )
 }
