@@ -72,14 +72,15 @@ export function ProductDetailCartActions({
 
 function PurchaseActions({ variant, inStock }: ProductDetailCartActionsProps) {
   const {
-    quantity,
+    rawInput,
+    handleRawInput,
+    handleRawInputBlur,
     isInCart,
     isDirty,
     min,
     max,
     canIncrement,
     canDecrement,
-    setQuantity,
     increment,
     decrement,
     add,
@@ -101,21 +102,16 @@ function PurchaseActions({ variant, inStock }: ProductDetailCartActionsProps) {
           </Button>
 
           <Input
-            type="number"
-            min={min}
-            max={max}
-            value={quantity}
-            onChange={(event) =>
-              setQuantity(
-                Number.isNaN(event.target.valueAsNumber)
-                  ? min
-                  : event.target.valueAsNumber
-              )
-            }
-            className="h-12 w-20 rounded-none text-center"
-            aria-label="Quantity input"
+            type="text"
             inputMode="numeric"
             pattern="[0-9]*"
+            min={min}
+            max={max}
+            value={rawInput}
+            onChange={(e) => handleRawInput(e.target.value)}
+            onBlur={handleRawInputBlur}
+            className="h-12 w-20 rounded-none text-center"
+            aria-label="Quantity input"
             placeholder="1"
           />
 
@@ -136,17 +132,17 @@ function PurchaseActions({ variant, inStock }: ProductDetailCartActionsProps) {
         className={cn("h-12 flex-1 rounded-md px-6 text-base font-semibold", {
           "bg-green-600 text-white hover:bg-green-700": isDirty,
         })}
-        disabled={isPending || !inStock}
+        disabled={isPending || !inStock || (isInCart && !isDirty)}
         onClick={() => add()}
       >
         {isPending ? (
           <Spinner />
-        ) : isDirty ? (
-          "Update"
+        ) : isInCart ? (
+          "Update Cart"
         ) : (
           <>
             <ShoppingCart className="size-5" />
-            Add to cart
+            Add to Cart
           </>
         )}
       </Button>
