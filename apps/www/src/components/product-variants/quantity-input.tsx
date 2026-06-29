@@ -15,14 +15,15 @@ type QuantityInputProps = {
 
 export function QuantityInput({ variant }: QuantityInputProps) {
   const {
-    quantity,
+    rawInput,
+    handleRawInput,
+    handleRawInputBlur,
     isInCart,
     isDirty,
     min,
     max,
     canIncrement,
     canDecrement,
-    setQuantity,
     increment,
     decrement,
     add,
@@ -44,21 +45,16 @@ export function QuantityInput({ variant }: QuantityInputProps) {
       )}
 
       <Input
-        type="number"
-        min={min}
-        max={max}
-        value={quantity}
-        onChange={(event) =>
-          setQuantity(
-            Number.isNaN(event.target.valueAsNumber)
-              ? min
-              : event.target.valueAsNumber
-          )
-        }
-        className="w-16 rounded-none bg-background text-center text-sm shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
-        aria-label="Quantity input"
+        type="text"
         inputMode="numeric"
         pattern="[0-9]*"
+        min={min}
+        max={max}
+        value={rawInput}
+        onChange={(e) => handleRawInput(e.target.value)}
+        onBlur={handleRawInputBlur}
+        className="w-16 rounded-none bg-background text-center text-sm shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+        aria-label="Quantity input"
         placeholder="1"
       />
 

@@ -38,23 +38,45 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
   const min = isInCart ? 0 : 1
 
   const [draft, setDraft] = useState(1)
+  const [rawInput, setRawInput] = useState("1")
 
   // Keep the field in step with the cart after commits and external changes, and
   // reset to a clean "add 1" once a line leaves the cart. Typing only changes
   // `draft` (not `cartQuantity`/`isInCart`), so it never refires here — that
   // divergence is exactly what `isDirty` reports.
   useEffect(() => {
-    setDraft(isInCart ? cartQuantity : 1)
+    const next = isInCart ? cartQuantity : 1
+    setDraft(next)
+    setRawInput(String(next))
   }, [cartQuantity, isInCart])
 
   // While a commit is in flight the optimistic `cartQuantity` updates a tick
   // before the sync effect copies it into `draft`; gating on `isPending` keeps
   // that lag from flashing the "Change" affordance.
   const isPending = isAddingToCart || isUpdatingQuantity || isRemovingItem
-  const isDirty = isInCart && draft !== cartQuantity && !isPending
+  const isDirty =
+    isInCart && (rawInput === "" || draft !== cartQuantity) && !isPending
   const hasQuantity = draft > 0
 
-  const setQuantity = (next: number) => setDraft(clamp(next, min, max))
+  const setQuantity = (next: number) => {
+    const clamped = clamp(next, min, max)
+    setDraft(clamped)
+    setRawInput(String(clamped))
+  }
+
+  // Accepts raw text from the input. Allows empty string as an intermediate
+  // state so users can clear-then-retype without seeing a "0" flash.
+  const handleRawInput = (val: string) => {
+    if (val !== "" && !/^\d+$/.test(val)) return
+    setRawInput(val)
+    if (val === "") return
+    const num = parseInt(val, 10)
+    if (!isNaN(num)) setDraft(clamp(num, min, max))
+  }
+
+  // Clamp rawInput to the valid draft on blur so out-of-range typed values snap
+  // back to the real quantity.
+  const handleRawInputBlur = () => setRawInput(String(draft))
 
   const commit = (next: number) =>
     setCartQuantity({ productVariantId: variant.id, quantity: next })
@@ -66,6 +88,7 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
       return
     }
     setDraft(next)
+    setRawInput(String(next))
   }
 
   const decrement = () => {
@@ -74,17 +97,22 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
       commit(next)
       return
     }
-    setDraft(clamp(next, min, max))
+    const clamped = clamp(next, min, max)
+    setDraft(clamped)
+    setRawInput(String(clamped))
   }
 
   const add = async () => {
+    // Empty input is treated as 0 when submitted (removes from cart or no-op for new adds)
+    const effectiveQuantity = rawInput === "" ? (isInCart ? 0 : 1) : draft
     if (isInCart) {
-      await commit(draft)
+      await commit(effectiveQuantity)
       return
     }
+    if (effectiveQuantity <= 0) return
     await addToCart({
       productVariantId: variant.id,
-      quantity: draft,
+      quantity: effectiveQuantity,
       optimisticItem: { productVariant: variant.id },
     })
   }
@@ -93,6 +121,9 @@ export function useCartQuantity({ variant }: UseCartQuantityInput) {
 
   return {
     quantity: draft,
+    rawInput,
+    handleRawInput,
+    handleRawInputBlur,
     hasQuantity,
     cartQuantity,
     isInCart,
