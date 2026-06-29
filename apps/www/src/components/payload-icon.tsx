@@ -17,5 +17,12 @@ export function PayloadIcon({
   if (!name) return null
   const Icon = icons[name as keyof typeof icons] as LucideIcon | undefined
   if (!Icon) return null
-  return <Icon size={size} className={className} color={fill ?? undefined} />
+  return (
+    <Icon
+      size={size}
+      className={className}
+      fill={fill ?? "none"}
+      stroke={fill ?? undefined}
+    />
+  )
 }

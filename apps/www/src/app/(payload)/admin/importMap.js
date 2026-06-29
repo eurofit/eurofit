@@ -31,6 +31,8 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { IconCell as IconCell_9fdb67fd00e3e3f62ff872c6903159bd } from '@/fields/icon/components/icon-cell'
 import { IconPicker as IconPicker_2cd1e555bebbdf8800e900e0ce9e0b07 } from '@/fields/icon/components/icon-picker'
+import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
+import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
 import { default as default_94178027dff7c51846e7ce15f8cedad8 } from '@/components/admin/font-provider'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -70,6 +72,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/fields/icon/components/icon-cell#IconCell": IconCell_9fdb67fd00e3e3f62ff872c6903159bd,
   "@/fields/icon/components/icon-picker#IconPicker": IconPicker_2cd1e555bebbdf8800e900e0ce9e0b07,
+  "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
+  "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,
   "@/components/admin/font-provider#default": default_94178027dff7c51846e7ce15f8cedad8,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
