@@ -40,7 +40,7 @@ export function ProductList({
       }}
     >
       <div
-        className="p-2 px-4"
+        className="p-2 pr-4 pl-0"
         style={{
           backgroundColor: styles?.headerBg ?? undefined,
           color: styles?.headerFg ?? undefined,
