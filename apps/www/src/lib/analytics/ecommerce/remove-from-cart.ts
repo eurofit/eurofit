@@ -15,6 +15,7 @@ import type { FormattedCartItem } from "@/lib/utils/cart/formatCartItem"
 type SendRemoveFromCartEventInput = {
   /** The lines removed, each with `quantity` set to the amount removed (the delta). */
   items: FormattedCartItem[]
+  userId?: string | null
 }
 
 /**
@@ -24,17 +25,21 @@ type SendRemoveFromCartEventInput = {
  */
 export function sendRemoveFromCartEvent({
   items,
+  userId,
 }: SendRemoveFromCartEventInput): void {
   if (items.length === 0) return
 
   const gtmItems = toGTMItems(items.map(formattedCartItemToGTMInput))
 
-  sendGTMEcommerceEvent({
-    event: GTM_ECOMMERCE_EVENT.REMOVE_FROM_CART,
-    ecommerce: {
-      currency: GTM_ECOMMERCE_CURRENCY,
-      value: toGTMItemsValue(gtmItems),
-      items: gtmItems,
+  sendGTMEcommerceEvent(
+    {
+      event: GTM_ECOMMERCE_EVENT.REMOVE_FROM_CART,
+      ecommerce: {
+        currency: GTM_ECOMMERCE_CURRENCY,
+        value: toGTMItemsValue(gtmItems),
+        items: gtmItems,
+      },
     },
-  })
+    { id: userId ?? undefined }
+  )
 }

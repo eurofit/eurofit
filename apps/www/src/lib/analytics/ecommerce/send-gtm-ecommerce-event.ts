@@ -10,6 +10,7 @@ type GTMEcommerceEventData = {
 
 /** User identity fields for GA4 Enhanced Conversions. */
 export type GTMUserData = {
+  id?: string
   email?: string
   is_new_customer?: boolean
   customer_lifetime_value?: number

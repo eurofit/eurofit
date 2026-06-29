@@ -11,7 +11,7 @@ import { getPayload, ValidationError } from "payload"
 export async function signUp(
   unsafeData: SignupData,
   turnstileToken: string
-): Promise<ActionResult<{ email: string }>> {
+): Promise<ActionResult<{ id: string; email: string }>> {
   const turnstileOk = await verifyTurnstile(
     turnstileToken,
     env.CLOUDFLARE_TURNSTILE_SECRET_KEY
@@ -44,7 +44,7 @@ export async function signUp(
       },
       draft: false,
     })
-    return { success: true, data: { email: user.email } }
+    return { success: true, data: { id: user.id, email: user.email } }
   } catch (e) {
     if (e instanceof ValidationError) {
       const hasEmailConflict = e.data?.errors?.some(

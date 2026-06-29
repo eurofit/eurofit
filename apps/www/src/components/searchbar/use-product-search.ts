@@ -1,6 +1,7 @@
 "use client"
 
 import { recentSearchesAtom } from "@/atoms/search-bar"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { sendSearchEvent } from "@/lib/analytics/send-search-event"
 import {
   SearchProductResult,
@@ -15,6 +16,7 @@ import { useDebouncedCallback } from "use-debounce"
 export function useProductSearch() {
   const searchParams = useSearchParams()
   const q = searchParams.get("q")?.toString() ?? ""
+  const userId = useCurrentUserId()
 
   const [query, setQuery] = React.useState(q)
   const trimmedQuery = query.trim()
@@ -53,7 +55,7 @@ export function useProductSearch() {
 
         if (result.query !== lastSearchTermRef.current) {
           lastSearchTermRef.current = result.query
-          sendSearchEvent({ searchTerm: result.query })
+          sendSearchEvent({ searchTerm: result.query, userId })
         }
       }
     },

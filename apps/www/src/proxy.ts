@@ -1,6 +1,65 @@
 import { ensureGuestSession } from "@/lib/utils/ensure-guest-session"
 import { type NextRequest, NextResponse } from "next/server"
 
+function generateNonce(): string {
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes))
+}
+
+function buildCsp(nonce: string): string {
+  const isDev = process.env.NODE_ENV !== "production"
+
+  const supabaseOrigin = (() => {
+    try {
+      return new URL(process.env.SUPABASE_S3_ENDPOINT ?? "").origin
+    } catch {
+      return ""
+    }
+  })()
+
+  const imgSrc = [
+    "'self'",
+    "data:",
+    "blob:",
+    supabaseOrigin,
+    "https://www.tropicanawholesale.com",
+    "https://images.unsplash.com",
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  const connectSrc = [
+    "'self'",
+    "https://*.ingest.sentry.io",
+    "https://www.google-analytics.com",
+    "https://analytics.google.com",
+    "https://stats.g.doubleclick.net",
+    "https://region1.analytics.google.com",
+    isDev ? "ws://localhost:* wss://localhost:*" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  const directives = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com`,
+    "style-src 'self' 'unsafe-inline'",
+    `img-src ${imgSrc}`,
+    "font-src 'self' data:",
+    `connect-src ${connectSrc}`,
+    "frame-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "worker-src blob:",
+    "upgrade-insecure-requests",
+  ]
+
+  return directives.join("; ")
+}
+
 const ROBOTS_TXT = `User-agent: *
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
@@ -103,7 +162,12 @@ export function proxy(req: NextRequest) {
     })
   }
 
-  const res = NextResponse.next()
+  const nonce = generateNonce()
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set("x-nonce", nonce)
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } })
+  res.headers.set("Content-Security-Policy", buildCsp(nonce))
   ensureGuestSession(req, res)
   return res
 }

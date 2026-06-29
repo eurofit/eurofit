@@ -2,6 +2,7 @@
 
 import { AddressRadioItem } from "@/components/addresses/radio-item"
 import { stepper } from "@/components/checkout/stepper/steps"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { useCart } from "@/hooks/use-cart"
 import { sendAddShippingInfoEvent } from "@/lib/analytics/ecommerce/add-shipping-info"
 import { AddressId, addressIdSchema } from "@/lib/schemas/addresses/address"
@@ -26,6 +27,7 @@ export function AddressSelector({
 }: AddressSelectorProps) {
   const stepper = useStepper()
   const { items, total } = useCart()
+  const userId = useCurrentUserId()
 
   const addressForm = useForm<AddressId>({
     resolver: zodResolver(addressIdSchema),
@@ -45,7 +47,7 @@ export function AddressSelector({
       | Address
       | undefined
     if (lastConfirmedAddress?.id !== address.id) {
-      sendAddShippingInfoEvent({ items, value: total })
+      sendAddShippingInfoEvent({ items, value: total, userId })
     }
 
     stepper.data.set("address", address)

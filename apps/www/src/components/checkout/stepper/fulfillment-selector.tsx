@@ -1,6 +1,6 @@
 "use client"
 
-import { STORE } from "@/const/store"
+import { site } from "@/const/site"
 import { Label } from "@eurofit/ui/components/label"
 import { RadioGroup, RadioGroupItem } from "@eurofit/ui/components/radio-group"
 import { Store, Truck } from "lucide-react"
@@ -72,7 +72,7 @@ export function FulfillmentSelector({
           value="pickup"
           icon={<Store className="size-4" />}
           title="Pick up at our store"
-          description={`Free — ${STORE.addressLines[0]}`}
+          description={`Free — ${site.address.line1}, ${site.address.line2}`}
         />
       </RadioGroup>
     </div>

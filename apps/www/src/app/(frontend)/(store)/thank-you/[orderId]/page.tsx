@@ -6,7 +6,7 @@ import {
   GTM_ECOMMERCE_CURRENCY,
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
-import { STORE } from "@/const/store"
+import { site } from "@/const/site"
 import { APP_TIME_ZONE } from "@/const/time"
 import { toGTMItems } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { formatWithCommas } from "@/lib/utils/format-with-commas"
@@ -77,6 +77,7 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
       <GTMEventTracker
         ecommerce
         userData={{
+          id: user.id,
           email: user.email,
           is_new_customer: isCustomerNew,
           customer_lifetime_value: clv,
@@ -256,18 +257,16 @@ export default async function ThankYouPage({ params }: ThankYouPageProps) {
                           Pick up at
                         </h3>
                         <div className="text-sm text-muted-foreground">
-                          <p className="font-medium">{STORE.name}</p>
-                          {STORE.addressLines.map((line) => (
-                            <p key={line}>{line}</p>
-                          ))}
+                          <p className="font-medium">{site.name}</p>
+                          <p>{site.address.fullAddress}</p>
                         </div>
                       </div>
                     </div>
                     <Alert>
                       <Clock />
                       <div>
-                        <AlertTitle>Store hours</AlertTitle>
-                        <p>{STORE.hours}</p>
+                        <AlertTitle>Store address</AlertTitle>
+                        <p>{site.address.fullAddress}</p>
                       </div>
                       <AlertDescription>
                         We will email you when your order is ready for

@@ -1,5 +1,6 @@
 "use client"
 
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { useCart } from "@/hooks/use-cart"
 import { sendBeginCheckoutEvent } from "@/lib/analytics/ecommerce/begin-checkout"
 import { Button } from "@eurofit/ui/components/button"
@@ -21,6 +22,7 @@ import { Stepper, useStepper } from "./steps"
 export function CartStep() {
   const stepper = useStepper()
   const { items, itemCount, isEmpty, total } = useCart()
+  const userId = useCurrentUserId()
   const didFireBeginCheckout = useRef(false)
 
   return (
@@ -75,7 +77,7 @@ export function CartStep() {
           <Button
             onClick={() => {
               if (!didFireBeginCheckout.current) {
-                sendBeginCheckoutEvent({ items, value: total })
+                sendBeginCheckoutEvent({ items, value: total, userId })
                 didFireBeginCheckout.current = true
               }
               stepper.next()

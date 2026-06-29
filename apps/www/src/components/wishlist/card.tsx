@@ -1,6 +1,7 @@
 "use client"
 
 import { toggleWishlist } from "@/actions/wishlists"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
 import { toGTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
 import { WishlistItem } from "@/types/wishlist"
@@ -18,6 +19,7 @@ type WishlistCardProps = {
 
 export function WishlistCard({ item }: WishlistCardProps) {
   const [optimisticRemoved, setOptimisticRemoved] = React.useOptimistic(false)
+  const userId = useCurrentUserId()
 
   const handleRemove = () => {
     React.startTransition(async () => {
@@ -37,6 +39,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
             variantLabel: item.title,
             categories: item.categories,
           }),
+          userId,
         })
       }
     })

@@ -5,6 +5,7 @@ import {
   useWishlistStatus,
   wishlistKeys,
 } from "@/components/product-variants/use-wishlist-status"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { sendAddToWishlistEvent } from "@/lib/analytics/ecommerce/add-to-wishlist"
 import { sendRemoveFromWishlistEvent } from "@/lib/analytics/ecommerce/remove-from-wishlist"
 import type { GTMItem } from "@/lib/analytics/ecommerce/to-gtm-item"
@@ -22,6 +23,7 @@ type WishlistButtonProps = {
 
 export function WishlistButton({ variantId, gtmItem }: WishlistButtonProps) {
   const queryClient = useQueryClient()
+  const userId = useCurrentUserId()
   const { data, isPending } = useWishlistStatus(variantId)
 
   const isWishlisted = data?.isWishlisted ?? false
@@ -55,9 +57,9 @@ export function WishlistButton({ variantId, gtmItem }: WishlistButtonProps) {
     onSuccess: (result, _variables, context) => {
       if (!result.success || !gtmItem) return
       if (context?.wasWishlisted) {
-        sendRemoveFromWishlistEvent({ item: gtmItem })
+        sendRemoveFromWishlistEvent({ item: gtmItem, userId })
       } else {
-        sendAddToWishlistEvent({ item: gtmItem })
+        sendAddToWishlistEvent({ item: gtmItem, userId })
       }
     },
     onSettled: () => {

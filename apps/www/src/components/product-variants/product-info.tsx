@@ -10,6 +10,7 @@ import {
   GTM_ECOMMERCE_EVENT,
 } from "@/const/gtm-ecommerce-events"
 import { site } from "@/const/site"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { ProductAnalyticsProvider } from "@/contexts/product-analytics-context"
 import {
   toGTMItem,
@@ -77,6 +78,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
     totalRatings,
     labels,
   } = variant
+  const userId = useCurrentUserId()
 
   const gtmItem = toGTMItem({
     sku,
@@ -99,6 +101,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
     <>
       <GTMEventTracker
         ecommerce
+        userData={{ id: userId ?? undefined }}
         event={{
           event: GTM_ECOMMERCE_EVENT.VIEW_ITEM,
           ecommerce: {
@@ -256,7 +259,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    sendShareEvent({ method: "Facebook", itemId: sku })
+                    sendShareEvent({ method: "Facebook", itemId: sku, userId })
                   }
                 >
                   <Facebook />
@@ -276,7 +279,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    sendShareEvent({ method: "Twitter", itemId: sku })
+                    sendShareEvent({ method: "Twitter", itemId: sku, userId })
                   }
                 >
                   <Twitter />
@@ -296,7 +299,7 @@ export function ProductInfo({ variant }: ProductInfoProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    sendShareEvent({ method: "WhatsApp", itemId: sku })
+                    sendShareEvent({ method: "WhatsApp", itemId: sku, userId })
                   }
                 >
                   <Whatsapp />

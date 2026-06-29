@@ -52,7 +52,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       if (!result.success) throw new Error(result.message)
       return result.data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Account created successfully!", {
         description: "Please check your email to verify your account.",
       })
@@ -61,6 +61,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       sendGTMEvent({
         event: "sign_up",
         method: "email",
+        user: { id: data.id },
       })
     },
     onError: (error) => {

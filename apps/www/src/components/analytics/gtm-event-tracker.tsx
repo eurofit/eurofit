@@ -1,5 +1,6 @@
 "use client"
 
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import type { GTMUserData } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import { sendGTMEcommerceEvent } from "@/lib/analytics/ecommerce/send-gtm-ecommerce-event"
 import { sendGTMEvent } from "@next/third-parties/google"
@@ -31,6 +32,7 @@ export function GTMEventTracker({
   ecommerce = false,
   userData,
 }: GTMEventTrackerProps) {
+  const userId = useCurrentUserId()
   const didFireRef = React.useRef(false)
 
   React.useEffect(() => {
@@ -42,10 +44,10 @@ export function GTMEventTracker({
     if (ecommerce) {
       sendGTMEcommerceEvent(
         event as Parameters<typeof sendGTMEcommerceEvent>[0],
-        userData
+        { id: userId ?? undefined, ...userData }
       )
     } else {
-      sendGTMEvent(event)
+      sendGTMEvent({ ...event, user: { id: userId ?? undefined } })
     }
     // Fire once per mount with the payload captured at mount time.
     // eslint-disable-next-line react-hooks/exhaustive-deps

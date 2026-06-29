@@ -1,6 +1,7 @@
 "use client"
 
 import { PreventScroll } from "@/components/prevent-scroll"
+import { useCurrentUserId } from "@/contexts/current-user-context"
 import { useToggle } from "@/hooks/use-toggle"
 import { sendSearchEvent } from "@/lib/analytics/send-search-event"
 import {
@@ -31,6 +32,7 @@ const SEARCH_RESULT_LIMIT = 7
 export function SearchSheet() {
   const searchParams = useSearchParams()
   const q = searchParams.get("q")?.toString() ?? ""
+  const userId = useCurrentUserId()
 
   const { value: isOpen, setOff, setOn } = useToggle(false)
 
@@ -60,7 +62,7 @@ export function SearchSheet() {
 
       if (result.query !== lastSearchTermRef.current) {
         lastSearchTermRef.current = result.query
-        sendSearchEvent({ searchTerm: result.query })
+        sendSearchEvent({ searchTerm: result.query, userId })
       }
     },
     onError: () => {
