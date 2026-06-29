@@ -52,7 +52,7 @@ export function ProductList({
             {title}
           </h2>
           <div className="hidden text-center md:block">
-            {timer && <ProductListTimer timer={timer} />}
+            {timer && <ProductListTimer key={timer} timer={timer} />}
           </div>
           <div className="flex items-center justify-end">
             {link?.href && (
@@ -65,7 +65,7 @@ export function ProductList({
         </div>
         {timer && (
           <div className="mt-1 md:hidden">
-            <ProductListTimer timer={timer} />
+            <ProductListTimer key={timer} timer={timer} />
           </div>
         )}
       </div>
